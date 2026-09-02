@@ -1,4 +1,4 @@
-# Byte-compiled / optimized / DLL files
+﻿# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *.class
@@ -9,7 +9,9 @@ __pycache__/
 env/
 venv/
 
-# Test data artifacts
+# Generated runtime outputs
+data/processed/*.pdf
+data/processed/*.png
 data_test/
 data_test_p3/
 
