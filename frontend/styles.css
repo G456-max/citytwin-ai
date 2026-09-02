@@ -1,0 +1,100 @@
+/* Unified Stylesheet for CityTwin AI */
+
+:root {
+    --brand-blue: #38bdf8;   /* Sky-400 */
+    --brand-green: #34d399;  /* Emerald-400 */
+    --brand-red: #f43f5e;    /* Rose-500 */
+}
+
+body {
+    background-color: #020617; /* Slate-950 */
+    font-family: 'Outfit', sans-serif;
+    overflow: hidden;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: #020617;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+}
+
+/* Map Dark Theme Tile Inversion Filter */
+.leaflet-container {
+    background-color: #030712 !important;
+}
+
+.leaflet-tile-pane {
+    filter: invert(100%) hue-rotate(190deg) brightness(85%) contrast(95%);
+}
+
+.leaflet-popup-content-wrapper {
+    background-color: #0c111d !important;
+    color: #f1f5f9 !important;
+    border: 1px solid rgba(2, 132, 199, 0.2) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4) !important;
+}
+
+.leaflet-popup-tip {
+    background-color: #0c111d !important;
+    border: 1px solid rgba(2, 132, 199, 0.2) !important;
+}
+
+/* Split-screen swipe slider styling */
+.slider-handle {
+    transition: background-color 0.2s, box-shadow 0.2s;
+    cursor: ew-resize;
+}
+
+.slider-handle:hover {
+    background-color: #0284c7;
+    color: #ffffff !important;
+    box-shadow: 0 0 8px rgba(2, 132, 199, 0.4);
+}
+
+/* Active Cards Alerts */
+@keyframes card-pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 6px rgba(244, 63, 94, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+    }
+}
+
+.active-card-glow {
+    border-color: rgba(244, 63, 94, 0.6) !important;
+    animation: card-pulse 1.8s infinite;
+}
+
+/* Skeleton loader layout */
+.skeleton {
+    background: linear-gradient(90deg, #0f172a 25%, #1e293b 50%, #0f172a 75%);
+    background-size: 200% 100%;
+    animation: loading 1.4s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}

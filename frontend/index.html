@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-200">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CityTwin AI - Easy Compliance Dashboard</title>
+    
+    <!-- Tailwind CSS for structural grid layout -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#1e293b',
+                            950: '#0b0f19'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Leaflet.js Mapping Layer -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <!-- Icons and Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@450;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="h-full flex flex-col font-['Outfit'] overflow-hidden bg-slate-950">
+
+    <!-- Header Navigation -->
+    <header class="flex items-center justify-between px-6 py-4 bg-slate-900 border-b border-slate-800 backdrop-blur z-35 shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-sky-600 flex items-center justify-center shadow shadow-sky-500/20">
+                <i class="fa-solid fa-tree-city text-white text-lg font-bold"></i>
+            </div>
+            <div>
+                <h1 class="text-base font-bold text-white tracking-tight">CityTwin AI</h1>
+                <p class="text-[9px] text-slate-400 font-mono tracking-widest">MUNICIPAL CORRIDOR COMPLIANCE VERIFICATION</p>
+            </div>
+        </div>
+        
+        <!-- Live System Telemetry health logs -->
+        <div class="hidden lg:flex items-center gap-6 text-[10px] font-mono bg-slate-950 px-4 py-2 rounded-lg border border-slate-800">
+            <div class="flex items-center gap-2">
+                <span id="telemetry-connection-dot" class="w-2 h-2 rounded-full bg-slate-600"></span>
+                <span class="text-slate-400">CORRIDOR DEM ENGINE:</span>
+                <span id="telemetry-connection-text" class="text-slate-300 font-bold">STARTING...</span>
+            </div>
+            <div class="w-px h-3 bg-slate-800"></div>
+            <div>
+                <span class="text-slate-400">ACCELERATION:</span>
+                <span id="telemetry-device" class="text-slate-300">Probing core diagnostics...</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Split layout -->
+    <main class="flex-1 flex overflow-hidden p-6 gap-6 max-w-[1600px] mx-auto w-full">
+        
+        <!-- LEFT PANEL: Child-Friendly Step-by-Step Control Wizard -->
+        <section class="w-80 lg:w-96 flex flex-col bg-slate-900 border border-slate-800 rounded-xl h-full shadow-sm overflow-hidden shrink-0 p-5">
+            
+            <div class="mb-5 border-b border-slate-800 pb-3">
+                <h2 class="text-sm font-bold text-white uppercase tracking-wider">How to use CityTwin AI:</h2>
+                <p class="text-xs text-slate-400 mt-1">Follow the steps below to inspect the corridor.</p>
+            </div>
+
+            <!-- Step-by-Step Buttons Container -->
+            <div class="flex-1 flex flex-col justify-start gap-5 overflow-y-auto">
+                
+                <!-- STEP 1: Find Encroachments -->
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-850 flex flex-col gap-2">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-sky-500 font-mono">🔍 Step 1</span>
+                    <button id="btn-step1-audit" class="w-full flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-lg transition text-xs shadow">
+                        Find Encroachments
+                    </button>
+                    <p class="text-[11px] text-slate-400 leading-relaxed text-center">
+                        Checks if any houses, walls, or fences are blocking the highway.
+                    </p>
+                </div>
+
+                <!-- STEP 2: Paint Future Road -->
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-850 flex flex-col gap-2">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-sky-500 font-mono">🎨 Step 2</span>
+                    
+                    <div class="flex gap-2">
+                        <select id="select-style-preset" class="bg-slate-900 border border-slate-800 text-[11px] text-slate-350 px-2 py-2 rounded-lg focus:outline-none focus:border-sky-500 transition flex-1">
+                            <option value="Realistic Daylight">Realistic Daylight</option>
+                            <option value="Nighttime Illumination">Nighttime Illumination</option>
+                            <option value="Monsoon Weather">Monsoon Weather</option>
+                            <option value="Eco-Green Corridor">Eco-Green Corridor</option>
+                        </select>
+                        <button id="btn-step2-render" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition shadow">
+                            Paint Future Road
+                        </button>
+                    </div>
+                    
+                    <p class="text-[11px] text-slate-400 leading-relaxed text-center">
+                        Paints a photorealistic preview of the highway widening based on your style choice.
+                    </p>
+                </div>
+
+                <!-- STEP 3: Download PDF Report -->
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-850 flex flex-col gap-2">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-500 font-mono">📄 Step 3</span>
+                    <button id="btn-step3-pdf" class="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg transition text-xs shadow">
+                        Download PDF Report
+                    </button>
+                    <p class="text-[11px] text-slate-400 leading-relaxed text-center">
+                        Downloads a formal print-ready certificate containing compliance scores.
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- Lower footer metadata -->
+            <div class="border-t border-slate-800 pt-3 mt-4 flex items-center justify-between shrink-0">
+                <button id="btn-export-json" class="flex items-center gap-1.5 text-[10px] text-slate-400 hover:text-white transition">
+                    <i class="fa-solid fa-file-export text-sky-500"></i> Export JSON
+                </button>
+                <span class="text-[9px] font-mono text-slate-500">v3.0.0 (Localhost)</span>
+            </div>
+
+        </section>
+
+        <!-- RIGHT VIEWPORT: Progressive Viewports Panel (Shows only 1 viewport at a time) -->
+        <section class="flex-1 flex flex-col min-w-0 bg-slate-900 border border-slate-800 rounded-xl h-full shadow-sm overflow-hidden relative">
+            
+            <!-- VIEWPORT A: Friendly Welcome Card (Default Startup View) -->
+            <div id="viewport-welcome" class="w-full h-full flex flex-col items-center justify-center p-12 text-center">
+                <div class="w-20 h-20 rounded-full bg-slate-950 flex items-center justify-center border border-slate-850 mb-6 shadow-inner">
+                    <i class="fa-solid fa-compass-drafting text-4xl text-sky-500 animate-pulse"></i>
+                </div>
+                <h2 class="text-xl font-bold text-white tracking-tight">Welcome to CityTwin AI!</h2>
+                <p class="text-xs text-slate-400 max-w-sm mt-2 leading-relaxed">
+                    This compliance engine lets you inspect the Godavari highway corridor in Rajamahendravaram.
+                </p>
+                <div class="mt-8 bg-slate-950/40 p-4 rounded-xl border border-slate-850 max-w-sm text-left">
+                    <span class="text-[9px] uppercase tracking-wider font-bold text-sky-500 block mb-2 font-mono">Quick Start Guide:</span>
+                    <ol class="text-[11px] text-slate-350 space-y-2 list-decimal list-inside leading-relaxed">
+                        <li>Click <b class="text-slate-200">Step 1</b> to see building encroachments on the Map.</li>
+                        <li>Click <b class="text-slate-200">Step 2</b> to load the comparative design slider.</li>
+                        <li>Click <b class="text-slate-200">Step 3</b> to save the formal municipal compliance report PDF.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- VIEWPORT B: Step 1 Compliance Map Layout (Hidden initially) -->
+            <div id="viewport-map" class="w-full h-full flex flex-col hidden">
+                
+                <!-- Map Top Panel Bar -->
+                <div class="px-5 py-3.5 border-b border-slate-800 bg-slate-950/20 flex flex-wrap justify-between items-center gap-3 shrink-0">
+                    <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                        <h4 class="text-xs font-bold text-white">Geospatial Compliance Boundary Map</h4>
+                    </div>
+                    
+                    <!-- Scorecard overlays -->
+                    <div class="flex items-center gap-4 text-[10px] font-mono">
+                        <div class="bg-slate-950 px-2.5 py-1.5 rounded border border-slate-850">
+                            <span class="text-slate-500 mr-1.5">Grade:</span>
+                            <span id="compliance-grade-text" class="text-slate-200 font-bold">--</span>
+                        </div>
+                        <div class="bg-slate-950 px-2.5 py-1.5 rounded border border-slate-850">
+                            <span class="text-slate-500 mr-1.5">Violations:</span>
+                            <span id="compliance-violations-count" class="text-slate-200 font-bold">--</span>
+                        </div>
+                        <div class="bg-slate-950 px-2.5 py-1.5 rounded border border-slate-850">
+                            <span class="text-slate-500 mr-1.5">Encroachment Area:</span>
+                            <span id="compliance-area-total" class="text-rose-500 font-bold">0.00 m²</span>
+                        </div>
+                        <div class="bg-slate-950 px-2.5 py-1.5 rounded border border-slate-850">
+                            <span class="text-slate-500 mr-1.5">Canopy Clearing:</span>
+                            <span id="compliance-tree-total" class="text-emerald-400 font-bold">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Map Viewport Split (Map + Sidebar logs side-by-side) -->
+                <div class="flex-1 flex min-h-0 relative overflow-hidden">
+                    
+                    <!-- The Interactive Map frame -->
+                    <div id="map" class="flex-1 h-full"></div>
+                    
+                    <!-- Sidebar log inside the map view -->
+                    <div class="w-72 border-l border-slate-800 flex flex-col min-h-0 bg-slate-950/20 shrink-0">
+                        <div class="p-3 border-b border-slate-800 bg-slate-950/40 text-[10px] uppercase font-bold text-slate-400">
+                            Audit Triage Cards
+                        </div>
+                        <div class="flex-1 overflow-y-auto p-3 space-y-2.5" id="audit-triage-container">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- VIEWPORT C: Step 2 Split-screen Visualizer Layout (Hidden initially) -->
+            <div id="viewport-slider" class="w-full h-full flex flex-col hidden p-6 relative flex justify-center items-center">
+                
+                <!-- Rendering Latency Info overlay -->
+                <div class="absolute bottom-4 left-6 z-10 text-[10px] font-mono text-slate-400" id="render-latency-text">
+                    Choose styling parameters to render georeferenced texture overlays.
+                </div>
+
+                <!-- Draggable Comparative Wipe Slider frame -->
+                <div class="w-full h-full max-h-[460px] relative rounded-xl overflow-hidden border border-slate-800 shadow-inner flex items-center justify-center select-none" id="visual-slider-container">
+                    
+                    <!-- Background layer (Drone Baseline View) -->
+                    <div class="absolute inset-0 w-full h-full">
+                        <img id="img-drone-feed" src="" alt="Drone base orthomosaic" class="w-full h-full object-cover">
+                        <div class="absolute bottom-3 left-3 z-10 bg-slate-950/80 backdrop-blur border border-slate-800 text-[9px] font-mono px-2 py-0.5 rounded text-emerald-400">
+                            BASELINE: DRONE AERIAL REALITY
+                        </div>
+                    </div>
+                    
+                    <!-- Foreground layer (ControlNet styled CAD view) -->
+                    <div class="absolute inset-0 w-full h-full overflow-hidden" id="comparison-slider-overlay" style="width: 50%;">
+                        <div class="absolute inset-0 w-[512px] h-[512px] md:w-full md:h-full">
+                            <img id="img-controlnet-render" src="" alt="ControlNet styled CAD view" class="w-full h-full object-cover max-w-none">
+                        </div>
+                        <div class="absolute bottom-3 right-3 z-10 bg-slate-950/80 backdrop-blur border border-slate-800 text-[9px] font-mono px-2 py-0.5 rounded text-sky-400">
+                            SYNTHESIZED: GEOMETRY-LOCKED TEXTURING
+                        </div>
+                    </div>
+                    
+                    <!-- Wipe divider line -->
+                    <div class="absolute top-0 bottom-0 w-0.5 bg-sky-500/80 cursor-ew-resize flex items-center justify-center z-20" id="comparison-slider-handle" style="left: 50%;">
+                        <div class="w-7 h-7 rounded-full bg-slate-900 border border-sky-500 shadow-md flex items-center justify-center text-sky-400 text-[10px] slider-handle">
+                            <i class="fa-solid fa-left-right"></i>
+                        </div>
+                    </div>
+
+                    <!-- Loader overlay -->
+                    <div id="render-loader" class="absolute inset-0 bg-slate-950/95 z-30 flex flex-col items-center justify-center gap-3 opacity-0 pointer-events-none transition-opacity">
+                        <i class="fa-solid fa-spinner fa-spin text-xl text-sky-500"></i>
+                        <span class="text-xs font-mono text-slate-450">Loading ControlNet parameters & normalizing raw depth raster...</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Statically serving JS -->
+    <script src="/static/app.js"></script>
+</body>
+</html>

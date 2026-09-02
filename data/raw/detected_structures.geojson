@@ -1,0 +1,10 @@
+{
+"type": "FeatureCollection",
+"name": "detected_structures",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "id": "BUILDING_001", "name": "Compliant Commercial Plaza" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 80.3248, 26.4716 ], [ 80.325, 26.4716 ], [ 80.325, 26.4718 ], [ 80.3248, 26.4718 ], [ 80.3248, 26.4716 ] ] ] } },
+{ "type": "Feature", "properties": { "id": "BUILDING_002", "name": "Illegal Shop Extension" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 80.3259, 26.4718 ], [ 80.3262, 26.4718 ], [ 80.3262, 26.47195 ], [ 80.3259, 26.47195 ], [ 80.3259, 26.4718 ] ] ] } },
+{ "type": "Feature", "properties": { "id": "BUILDING_003", "name": "Residential Boundary Wall" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 80.32645, 26.4725 ], [ 80.3267, 26.4725 ], [ 80.3267, 26.4727 ], [ 80.32645, 26.4727 ], [ 80.32645, 26.4725 ] ] ] } }
+]
+}
