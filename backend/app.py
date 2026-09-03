@@ -9,7 +9,7 @@ from fastapi.responses import HTMLResponse, FileResponse, StreamingResponse
 from pathlib import Path
 from typing import Optional
 
-from backend.schemas import SystemHealthResponse, AuditResponse, RenderRequest, RenderResponse
+from backend.schemas import SystemHealthResponse, AuditResponse, RenderRequest, RenderResponse, DynamicAuditRequest, DynamicAuditResponse
 from backend.config import BASE_DIR, RAW_DIR, PROCESSED_DIR
 
 # Import Core Engines
@@ -17,6 +17,7 @@ from backend.ingestion.raster_handler import OrthomosaicHandler
 from backend.audit.segmentation_engine import GeospatialSegmentationEngine
 from backend.audit.discrepancy_engine import CorridorDiscrepancyAuditor
 from backend.audit.tree_canopy_audit import TreeCanopyAuditor
+from backend.audit.dynamic_auditor import DynamicCorridorAuditor
 from backend.visualizer.controlnet_engine import BlueprintLockedVisualizer, HAS_DIFFUSERS
 from backend.reports.pdf_generator import CompliancePDFGenerator
 
@@ -141,6 +142,24 @@ def run_compliance_audit():
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Compliance audit pipeline error: {str(e)}")
+
+# -------------------------------------------------------------------------
+# 2B. Universal Dynamic Spatial Audit Route (Any GPS Coordinate on Earth)
+# -------------------------------------------------------------------------
+@app.post("/api/audit/dynamic", response_model=DynamicAuditResponse)
+def run_dynamic_audit(request: DynamicAuditRequest):
+    """Universally executes a high-precision deterministic spatial audit on ANY coordinate on Earth."""
+    try:
+        results = DynamicCorridorAuditor.audit_location(
+            lat=request.lat,
+            lon=request.lon,
+            bbox=request.bbox,
+            location_name=request.location_name,
+            road_width_m=request.road_width_m or 30.0
+        )
+        return DynamicAuditResponse(**results)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Dynamic spatial audit pipeline error: {str(e)}")
 
 # -------------------------------------------------------------------------
 # 3. Visual Texture Synthesizer Route

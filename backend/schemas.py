@@ -34,3 +34,27 @@ class SystemHealthResponse(BaseModel):
     gpu_available: bool
     device_name: str
     loaded_engines: List[str]
+
+class DynamicAuditRequest(BaseModel):
+    lat: float
+    lon: float
+    zoom: Optional[int] = 16
+    bbox: Optional[List[float]] = None # [min_lat, min_lon, max_lat, max_lon]
+    location_name: Optional[str] = None
+    road_width_m: Optional[float] = 30.0
+
+class DynamicAuditResponse(BaseModel):
+    status: str
+    location_name: str
+    lat: float
+    lon: float
+    utm_zone: str
+    flags_count: int
+    total_encroachment_m2: float
+    compliance_grade: str
+    geojson: Dict[str, Any]
+    all_structures_geojson: Optional[Dict[str, Any]] = None
+    row_geojson: Optional[Dict[str, Any]] = None
+    canopy_geojson: Optional[Dict[str, Any]] = None
+    canopy_loss_m2: float
+    trees_mandated_count: int

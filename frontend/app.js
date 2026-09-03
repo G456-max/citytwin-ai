@@ -111,9 +111,20 @@ class MapController {
             if (utmEl) utmEl.innerText = `X: ${Math.round(utm.x).toLocaleString()}m | Y: ${Math.round(utm.y).toLocaleString()}m`;
         });
 
-        // 4. Click to Inspect Real GPS Pinpoint
+        // 4. Click to Inspect Real GPS Pinpoint & One-Click Sector Audit
         this.map.on('click', (e) => {
             this.dropGPSInspector(e.latlng);
+        });
+
+        // 5. Auto-Audit on Map Pan / Move (if enabled)
+        this.map.on('moveend', () => {
+            const autoAudit = document.getElementById('toggle-auto-audit-pan');
+            if (autoAudit && autoAudit.checked && window.executeDynamicAudit) {
+                const center = this.map.getCenter();
+                const b = this.map.getBounds();
+                const bbox = [b.getSouth(), b.getWest(), b.getNorth(), b.getEast()];
+                window.executeDynamicAudit(center.lat, center.lng, bbox, "Dynamic Map Sector");
+            }
         });
     }
 
@@ -151,19 +162,21 @@ class MapController {
 
         this.inspectorMarker = L.marker(latlng, { icon: customIcon }).addTo(this.map);
         this.inspectorMarker.bindPopup(`
-            <div class="p-2 text-slate-100 font-sans text-xs">
-                <div class="flex items-center gap-1.5 text-sky-400 font-mono font-bold mb-1">
-                    <i class="fa-solid fa-location-crosshairs"></i>
-                    <span>GPS INSPECTOR PIN</span>
+            <div class="p-2 text-slate-100 font-sans text-xs min-w-[210px]">
+                <div class="flex items-center justify-between text-sky-400 font-mono font-bold mb-1.5">
+                    <span class="flex items-center gap-1"><i class="fa-solid fa-location-crosshairs"></i> PINPOINT INSPECTOR</span>
+                    <span class="text-[9px] bg-sky-500/20 text-sky-300 px-1 py-0.5 rounded">1km² Sector</span>
                 </div>
                 <div class="space-y-1 font-mono text-[11px] bg-slate-900/90 p-2 rounded border border-slate-800">
-                    <div><span class="text-slate-500">WGS84 Lat:</span> <span class="text-emerald-400 font-bold">${latlng.lat.toFixed(6)}° N</span></div>
-                    <div><span class="text-slate-500">WGS84 Lon:</span> <span class="text-emerald-400 font-bold">${latlng.lng.toFixed(6)}° E</span></div>
+                    <div><span class="text-slate-500">Lat:</span> <span class="text-emerald-400 font-bold">${latlng.lat.toFixed(6)}° N</span></div>
+                    <div><span class="text-slate-500">Lon:</span> <span class="text-emerald-400 font-bold">${latlng.lng.toFixed(6)}° E</span></div>
                     <div class="pt-1 border-t border-slate-800 text-sky-300">
-                        <span class="text-slate-500">UTM 44N:</span> X: ${Math.round(utm.x).toLocaleString()}m, Y: ${Math.round(utm.y).toLocaleString()}m
+                        <span class="text-slate-500">UTM:</span> X: ${Math.round(utm.x).toLocaleString()}m, Y: ${Math.round(utm.y).toLocaleString()}m
                     </div>
                 </div>
-                <div class="mt-2 text-[10px] text-slate-400 text-center">Rajamahendravaram Highway Corridor</div>
+                <button onclick="window.runSectorAudit(${latlng.lat}, ${latlng.lng})" class="mt-2.5 w-full bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold py-1.5 px-2 rounded text-[10px] font-mono flex items-center justify-center gap-1.5 transition shadow">
+                    <i class="fa-solid fa-bolt-lightning text-amber-300"></i> Audit This 1km² Sector
+                </button>
             </div>
         `).openPopup();
     }
@@ -457,6 +470,94 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
+
+    async function executeDynamicSpatialAudit(lat, lon, bbox = null, locationName = null) {
+        const btnAuditVisible = document.getElementById('btn-audit-visible-area');
+        const origText = btnAuditVisible ? btnAuditVisible.innerHTML : '';
+        if (btnAuditVisible) {
+            btnAuditVisible.disabled = true;
+            btnAuditVisible.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Auditing Sector...';
+        }
+
+        showSidebarSkeletons();
+
+        try {
+            const resp = await fetch('/api/audit/dynamic', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    lat: parseFloat(lat),
+                    lon: parseFloat(lon),
+                    bbox: bbox,
+                    location_name: locationName || `Sector (${parseFloat(lat).toFixed(4)}°N, ${parseFloat(lon).toFixed(4)}°E)`,
+                    road_width_m: 30.0
+                })
+            });
+            const data = await resp.json();
+
+            if (data.status === 'success') {
+                auditData = data;
+
+                // 1. Update location badges
+                const locBadge = document.getElementById('active-location-name-badge');
+                const utmBadge = document.getElementById('active-utm-zone-badge');
+                if (locBadge) locBadge.innerText = data.location_name;
+                if (utmBadge) utmBadge.innerText = data.utm_zone;
+
+                // 2. Draw dynamic Road Right-of-Way boundary
+                if (data.row_geojson && data.row_geojson.features) {
+                    mapCtrl.drawRoadBoundary(data.row_geojson);
+                }
+
+                // 3. Draw dynamic Building Footprints
+                if (data.all_structures_geojson && data.all_structures_geojson.features) {
+                    mapCtrl.drawAllBuildings(data.all_structures_geojson);
+                }
+
+                // 4. Draw dynamic Encroachment Violations
+                if (data.geojson && data.geojson.features) {
+                    mapCtrl.updateViolations(data.geojson, (violationId) => {
+                        highlightViolationCard(violationId);
+                    });
+                }
+
+                // 5. Draw dynamic Tree Canopy Loss
+                if (data.canopy_geojson && data.canopy_geojson.features) {
+                    mapCtrl.updateCanopyLoss(data.canopy_geojson);
+                }
+
+                // 6. Update scorecards and triage cards
+                const mockCanopyRes = {
+                    total_canopy_loss_m2: data.canopy_loss_m2,
+                    replanting_mandate_saplings: data.trees_mandated_count
+                };
+                updateScorecards(data, mockCanopyRes);
+                populateTriageCards(data.geojson.features || []);
+
+                // 7. Update Future Vision Slider telemetry
+                const locEl = document.getElementById('slider-sensing-location');
+                const encEl = document.getElementById('slider-enc-cleared');
+                const treeEl = document.getElementById('slider-trees-planted');
+                if (locEl) locEl.innerText = `${data.location_name} (${data.lat.toFixed(4)}°N, ${data.lon.toFixed(4)}°E)`;
+                if (encEl) encEl.innerText = `${data.flags_count} Encroachments Cleared (${data.total_encroachment_m2} m²)`;
+                if (treeEl) treeEl.innerText = `${data.trees_mandated_count} Shaded Canopy Trees Mandated`;
+            }
+        } catch (err) {
+            console.error("Dynamic sector audit failed: ", err);
+            showSidebarError();
+        } finally {
+            if (btnAuditVisible) {
+                btnAuditVisible.disabled = false;
+                btnAuditVisible.innerHTML = origText;
+            }
+        }
+    }
+
+    // Expose globally for map popups and auto-audit
+    window.executeDynamicAudit = executeDynamicSpatialAudit;
+    window.runSectorAudit = (lat, lon) => {
+        executeDynamicSpatialAudit(lat, lon, null, `Target Sector (${parseFloat(lat).toFixed(4)}°N, ${parseFloat(lon).toFixed(4)}°E)`);
+    };
 
     async function fetchTreeCanopyOverlay(canopySummary) {
         try {
@@ -756,27 +857,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const gpsEl = document.getElementById('map-live-gps');
                 if (gpsEl) gpsEl.innerText = `${lat.toFixed(5)}° N, ${lon.toFixed(5)}° E`;
 
-                // Draw target corridor boundary buffer around new location
-                const targetGeoJson = {
-                    "type": "FeatureCollection",
-                    "features": [
-                        {
-                            "type": "Feature",
-                            "properties": { "name": loc.display_name, "type": "target_corridor" },
-                            "geometry": {
-                                "type": "Polygon",
-                                "coordinates": [[
-                                    [lon - 0.003, lat - 0.001],
-                                    [lon + 0.003, lat + 0.001],
-                                    [lon + 0.003, lat + 0.002],
-                                    [lon - 0.003, lat],
-                                    [lon - 0.003, lat - 0.001]
-                                ]]
-                            }
-                        }
-                    ]
-                };
-                mapCtrl.drawRoadBoundary(targetGeoJson);
+                // Instantly execute universal spatial AI audit on this exact new location!
+                executeDynamicSpatialAudit(lat, lon, loc.boundingbox, loc.display_name);
             } else {
                 alert(`Location "${query}" could not be found. Please check spelling or enter GPS coordinates (e.g. 16.985, 81.782).`);
             }
@@ -934,6 +1016,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btnCloseModalFooter && modal) {
             btnCloseModalFooter.addEventListener('click', () => modal.classList.add('hidden'));
         }
+
+        // Dynamic Universal Spatial Audit Button
+        document.getElementById('btn-audit-visible-area')?.addEventListener('click', () => {
+            if (mapCtrl && mapCtrl.map) {
+                const center = mapCtrl.map.getCenter();
+                const b = mapCtrl.map.getBounds();
+                const bbox = [b.getSouth(), b.getWest(), b.getNorth(), b.getEast()];
+                executeDynamicSpatialAudit(center.lat, center.lng, bbox, "Visible Map Viewport Sector");
+            }
+        });
 
         // Viewport Tab Switchers
         document.getElementById('tab-nav-map')?.addEventListener('click', () => switchViewport('viewport-map'));
