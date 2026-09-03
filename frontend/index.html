@@ -37,28 +37,56 @@
 <body class="h-full flex flex-col font-['Outfit'] overflow-hidden bg-slate-950">
 
     <!-- Header Navigation -->
-    <header class="flex items-center justify-between px-6 py-4 bg-slate-900 border-b border-slate-800 backdrop-blur z-35 shrink-0">
+    <header class="flex flex-wrap items-center justify-between px-6 py-3.5 bg-slate-900 border-b border-slate-800 backdrop-blur z-35 shrink-0 gap-4">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-sky-600 flex items-center justify-center shadow shadow-sky-500/20">
-                <i class="fa-solid fa-tree-city text-white text-lg font-bold"></i>
+            <div class="w-9 h-9 rounded-lg bg-sky-600 flex items-center justify-center shadow shadow-sky-500/20">
+                <i class="fa-solid fa-tree-city text-white text-base font-bold"></i>
             </div>
             <div>
-                <h1 class="text-base font-bold text-white tracking-tight">CityTwin AI</h1>
-                <p class="text-[9px] text-slate-400 font-mono tracking-widest">MUNICIPAL CORRIDOR COMPLIANCE VERIFICATION</p>
+                <h1 class="text-sm font-bold text-white tracking-tight">CityTwin AI</h1>
+                <p class="text-[8.5px] text-slate-400 font-mono tracking-widest">SPATIAL COMPLIANCE ENGINE</p>
             </div>
+        </div>
+
+        <!-- Real Location Geocoding & Upload Bar -->
+        <div class="flex-1 max-w-2xl flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 shadow-inner">
+            <i class="fa-solid fa-magnifying-glass-location text-sky-400 text-sm"></i>
+            <input id="input-location-search" type="text" placeholder="Search any city, road, or GPS coords (e.g. 'Rajamahendravaram', '16.985, 81.782')..." 
+                   class="bg-transparent text-xs text-slate-200 placeholder-slate-500 focus:outline-none flex-1 font-sans">
+            
+            <button id="btn-search-location" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-3 py-1 rounded text-[11px] transition shadow-sm flex items-center gap-1.5 shrink-0">
+                <i class="fa-solid fa-crosshairs"></i> Target
+            </button>
+
+            <!-- Quick City Corridor Presets -->
+            <select id="select-city-preset" class="bg-slate-900 border border-slate-800 text-[11px] text-slate-300 px-2 py-1 rounded focus:outline-none focus:border-sky-500 transition max-w-[150px] font-mono">
+                <option value="">-- Corridors --</option>
+                <option value="16.9850,81.7820|Rajamahendravaram NH-16 (AP)">📍 Rajamahendravaram NH-16</option>
+                <option value="16.5150,80.6150|Vijayawada Kanaka Durga (AP)">📍 Vijayawada Flyover</option>
+                <option value="17.4400,78.3489|Hyderabad Outer Ring Road">📍 Hyderabad ORR</option>
+                <option value="26.4720,80.3250|Kanpur GT Road (UP)">📍 Kanpur GT Road</option>
+                <option value="12.9170,77.6230|Bengaluru Silk Board (KA)">📍 Bengaluru Hosur Rd</option>
+                <option value="28.6139,77.2090|Delhi Ring Road Corridor">📍 Delhi Ring Road</option>
+            </select>
+
+            <!-- Upload Custom File -->
+            <input type="file" id="input-file-geojson" accept=".geojson,.json,.kml" class="hidden">
+            <button id="btn-trigger-upload" title="Upload custom GeoJSON or CAD bounds" class="bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 px-2.5 py-1 rounded text-[11px] transition flex items-center gap-1 shrink-0 font-mono">
+                <i class="fa-solid fa-upload text-emerald-400"></i> Upload
+            </button>
         </div>
         
         <!-- Live System Telemetry health logs -->
-        <div class="hidden lg:flex items-center gap-6 text-[10px] font-mono bg-slate-950 px-4 py-2 rounded-lg border border-slate-800">
+        <div class="hidden xl:flex items-center gap-4 text-[10px] font-mono bg-slate-950 px-3.5 py-1.5 rounded-lg border border-slate-800">
             <div class="flex items-center gap-2">
                 <span id="telemetry-connection-dot" class="w-2 h-2 rounded-full bg-slate-600"></span>
-                <span class="text-slate-400">CORRIDOR DEM ENGINE:</span>
-                <span id="telemetry-connection-text" class="text-slate-300 font-bold">STARTING...</span>
+                <span class="text-slate-400">DEM ENGINE:</span>
+                <span id="telemetry-connection-text" class="text-slate-300 font-bold">READY</span>
             </div>
             <div class="w-px h-3 bg-slate-800"></div>
             <div>
-                <span class="text-slate-400">ACCELERATION:</span>
-                <span id="telemetry-device" class="text-slate-300">Probing core diagnostics...</span>
+                <span class="text-slate-400">CRS:</span>
+                <span class="text-sky-400 font-bold">EPSG:32644</span>
             </div>
         </div>
     </header>

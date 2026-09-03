@@ -619,6 +619,100 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function searchAndTargetLocation(query) {
+        if (!query || query.trim() === '') return;
+        switchViewport('viewport-map');
+
+        const searchBtn = document.getElementById('btn-search-location');
+        const origHTML = searchBtn.innerHTML;
+        searchBtn.disabled = true;
+        searchBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Targeting...';
+
+        try {
+            const resp = await fetch(`/api/location/search?query=${encodeURIComponent(query)}`);
+            const data = await resp.json();
+
+            if (data.status === 'success' && data.results && data.results.length > 0) {
+                const loc = data.results[0];
+                const lat = parseFloat(loc.lat);
+                const lon = parseFloat(loc.lon);
+
+                // Fly smoothly to target GPS location on real satellite map
+                if (mapCtrl && mapCtrl.map) {
+                    mapCtrl.map.flyTo([lat, lon], 16, { duration: 1.5 });
+                    mapCtrl.dropGPSInspector({ lat, lng: lon });
+                }
+
+                // Update GPS indicator in header
+                const gpsEl = document.getElementById('map-live-gps');
+                if (gpsEl) gpsEl.innerText = `${lat.toFixed(5)}° N, ${lon.toFixed(5)}° E`;
+
+                // Draw target corridor boundary buffer around new location
+                const targetGeoJson = {
+                    "type": "FeatureCollection",
+                    "features": [
+                        {
+                            "type": "Feature",
+                            "properties": { "name": loc.display_name, "type": "target_corridor" },
+                            "geometry": {
+                                "type": "Polygon",
+                                "coordinates": [[
+                                    [lon - 0.003, lat - 0.001],
+                                    [lon + 0.003, lat + 0.001],
+                                    [lon + 0.003, lat + 0.002],
+                                    [lon - 0.003, lat],
+                                    [lon - 0.003, lat - 0.001]
+                                ]]
+                            }
+                        }
+                    ]
+                };
+                mapCtrl.drawRoadBoundary(targetGeoJson);
+            } else {
+                alert(`Location "${query}" could not be found. Please check spelling or enter GPS coordinates (e.g. 16.985, 81.782).`);
+            }
+        } catch (err) {
+            console.error("Geocoding search failed: ", err);
+        } finally {
+            searchBtn.disabled = false;
+            searchBtn.innerHTML = origHTML;
+        }
+    }
+
+    function handleGeoJSONUpload(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const geojson = JSON.parse(e.target.result);
+                switchViewport('viewport-map');
+                
+                if (geojson.type === "FeatureCollection" || geojson.type === "Feature" || geojson.coordinates) {
+                    const normGeoJson = geojson.type === "FeatureCollection" ? geojson : { "type": "FeatureCollection", "features": [geojson] };
+                    
+                    if (mapCtrl && mapCtrl.map) {
+                        const customLayer = L.geoJSON(normGeoJson, {
+                            style: () => ({ color: '#38bdf8', weight: 3, fillColor: '#38bdf8', fillOpacity: 0.25 }),
+                            onEachFeature: (feature, layer) => {
+                                layer.bindPopup(`<div class="p-2 text-xs font-mono font-bold text-sky-400">📍 TARGET LOCATION LOADED<br><span class="text-slate-300">${feature.properties?.name || file.name}</span></div>`);
+                            }
+                        }).addTo(mapCtrl.map);
+                        
+                        mapCtrl.map.fitBounds(customLayer.getBounds(), { padding: [50, 50], maxZoom: 17 });
+                    }
+
+                    triggerComplianceAudit();
+                    alert(`Targeted uploaded area: "${file.name}". Map focused on location coordinates.`);
+                } else {
+                    alert("Invalid GeoJSON file format. Please upload a standard GeoJSON file.");
+                }
+            } catch (err) {
+                alert("Error parsing uploaded file: " + err.message);
+            }
+        };
+        reader.readAsText(file);
+    }
+
     function bindEvents() {
         document.getElementById('btn-step1-audit').addEventListener('click', () => {
             switchViewport('viewport-map');
@@ -650,6 +744,41 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btnSat) btnSat.addEventListener('click', () => mapCtrl.setBasemap('satellite'));
         if (btnVec) btnVec.addEventListener('click', () => mapCtrl.setBasemap('vector'));
         if (btnSnap) btnSnap.addEventListener('click', () => mapCtrl.snapToCorridor());
+
+        // Location Search & Targeting
+        const btnSearch = document.getElementById('btn-search-location');
+        const inputSearch = document.getElementById('input-location-search');
+        if (btnSearch && inputSearch) {
+            btnSearch.addEventListener('click', () => searchAndTargetLocation(inputSearch.value));
+            inputSearch.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') searchAndTargetLocation(inputSearch.value);
+            });
+        }
+
+        // Quick City Corridor Presets Dropdown
+        const selectPreset = document.getElementById('select-city-preset');
+        if (selectPreset) {
+            selectPreset.addEventListener('change', (e) => {
+                if (!e.target.value) return;
+                const [coords, name] = e.target.value.split('|');
+                if (coords) {
+                    if (inputSearch) inputSearch.value = name || coords;
+                    searchAndTargetLocation(coords);
+                }
+            });
+        }
+
+        // Custom File Upload Trigger
+        const btnUpload = document.getElementById('btn-trigger-upload');
+        const inputUpload = document.getElementById('input-file-geojson');
+        if (btnUpload && inputUpload) {
+            btnUpload.addEventListener('click', () => inputUpload.click());
+            inputUpload.addEventListener('change', (e) => {
+                if (e.target.files && e.target.files[0]) {
+                    handleGeoJSONUpload(e.target.files[0]);
+                }
+            });
+        }
     }
 
     init();
