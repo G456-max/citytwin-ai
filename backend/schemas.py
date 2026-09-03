@@ -25,6 +25,8 @@ class RenderResponse(BaseModel):
     status: str
     render_time_sec: float
     image_base64: str
+    baseline_drone_base64: Optional[str] = None
+    sensing_telemetry: Optional[Dict[str, Any]] = None
     message: Optional[str] = None
 
 class SystemHealthResponse(BaseModel):

@@ -329,15 +329,23 @@
             </div>
 
             <!-- VIEWPORT C: Step 2 Split-screen Visualizer Layout (Hidden initially) -->
-            <div id="viewport-slider" class="w-full h-full flex flex-col hidden p-6 relative flex justify-center items-center">
+            <div id="viewport-slider" class="w-full h-full flex flex-col hidden p-4 relative justify-between items-center gap-3">
                 
-                <!-- Rendering Latency Info overlay -->
-                <div class="absolute bottom-4 left-6 z-10 text-[10px] font-mono text-slate-400" id="render-latency-text">
-                    Choose styling parameters to render georeferenced texture overlays.
+                <!-- Top Sensing & Telemetry Subbar -->
+                <div class="px-4 py-2 border border-slate-800 rounded-xl bg-slate-950/90 flex flex-wrap items-center justify-between text-[10.5px] font-mono shrink-0 gap-3 w-full shadow-md">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sky-400 font-bold flex items-center gap-1.5"><i class="fa-solid fa-satellite-dish"></i> SENSED CORRIDOR:</span>
+                        <span id="slider-sensing-location" class="bg-slate-900 px-2.5 py-0.5 rounded border border-slate-800 text-slate-200 font-semibold">Rajamahendravaram NH-16 (16.9850°N, 81.7820°E)</span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 text-slate-400">
+                        <span class="bg-slate-900 px-2 py-0.5 rounded border border-slate-800 text-rose-400"><i class="fa-solid fa-ban mr-1"></i> <span id="slider-enc-cleared">4 Encroachments Cleared (1,261 m²)</span></span>
+                        <span class="bg-slate-900 px-2 py-0.5 rounded border border-slate-800 text-emerald-400"><i class="fa-solid fa-person-biking mr-1"></i> <span id="slider-bike-lanes">2x Dedicated Bicycle Tracks</span></span>
+                        <span class="bg-slate-900 px-2 py-0.5 rounded border border-slate-800 text-teal-400"><i class="fa-solid fa-tree mr-1"></i> <span id="slider-trees-planted">36 Shaded Canopy Trees</span></span>
+                    </div>
                 </div>
 
                 <!-- Draggable Comparative Wipe Slider frame -->
-                <div class="w-full h-full max-h-[460px] relative rounded-xl overflow-hidden border border-slate-800 shadow-inner flex items-center justify-center select-none" id="visual-slider-container">
+                <div class="w-full flex-1 max-h-[460px] relative rounded-xl overflow-hidden border border-slate-800 shadow-inner flex items-center justify-center select-none" id="visual-slider-container">
                     
                     <!-- Background layer (Drone Baseline View) -->
                     <div class="absolute inset-0 w-full h-full">

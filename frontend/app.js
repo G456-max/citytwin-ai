@@ -493,8 +493,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const loader = document.getElementById('render-loader');
         const latencyText = document.getElementById('render-latency-text');
         
-        loader.classList.remove('pointer-events-none');
-        loader.classList.add('opacity-100');
+        if (loader) {
+            loader.classList.remove('pointer-events-none');
+            loader.classList.add('opacity-100');
+        }
         
         try {
             const response = await fetch('/api/render/generate', {
@@ -505,15 +507,36 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             if (data.status === 'success') {
-                document.getElementById('img-controlnet-render').src = data.image_base64;
-                latencyText.innerText = `Synthesis latency: ${data.render_time_sec.toFixed(3)}s (${data.message})`;
+                const imgFuture = document.getElementById('img-controlnet-render');
+                const imgBase = document.getElementById('img-drone-feed');
+                if (imgFuture) imgFuture.src = data.image_base64;
+                if (imgBase && data.baseline_drone_base64) imgBase.src = data.baseline_drone_base64;
+
+                if (data.sensing_telemetry) {
+                    const t = data.sensing_telemetry;
+                    const locEl = document.getElementById('slider-sensing-location');
+                    const encEl = document.getElementById('slider-enc-cleared');
+                    const bikeEl = document.getElementById('slider-bike-lanes');
+                    const treeEl = document.getElementById('slider-trees-planted');
+
+                    if (locEl) locEl.innerText = `${t.location_name} (${t.gps_centroid})`;
+                    if (encEl) encEl.innerText = `${t.encroachments_cleared} Encroachments Cleared (${t.encroachment_area_m2} m²)`;
+                    if (bikeEl) bikeEl.innerText = `${t.bicycle_tracks}`;
+                    if (treeEl) treeEl.innerText = `${t.canopy_trees_planted} Shaded Canopy Trees (1:3 Replanted)`;
+                }
+
+                if (latencyText) {
+                    latencyText.innerText = `AI ControlNet Latency: ${data.render_time_sec.toFixed(3)}s | Preset: ${styleName} | Sensed 14.2m → Sanctioned 30.0m (${data.message})`;
+                }
             }
         } catch (err) {
             console.error("Generative synthesis error: ", err);
-            latencyText.innerText = "Generative visual synthesis failed to connect.";
+            if (latencyText) latencyText.innerText = "Generative visual synthesis failed to connect.";
         } finally {
-            loader.classList.add('pointer-events-none');
-            loader.classList.remove('opacity-100');
+            if (loader) {
+                loader.classList.add('pointer-events-none');
+                loader.classList.remove('opacity-100');
+            }
         }
     }
 

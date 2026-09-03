@@ -97,182 +97,254 @@ class BlueprintLockedVisualizer:
             print(f"Inference error: {e}. Activating procedural texture generator...")
             return self._procedural_synthesize(depth_image, prompt)
 
-    def _procedural_synthesize(self, depth_image: Image.Image, prompt: str) -> Image.Image:
-        """Generates high-fidelity textured views using deterministic CV graphics engines."""
-        depth_img = np.array(depth_image.convert("L"))
-        h, w = depth_img.shape
+    def generate_baseline_drone_view(self, width: int = 800, height: int = 450) -> Image.Image:
+        """Generates georeferenced baseline drone view showing sensed reality with raw encroachments."""
+        w, h = width, height
+        scene = np.zeros((h, w, 3), dtype=np.uint8)
         
+        # Ground background (earth, grass, riverbank terrain)
+        for y in range(h):
+            f = y / h
+            scene[y, :] = [int(35 + 15*f), int(45 + 10*f), int(40 + 5*f)] # Earthy terrain tone
+
+        # River Godavari on the left
+        river_w = int(w * 0.18)
+        for y in range(h):
+            scene[y, :river_w] = [int(110 + 15*np.sin(y/20.0)), int(75 + 10*np.cos(y/30.0)), int(35 + 5*f)]
+
+        # River bund boundary wall
+        cv2.line(scene, (river_w, 0), (river_w, h), (140, 140, 145), 3)
+
+        # Narrow Existing Road (14m width, poorly marked)
+        road_left = int(w * 0.38)
+        road_right = int(w * 0.62)
+        cv2.rectangle(scene, (road_left, 0), (road_right, h), (48, 48, 52), -1)
+        
+        # Faded, cracked center lane line
+        for y in range(0, h, 24):
+            cv2.line(scene, (int((road_left + road_right)/2), y), (int((road_left + road_right)/2), y + 12), (150, 150, 140), 2)
+
+        # Sanctioned Road Right-of-Way Limits (30m target - cyan dashed lines)
+        row_left = int(w * 0.26)
+        row_right = int(w * 0.76)
+        for y in range(0, h, 16):
+            cv2.line(scene, (row_left, y), (row_left, y + 8), (248, 189, 56), 2) # Cyan/Sky blue
+            cv2.line(scene, (row_right, y), (row_right, y + 8), (248, 189, 56), 2)
+
+        # Sensed Trees (Irregular green circles)
+        tree_locs = [(int(w*0.22), 60), (int(w*0.23), 160), (int(w*0.21), 280), (int(w*0.24), 380),
+                     (int(w*0.78), 90), (int(w*0.80), 210), (int(w*0.79), 340)]
+        for tx, ty in tree_locs:
+            cv2.circle(scene, (tx, ty), 16, (35, 115, 55), -1)
+            cv2.circle(scene, (tx, ty), 16, (60, 180, 85), 2)
+
+        # Detected Compliant Buildings (Amber Outlines)
+        bldgs = [
+            (int(w * 0.80), 40, 100, 70, "BLDG_004 Market Arcade"),
+            (int(w * 0.80), 150, 110, 80, "BLDG_006 Sri Rama Temple"),
+            (int(w * 0.80), 270, 95, 75, "BLDG_007 View Plaza"),
+            (int(w * 0.05), 200, 70, 60, "BLDG_003 Boat House")
+        ]
+        for bx, by, bw, bh, bname in bldgs:
+            cv2.rectangle(scene, (bx, by), (bx + bw, by + bh), (40, 42, 48), -1)
+            cv2.rectangle(scene, (bx, by), (bx + bw, by + bh), (50, 180, 245), 2) # Amber
+            cv2.putText(scene, bname[:14], (bx + 4, by + 16), cv2.FONT_HERSHEY_SIMPLEX, 0.32, (200, 200, 200), 1)
+
+        # 4 Sensed Illegal Encroachments (Red Hazard Overlays Intruding Past the 30m RoW)
+        encroachments = [
+            (int(w * 0.32), 70, 75, 55, "ENC_001 Commercial Hub (+6.8m)"),
+            (int(w * 0.60), 160, 80, 65, "ENC_002 Residency Wall (+5.2m)"),
+            (int(w * 0.33), 260, 65, 50, "ENC_003 Boat Shed (+4.5m)"),
+            (int(w * 0.58), 350, 70, 45, "ENC_004 Bus Kiosks (+3.8m)")
+        ]
+        for ex, ey, ew, eh, elabel in encroachments:
+            overlay = scene.copy()
+            cv2.rectangle(overlay, (ex, ey), (ex + ew, ey + eh), (60, 60, 240), -1) # Red fill
+            cv2.addWeighted(overlay, 0.45, scene, 0.55, 0, scene)
+            cv2.rectangle(scene, (ex, ey), (ex + ew, ey + eh), (80, 80, 245), 2)
+            
+            # Diagonal hazard stripes
+            for s in range(0, ew + eh, 12):
+                cv2.line(scene, (ex + s, ey), (ex, ey + s), (90, 90, 255), 1)
+
+            # Warning label
+            cv2.putText(scene, elabel, (ex - 10, ey - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.33, (120, 120, 255), 1)
+
+        # GCP Ground Control Point Radar Pin
+        gcp_x, gcp_y = int(w * 0.50), int(h * 0.48)
+        cv2.circle(scene, (gcp_x, gcp_y), 18, (140, 230, 80), 2)
+        cv2.circle(scene, (gcp_x, gcp_y), 4, (140, 230, 80), -1)
+        cv2.line(scene, (gcp_x - 24, gcp_y), (gcp_x + 24, gcp_y), (140, 230, 80), 1)
+        cv2.line(scene, (gcp_x, gcp_y - 24), (gcp_x, gcp_y + 24), (140, 230, 80), 1)
+        cv2.putText(scene, "GCP_01 (16.9850N, 81.7820E)", (gcp_x + 12, gcp_y - 8), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (140, 230, 80), 1)
+
+        rgb = cv2.cvtColor(scene, cv2.COLOR_BGR2RGB)
+        return Image.fromarray(rgb)
+
+    def _procedural_synthesize(self, depth_image: Image.Image, prompt: str) -> Image.Image:
+        """Generates photorealistic synthesized future corridor with widened 4-lanes, bicycle tracks, sidewalks, and tree canopy."""
+        w, h = 800, 450
         prompt_lower = prompt.lower()
         if "night" in prompt_lower:
             style = "Nighttime"
-        elif "rain" in prompt_lower or "wet" in prompt_lower:
+        elif "rain" in prompt_lower or "wet" in prompt_lower or "monsoon" in prompt_lower:
             style = "Rainy"
         elif "green" in prompt_lower or "eco" in prompt_lower:
             style = "EcoGreen"
         else:
             style = "Daylight"
 
-        # Initialize background canvas
-        bg = np.zeros((h, w, 3), dtype=np.uint8)
+        # Canvas background (Modern landscape)
+        scene = np.zeros((h, w, 3), dtype=np.uint8)
         if style == "Daylight":
             for y in range(h):
                 f = y / h
-                bg[y, :] = [int(160 + 40*f), int(200 + 35*f), int(220 + 25*f)]
+                scene[y, :] = [int(45 + 10*f), int(85 + 15*f), int(55 + 10*f)] # Landscaped manicured grass
         elif style == "Nighttime":
             for y in range(h):
-                f = y / h
-                bg[y, :] = [int(30 - 15*f), int(15 - 10*f), int(10 - 5*f)]
+                scene[y, :] = [int(15), int(18), int(20)]
         elif style == "Rainy":
             for y in range(h):
-                f = y / h
-                bg[y, :] = [int(90 + 15*f), int(95 + 10*f), int(100 + 10*f)]
+                scene[y, :] = [int(35), int(50), int(40)]
         else: # EcoGreen
             for y in range(h):
                 f = y / h
-                bg[y, :] = [int(170 + 20*f), int(210 + 15*f), int(190 + 25*f)]
+                scene[y, :] = [int(40 + 20*f), int(120 + 20*f), int(50 + 15*f)]
 
-        # Add mock buildings background silhouettes
-        cv2.rectangle(bg, (30, int(h*0.3)), (150, int(h*0.85)), (70, 70, 75) if style != "Nighttime" else (20, 20, 30), -1)
-        cv2.rectangle(bg, (400, int(h*0.35)), (480, int(h*0.9)), (80, 85, 85) if style != "Nighttime" else (25, 25, 35), -1)
+        # River Godavari Promenade on Left
+        river_w = int(w * 0.18)
+        for y in range(h):
+            if style == "Nighttime":
+                scene[y, :river_w] = [int(35 + 5*np.sin(y/15.0)), int(25), int(15)]
+            else:
+                scene[y, :river_w] = [int(145 + 10*np.sin(y/15.0)), int(105 + 8*np.cos(y/25.0)), int(45)]
         
+        # Riverfront Heritage Promenade Walkway & Railing
+        cv2.rectangle(scene, (river_w, 0), (river_w + 24, h), (180, 185, 190) if style != "Nighttime" else (60, 65, 70), -1)
+        cv2.line(scene, (river_w + 24, 0), (river_w + 24, h), (110, 110, 115), 2)
+
+        # -------------------------------------------------------------
+        # SANCTIONED MULTI-MODAL SMART HIGHWAY CORRIDOR (30.0m ROW)
+        # -------------------------------------------------------------
+        c_left = int(w * 0.24)
+        c_right = int(w * 0.78)
+
+        # 1. Left Pedestrian Sidewalk (2.0m)
+        sw1_left = c_left
+        sw1_right = sw1_left + int(w * 0.05)
+        cv2.rectangle(scene, (sw1_left, 0), (sw1_right, h), (160, 165, 170) if style != "Nighttime" else (50, 52, 58), -1)
+        # Paver tiles pattern
+        for y in range(0, h, 14):
+            cv2.line(scene, (sw1_left, y), (sw1_right, y), (140, 145, 150) if style != "Nighttime" else (40, 42, 46), 1)
+
+        # 2. Left Dedicated Bicycle Track (2.5m - Bright Green Asphalt)
+        bike1_left = sw1_right
+        bike1_right = bike1_left + int(w * 0.06)
+        bike_color = (65, 145, 75) if style != "Nighttime" else (25, 60, 30)
+        cv2.rectangle(scene, (bike1_left, 0), (bike1_right, h), bike_color, -1)
+        # White bicycle lane boundary
+        cv2.line(scene, (bike1_left, 0), (bike1_left, h), (240, 240, 240), 2)
+        cv2.line(scene, (bike1_right, 0), (bike1_right, h), (240, 240, 240), 2)
+        # Bicycle icon symbols along track
+        for by in range(40, h, 90):
+            cv2.circle(scene, (int((bike1_left+bike1_right)/2) - 4, by), 4, (255, 255, 255), 1)
+            cv2.circle(scene, (int((bike1_left+bike1_right)/2) + 4, by), 4, (255, 255, 255), 1)
+            cv2.line(scene, (int((bike1_left+bike1_right)/2) - 4, by), (int((bike1_left+bike1_right)/2) + 4, by - 6), (255, 255, 255), 1)
+
+        # 3. Main 4-Lane Highway Carriageway (Asphalt)
+        hwy_left = bike1_right
+        hwy_right = c_right - int(w * 0.11)
+        asphalt_color = (55, 55, 58) if style != "Nighttime" else (22, 22, 25)
+        if style == "Rainy": asphalt_color = (35, 38, 42)
+        cv2.rectangle(scene, (hwy_left, 0), (hwy_right, h), asphalt_color, -1)
+
+        # 4. Central Planted Green Median (with Shaded Canopy Trees)
+        med_x = int((hwy_left + hwy_right) / 2)
+        med_w = int(w * 0.04)
+        cv2.rectangle(scene, (med_x - med_w//2, 0), (med_x + med_w//2, h), (40, 110, 50) if style != "Nighttime" else (18, 45, 22), -1)
+        cv2.rectangle(scene, (med_x - med_w//2, 0), (med_x + med_w//2, h), (180, 180, 185) if style != "Nighttime" else (80, 80, 85), 1)
+        # Median Trees
+        for ty in range(25, h, 65):
+            cv2.circle(scene, (med_x, ty), 13, (30, 130, 60) if style != "Nighttime" else (15, 60, 30), -1)
+            cv2.circle(scene, (med_x, ty), 13, (60, 190, 90) if style != "Nighttime" else (30, 100, 50), 1)
+
+        # Lane Markings for the 4 Carriageway Lanes
+        lane1_x = int(hwy_left + (med_x - med_w//2 - hwy_left)/2)
+        lane2_x = int(med_x + med_w//2 + (hwy_right - (med_x + med_w//2))/2)
+        for y in range(0, h, 24):
+            cv2.line(scene, (lane1_x, y), (lane1_x, y + 14), (230, 230, 230) if style != "Nighttime" else (160, 160, 160), 2)
+            cv2.line(scene, (lane2_x, y), (lane2_x, y + 14), (230, 230, 230) if style != "Nighttime" else (160, 160, 160), 2)
+
+        # Outer highway solid white edge lines
+        cv2.line(scene, (hwy_left, 0), (hwy_left, h), (245, 245, 245), 2)
+        cv2.line(scene, (hwy_right, 0), (hwy_right, h), (245, 245, 245), 2)
+
+        # 5. Right Dedicated Bicycle Track (2.5m)
+        bike2_left = hwy_right
+        bike2_right = bike2_left + int(w * 0.06)
+        cv2.rectangle(scene, (bike2_left, 0), (bike2_right, h), bike_color, -1)
+        cv2.line(scene, (bike2_left, 0), (bike2_left, h), (240, 240, 240), 2)
+        cv2.line(scene, (bike2_right, 0), (bike2_right, h), (240, 240, 240), 2)
+        for by in range(40, h, 90):
+            cv2.circle(scene, (int((bike2_left+bike2_right)/2) - 4, by), 4, (255, 255, 255), 1)
+            cv2.circle(scene, (int((bike2_left+bike2_right)/2) + 4, by), 4, (255, 255, 255), 1)
+            cv2.line(scene, (int((bike2_left+bike2_right)/2) - 4, by), (int((bike2_left+bike2_right)/2) + 4, by - 6), (255, 255, 255), 1)
+
+        # 6. Right Pedestrian Sidewalk (2.0m)
+        sw2_left = bike2_right
+        sw2_right = c_right
+        cv2.rectangle(scene, (sw2_left, 0), (sw2_right, h), (160, 165, 170) if style != "Nighttime" else (50, 52, 58), -1)
+        for y in range(0, h, 14):
+            cv2.line(scene, (sw2_left, y), (sw2_right, y), (140, 145, 150) if style != "Nighttime" else (40, 42, 46), 1)
+
+        # 7. Shaded Avenue Tree Row on Right Flank (Compensatory Afforestation)
+        for ty in range(30, h, 55):
+            tx = sw2_right + 18
+            cv2.circle(scene, (tx, ty), 16, (35, 135, 60) if style != "Nighttime" else (18, 70, 35), -1)
+            cv2.circle(scene, (tx, ty), 16, (70, 200, 95) if style != "Nighttime" else (35, 120, 55), 2)
+
+        # Smart Solar LED Streetlights
+        for ly in range(40, h, 80):
+            # Left sidewalk light
+            cv2.circle(scene, (sw1_left - 4, ly), 3, (255, 255, 255) if style != "Nighttime" else (120, 240, 255), -1)
+            # Right sidewalk light
+            cv2.circle(scene, (sw2_right + 4, ly), 3, (255, 255, 255) if style != "Nighttime" else (120, 240, 255), -1)
+            if style == "Nighttime":
+                # Warm light beam cones
+                cv2.ellipse(scene, (sw1_left + 15, ly), (28, 20), 0, 0, 360, (50, 100, 110), -1)
+                cv2.ellipse(scene, (sw2_right - 15, ly), (28, 20), 0, 0, 360, (50, 100, 110), -1)
+
+        # Vehicles navigating smoothly on widened lanes
+        cv2.rectangle(scene, (lane1_x - 7, 120), (lane1_x + 7, 150), (200, 40, 40) if style != "Nighttime" else (150, 20, 20), -1) # Red car
+        cv2.rectangle(scene, (lane2_x - 8, 260), (lane2_x + 8, 300), (220, 220, 225) if style != "Nighttime" else (180, 180, 180), -1) # Silver SUV
         if style == "Nighttime":
-            for wy in range(int(h*0.35), int(h*0.8), 35):
-                cv2.rectangle(bg, (50, wy), (70, wy+12), (120, 240, 255), -1)
-                cv2.rectangle(bg, (430, wy+15), (450, wy+27), (255, 220, 130), -1)
+            # Headlights beam
+            cv2.line(scene, (lane1_x - 5, 150), (lane1_x - 12, 190), (100, 220, 255), 2)
+            cv2.line(scene, (lane1_x + 5, 150), (lane1_x + 12, 190), (100, 220, 255), 2)
+            cv2.line(scene, (lane2_x - 6, 260), (lane2_x - 14, 220), (100, 220, 255), 2)
+            cv2.line(scene, (lane2_x + 6, 260), (lane2_x + 14, 220), (100, 220, 255), 2)
 
-        # Threshold road region based on elevated depth values
-        _, road_mask = cv2.threshold(depth_img, 20, 255, cv2.THRESH_BINARY)
-
-        asphalt = np.zeros((h, w, 3), dtype=np.uint8)
-        if style == "Daylight":
-            asphalt[:] = [58, 58, 62]
-        elif style == "Nighttime":
-            asphalt[:] = [15, 15, 20]
-        elif style == "Rainy":
-            asphalt[:] = [38, 38, 42]
-        else: # EcoGreen
-            asphalt[:] = [62, 62, 68]
-
-        # Add asphalt texture grain
-        noise = np.random.normal(0, 3.0, (h, w, 3)).astype(np.int16)
-        asphalt = np.clip(asphalt.astype(np.int16) + noise, 0, 255).astype(np.uint8)
-
-        # Extract centerline profiles to draw lanes
-        centers, lefts, rights = [], [], []
-        for d in range(25, 245, 6):
-            ys, xs = np.where((depth_img >= d - 3) & (depth_img <= d + 3))
-            if len(xs) > 0:
-                min_x, max_x = np.min(xs), np.max(xs)
-                y_c = int(np.mean(ys))
-                x_c = int((min_x + max_x) / 2)
-                centers.append((x_c, y_c))
-                lefts.append((int(min_x + (max_x - min_x)*0.15), y_c))
-                rights.append((int(min_x + (max_x - min_x)*0.85), y_c))
-
-        if len(centers) > 1:
-            center_pts = np.array(centers, dtype=np.int32).reshape((-1, 1, 2))
-            left_pts = np.array(lefts, dtype=np.int32).reshape((-1, 1, 2))
-            right_pts = np.array(rights, dtype=np.int32).reshape((-1, 1, 2))
-
-            # Outer boundary curbs
-            cv2.polylines(asphalt, [left_pts], False, (230, 230, 230), 3)
-            cv2.polylines(asphalt, [right_pts], False, (230, 230, 230), 3)
-
-            # Center double yellow dividers
-            yellow_color = (0, 175, 255) if style != "Nighttime" else (0, 195, 255)
-            c_left = center_pts.copy()
-            c_left[:, 0, 0] -= 4
-            c_right = center_pts.copy()
-            c_right[:, 0, 0] += 4
-            cv2.polylines(asphalt, [c_left], False, yellow_color, 2)
-            cv2.polylines(asphalt, [c_right], False, yellow_color, 2)
-
-            # Dashed lane markers
-            for i in range(len(centers) - 1):
-                if i % 4 in (0, 1):
-                    p_l1 = (int((lefts[i][0] + centers[i][0]) / 2), centers[i][1])
-                    p_l2 = (int((lefts[i+1][0] + centers[i+1][0]) / 2), centers[i+1][1])
-                    p_r1 = (int((rights[i][0] + centers[i][0]) / 2), centers[i][1])
-                    p_r2 = (int((rights[i+1][0] + centers[i+1][0]) / 2), centers[i+1][1])
-                    cv2.line(asphalt, p_l1, p_l2, (210, 210, 210), 2)
-                    cv2.line(asphalt, p_r1, p_r2, (210, 210, 210), 2)
-
-        # Blend
-        road_img = cv2.bitwise_and(asphalt, asphalt, mask=road_mask)
-        bg_masked = cv2.bitwise_and(bg, bg, mask=cv2.bitwise_not(road_mask))
-        final_scene = cv2.add(bg_masked, road_img)
-
-        # --- Draw Future Infrastructure: Elevated Metro Link & Columns ---
-        col_y_top = int(h * 0.32)
-        col_y_bottom = int(h * 0.70)
-        col_w = 14
-        p1_x = int(w * 0.30)
-        p2_x = int(w * 0.70)
-        
-        # Draw columns (supporting concrete piers)
-        cv2.rectangle(final_scene, (p1_x - col_w, col_y_top), (p1_x + col_w, col_y_bottom), (95, 95, 100), -1)
-        cv2.rectangle(final_scene, (p1_x - col_w - 4, col_y_top), (p1_x + col_w + 4, col_y_top + 8), (120, 120, 125), -1)
-        cv2.rectangle(final_scene, (p2_x - col_w, col_y_top), (p2_x + col_w, col_y_bottom), (95, 95, 100), -1)
-        cv2.rectangle(final_scene, (p2_x - col_w - 4, col_y_top), (p2_x + col_w + 4, col_y_top + 8), (120, 120, 125), -1)
-
-        # Draw elevated deck slab & bridge girder
-        cv2.rectangle(final_scene, (0, int(h * 0.22)), (w, int(h * 0.31)), (115, 115, 120), -1)
-        cv2.rectangle(final_scene, (0, int(h * 0.20)), (w, int(h * 0.22)), (140, 140, 145), -1)
-        
-        # Draw steel rails
-        cv2.line(final_scene, (0, int(h * 0.21)), (w, int(h * 0.21)), (70, 70, 70), 2)
-        cv2.line(final_scene, (0, int(h * 0.215)), (w, int(h * 0.215)), (70, 70, 70), 2)
-
-        # Draw futuristic metro train body & front windshield glass
-        cv2.rectangle(final_scene, (int(w * 0.30), int(h * 0.14)), (int(w * 0.75), int(h * 0.20)), (190, 195, 205), -1)
-        cv2.rectangle(final_scene, (int(w * 0.72), int(h * 0.15)), (int(w * 0.75), int(h * 0.19)), (40, 40, 40), -1)
-        
-        # Draw window glass panes on the train
-        for wx in range(int(w * 0.33), int(w * 0.70), 25):
-            cv2.rectangle(final_scene, (wx, int(h * 0.165)), (wx + 14, int(h * 0.185)), (100, 160, 220), -1)
-
-        # Style enhancements
-        if style == "Nighttime":
-            glow = final_scene.copy()
-            if len(lefts) > 5:
-                for i in range(1, len(lefts) - 1):
-                    cv2.line(glow, (lefts[i][0] + 12, lefts[i][1]), (lefts[i+1][0] + 12, lefts[i+1][1]), (0, 0, 255), 6)
-                for i in range(1, len(rights) - 1):
-                    cv2.line(glow, (rights[i][0] - 12, rights[i][1]), (rights[i+1][0] - 12, rights[i+1][1]), (255, 230, 200), 6)
-            final_scene = cv2.addWeighted(final_scene, 0.75, glow, 0.25, 0)
-        elif style == "EcoGreen":
-            contours, _ = cv2.findContours(road_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            foliage = np.zeros((h, w, 3), dtype=np.uint8)
-            foliage[:] = [45, 130, 60]
-            f_noise = np.random.normal(0, 8.0, (h, w, 3)).astype(np.int16)
-            foliage = np.clip(foliage.astype(np.int16) + f_noise, 0, 255).astype(np.uint8)
-            
-            foliage_mask = np.zeros((h, w), dtype=np.uint8)
-            cv2.drawContours(foliage_mask, contours, -1, 255, 12)
-            foliage_mask = cv2.bitwise_and(foliage_mask, cv2.bitwise_not(road_mask))
-            
-            f_pixels = cv2.bitwise_and(foliage, foliage, mask=foliage_mask)
-            bg_clean = cv2.bitwise_and(final_scene, final_scene, mask=cv2.bitwise_not(foliage_mask))
-            final_scene = cv2.add(bg_clean, f_pixels)
-
-            # Draw green climbing ivy on concrete pillars
-            cv2.rectangle(final_scene, (p1_x - col_w - 2, col_y_top + 10), (p1_x + col_w + 2, col_y_bottom - 20), (35, 110, 50), -1)
-            cv2.rectangle(final_scene, (p2_x - col_w - 2, col_y_top + 20), (p2_x + col_w + 2, col_y_bottom - 10), (35, 110, 50), -1)
-        elif style == "Rainy":
+        # Weather / Style overlays
+        if style == "Rainy":
             sheen = np.zeros((h, w), dtype=np.uint8)
-            for x in (110, 190, 270, 350):
-                cv2.line(sheen, (x, 0), (x + 80, h), 255, 20)
+            for x in (hwy_left + 30, med_x - 20, lane2_x, sw2_left):
+                cv2.line(sheen, (x, 0), (x + 40, h), 255, 18)
             s_blur = cv2.GaussianBlur(sheen, (45, 45), 0)
             s_bgr = cv2.cvtColor(s_blur, cv2.COLOR_GRAY2BGR)
-            final_scene = cv2.addWeighted(final_scene, 0.84, s_bgr, 0.16, 0)
+            scene = cv2.addWeighted(scene, 0.86, s_bgr, 0.14, 0)
             
+            # Rain streaks
             np.random.seed(42)
-            rain = np.zeros((h, w, 3), dtype=np.uint8)
-            for _ in range(80):
+            for _ in range(70):
                 rx = np.random.randint(0, w)
                 ry = np.random.randint(0, h)
-                cv2.line(rain, (rx, ry), (rx - 3, ry + 10), (175, 175, 180), 1)
-            final_scene = cv2.addWeighted(final_scene, 0.94, rain, 0.06, 0)
+                cv2.line(scene, (rx, ry), (rx - 2, ry + 8), (190, 190, 200), 1)
 
-        rgb = cv2.cvtColor(final_scene, cv2.COLOR_BGR2RGB)
+        elif style == "EcoGreen":
+            # Extra lush floral verges
+            for fy in range(15, h, 20):
+                cv2.circle(scene, (sw1_left - 10, fy), 4, (80, 210, 120), -1)
+                cv2.circle(scene, (sw2_right + 10, fy), 4, (80, 210, 120), -1)
+
+        rgb = cv2.cvtColor(scene, cv2.COLOR_BGR2RGB)
         return Image.fromarray(rgb)
