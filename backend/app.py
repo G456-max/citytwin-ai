@@ -307,9 +307,17 @@ def search_real_location(query: str):
     except Exception as e:
         # Internal fallback for real Indian corridors
         fallbacks = {
+            "surampalem": {"name": "Surampalem ADB Road / Educational Corridor, AP, India", "lat": 17.0890, "lon": 82.0667},
+            "aditya": {"name": "Aditya Campus / ADB Road Corridor, Surampalem, AP, India", "lat": 17.0890, "lon": 82.0667},
+            "kakinada": {"name": "Kakinada Smart City Port Corridor, AP, India", "lat": 16.9890, "lon": 82.2475},
+            "samalkota": {"name": "Samalkota Industrial & Railway Corridor, AP, India", "lat": 17.0500, "lon": 82.1670},
+            "peddapuram": {"name": "Peddapuram Municipal Corridor, AP, India", "lat": 17.0780, "lon": 82.1380},
             "rajamahendravaram": {"name": "Rajamahendravaram NH-16 / Godavari Corridor, AP, India", "lat": 16.9850, "lon": 81.7820},
             "rajahmundry": {"name": "Rajahmundry Godavari Bund Corridor, AP, India", "lat": 16.9850, "lon": 81.7820},
+            "visakhapatnam": {"name": "Visakhapatnam Beach Road / NH-16 Corridor, AP, India", "lat": 17.6868, "lon": 83.2185},
             "vijayawada": {"name": "Vijayawada Kanaka Durga Flyover / NH-65, AP, India", "lat": 16.5150, "lon": 80.6150},
+            "amaravati": {"name": "Amaravati Seed Access Road Corridor, AP, India", "lat": 16.5410, "lon": 80.5150},
+            "guntur": {"name": "Guntur Inner Ring Road Corridor, AP, India", "lat": 16.3067, "lon": 80.4365},
             "hyderabad": {"name": "Hyderabad Outer Ring Road (ORR / Gachibowli), Telangana", "lat": 17.4400, "lon": 78.3489},
             "kanpur": {"name": "Kanpur GT Road / NH-19 Corridor, Uttar Pradesh", "lat": 26.4720, "lon": 80.3250},
             "bengaluru": {"name": "Bengaluru Silk Board / Hosur Road Corridor, Karnataka", "lat": 12.9170, "lon": 77.6230},

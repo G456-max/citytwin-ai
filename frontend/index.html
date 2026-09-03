@@ -59,10 +59,14 @@
             </button>
 
             <!-- Quick City Corridor Presets -->
-            <select id="select-city-preset" class="bg-slate-900 border border-slate-800 text-[11px] text-slate-300 px-2 py-1 rounded focus:outline-none focus:border-sky-500 transition max-w-[150px] font-mono">
+            <select id="select-city-preset" class="bg-slate-900 border border-slate-800 text-[11px] text-slate-300 px-2 py-1 rounded focus:outline-none focus:border-sky-500 transition max-w-[160px] font-mono">
                 <option value="">-- Corridors --</option>
-                <option value="16.9850,81.7820|Rajamahendravaram NH-16 (AP)">📍 Rajamahendravaram NH-16</option>
-                <option value="16.5150,80.6150|Vijayawada Kanaka Durga (AP)">📍 Vijayawada Flyover</option>
+                <option value="17.0890,82.0667|Surampalem ADB Road (AP)">📍 Surampalem ADB Rd</option>
+                <option value="16.9850,81.7820|Rajamahendravaram NH-16 (AP)">📍 Rajamahendravaram</option>
+                <option value="16.9890,82.2475|Kakinada Port Highway (AP)">📍 Kakinada Port Rd</option>
+                <option value="17.0500,82.1670|Samalkota Industrial (AP)">📍 Samalkota Corridor</option>
+                <option value="17.6868,83.2185|Visakhapatnam NH-16 (AP)">📍 Visakhapatnam Beach</option>
+                <option value="16.5150,80.6150|Vijayawada Flyover (AP)">📍 Vijayawada Flyover</option>
                 <option value="17.4400,78.3489|Hyderabad Outer Ring Road">📍 Hyderabad ORR</option>
                 <option value="26.4720,80.3250|Kanpur GT Road (UP)">📍 Kanpur GT Road</option>
                 <option value="12.9170,77.6230|Bengaluru Silk Board (KA)">📍 Bengaluru Hosur Rd</option>
@@ -196,11 +200,26 @@
 
         </section>
 
-        <!-- RIGHT VIEWPORT: Progressive Viewports Panel (Shows only 1 viewport at a time) -->
+        <!-- RIGHT VIEWPORT: Progressive Viewports Panel -->
         <section class="flex-1 flex flex-col min-w-0 bg-slate-900 border border-slate-800 rounded-xl h-full shadow-sm overflow-hidden relative">
             
+            <!-- TOP VIEWPORT TAB SWITCHER -->
+            <div class="px-4 py-2 border-b border-slate-800 bg-slate-950 flex flex-wrap items-center justify-between gap-2 shrink-0">
+                <div class="flex items-center gap-2">
+                    <button id="tab-nav-map" class="px-3 py-1 rounded-lg text-xs font-bold bg-sky-600 text-white shadow flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-map-location-dot"></i> 1. Live Spatial Map (Scroll & Inspect)
+                    </button>
+                    <button id="tab-nav-slider" class="px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-wand-magic-sparkles text-sky-400"></i> 2. Future Vision Wipe Slider
+                    </button>
+                </div>
+                <div class="flex items-center gap-2 text-[10px] font-mono text-slate-400">
+                    <span class="text-emerald-400"><i class="fa-solid fa-crosshairs mr-1"></i> Continuous Inch-by-Inch GIS GPS</span>
+                </div>
+            </div>
+
             <!-- VIEWPORT B: Live Spatial Compliance Map (Default Active View) -->
-            <div id="viewport-map" class="w-full h-full flex flex-col">
+            <div id="viewport-map" class="w-full flex-1 flex flex-col">
                 
                 <!-- Map Top Panel Bar -->
                 <div class="px-5 py-3 border-b border-slate-800 bg-slate-950/40 flex flex-wrap justify-between items-center gap-3 shrink-0">

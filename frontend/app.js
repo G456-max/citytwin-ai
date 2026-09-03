@@ -71,23 +71,30 @@ class MapController {
     }
 
     init() {
-        // Centered at Godavari Bund Road / NH-16 (Rajamahendravaram) real GPS coords
+        // Centered at Godavari Bund Road / NH-16 (Rajamahendravaram) real GPS coords with high-precision scrolling & smooth zoom
         this.map = L.map(this.mapId, {
             center: [16.9850, 81.7820],
             zoom: 16,
-            maxZoom: 19
+            minZoom: 3,
+            maxZoom: 22,
+            scrollWheelZoom: true,
+            smoothWheelZoom: true,
+            wheelDebounceTime: 40,
+            wheelPxPerZoomLevel: 60
         });
 
-        // 1. High-Resolution Real Satellite Imagery (Esri World Imagery)
+        // 1. High-Resolution Real Satellite Imagery (Esri World Imagery) with maxZoom 22
         this.satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 19,
+            maxNativeZoom: 19,
+            maxZoom: 22,
             attribution: 'Tiles &copy; Esri &mdash; DigitalGlobe, GeoEye, Earthstar Geographics',
             className: 'satellite-tiles'
         }).addTo(this.map);
 
         // 2. High-Contrast Dark Street Vector Basemap
         this.vectorLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
+            maxNativeZoom: 19,
+            maxZoom: 22,
             attribution: '&copy; OpenStreetMap contributors',
             className: 'dark-tiles'
         });
@@ -695,6 +702,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const vWelcome = document.getElementById('viewport-welcome');
         const vMap = document.getElementById('viewport-map');
         const vSlider = document.getElementById('viewport-slider');
+        const tabMap = document.getElementById('tab-nav-map');
+        const tabSlider = document.getElementById('tab-nav-slider');
         
         if (vWelcome) vWelcome.classList.add('hidden');
         if (vMap) vMap.classList.add('hidden');
@@ -703,11 +712,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const target = document.getElementById(viewportId);
         if (target) target.classList.remove('hidden');
         
-        // Force Leaflet map resize calculation to reload tiles correctly on tab switch
-        if (viewportId === 'viewport-map' && mapCtrl && mapCtrl.map) {
-            setTimeout(() => {
-                mapCtrl.map.invalidateSize();
-            }, 150);
+        if (viewportId === 'viewport-map') {
+            if (tabMap) tabMap.className = "px-3 py-1 rounded-lg text-xs font-bold bg-sky-600 text-white shadow flex items-center gap-1.5 transition";
+            if (tabSlider) tabSlider.className = "px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1.5 transition";
+            if (mapCtrl && mapCtrl.map) {
+                setTimeout(() => {
+                    mapCtrl.map.invalidateSize();
+                }, 150);
+            }
+        } else if (viewportId === 'viewport-slider') {
+            if (tabMap) tabMap.className = "px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1.5 transition";
+            if (tabSlider) tabSlider.className = "px-3 py-1 rounded-lg text-xs font-bold bg-sky-600 text-white shadow flex items-center gap-1.5 transition";
         }
     }
 
@@ -919,6 +934,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btnCloseModalFooter && modal) {
             btnCloseModalFooter.addEventListener('click', () => modal.classList.add('hidden'));
         }
+
+        // Viewport Tab Switchers
+        document.getElementById('tab-nav-map')?.addEventListener('click', () => switchViewport('viewport-map'));
+        document.getElementById('tab-nav-slider')?.addEventListener('click', () => {
+            switchViewport('viewport-slider');
+            const style = document.getElementById('select-style-preset')?.value || 'Realistic Daylight';
+            synthesizeFutureView(style);
+        });
     }
 
     init();
