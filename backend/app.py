@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Optional
 
 from backend.schemas import (
-    SystemHealthResponse, AuditResponse, RenderRequest, RenderResponse,
+    SystemHealthResponse, AuditRequest, AuditResponse, RenderRequest, RenderResponse,
     DynamicAuditRequest, DynamicAuditResponse, SimulateEncroachmentRequest, SimulateEncroachmentResponse,
     DynamicPDFRequest
 )
@@ -147,6 +147,11 @@ def run_compliance_audit():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Compliance audit pipeline error: {str(e)}")
 
+@app.post("/api/audit/real", response_model=AuditResponse)
+def run_real_audit_alias(request: Optional[AuditRequest] = None):
+    """Backwards-compatible alias for /api/audit/run."""
+    return run_compliance_audit()
+
 # -------------------------------------------------------------------------
 # 2B. Universal Dynamic Spatial Audit Route (Any GPS Coordinate on Earth)
 # -------------------------------------------------------------------------
@@ -271,6 +276,11 @@ def generate_visual_render(request: Optional[RenderRequest] = None):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Texture synthesis pipeline error: {str(e)}")
+
+@app.post("/api/render/real", response_model=RenderResponse)
+def generate_real_render_alias(request: Optional[RenderRequest] = None):
+    """Backwards-compatible alias for /api/render/generate."""
+    return generate_visual_render(request)
 
 # -------------------------------------------------------------------------
 # 4. Tree Canopy Addons Route
@@ -485,6 +495,7 @@ def serve_index():
         raise HTTPException(status_code=404, detail="Index.html not found.")
     return FileResponse(str(index_html_path))
 
-# Mount static asset directory to serve CSS and JS
+# Mount static asset directory to serve CSS, JS, and media
 app.mount("/static", StaticFiles(directory=str(frontend_path)), name="static")
+app.mount("/", StaticFiles(directory=str(frontend_path), html=True), name="frontend")
 print(f"Mounted static folder: {frontend_path.resolve()}")

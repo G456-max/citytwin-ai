@@ -1,4 +1,4 @@
-﻿import math
+import math
 import random
 import json
 import urllib.request
@@ -7,6 +7,7 @@ import ssl
 from typing import Dict, Any, List, Optional, Tuple
 import shapely.geometry as sg
 import shapely.ops as so
+from shapely import affinity
 import pyproj
 
 class DynamicCorridorAuditor:
@@ -148,7 +149,7 @@ class DynamicCorridorAuditor:
                 p_wgs = sg.shape(st_feat["geometry"])
                 p_utm = so.transform(transformer_to_utm.transform, p_wgs)
                 # Shift towards road
-                shifted_utm = sg.affinity.translate(p_utm, xoff=random.uniform(-10, 10), yoff=random.uniform(-10, 10))
+                shifted_utm = affinity.translate(p_utm, xoff=random.uniform(-10, 10), yoff=random.uniform(-10, 10))
                 if shifted_utm.intersects(road_row_utm):
                     inter = shifted_utm.intersection(road_row_utm)
                     enc_a = inter.area
