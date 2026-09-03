@@ -140,10 +140,10 @@ class BlueprintLockedVisualizer:
 
         # Detected Compliant Buildings (Amber Outlines)
         bldgs = [
-            (int(w * 0.80), 40, 100, 70, "BLDG_004 Market Arcade"),
-            (int(w * 0.80), 150, 110, 80, "BLDG_006 Sri Rama Temple"),
-            (int(w * 0.80), 270, 95, 75, "BLDG_007 View Plaza"),
-            (int(w * 0.05), 200, 70, 60, "BLDG_003 Boat House")
+            (int(w * 0.80), 40, 100, 70, "BLDG_004 Campus Block A"),
+            (int(w * 0.80), 150, 110, 80, "BLDG_006 Engineering Lab"),
+            (int(w * 0.80), 270, 95, 75, "BLDG_007 ADB Tech Plaza"),
+            (int(w * 0.05), 200, 70, 60, "BLDG_003 Innovation Hub")
         ]
         for bx, by, bw, bh, bname in bldgs:
             cv2.rectangle(scene, (bx, by), (bx + bw, by + bh), (40, 42, 48), -1)
@@ -153,9 +153,9 @@ class BlueprintLockedVisualizer:
         # 4 Sensed Illegal Encroachments (Red Hazard Overlays Intruding Past the 30m RoW)
         encroachments = [
             (int(w * 0.32), 70, 75, 55, "ENC_001 Commercial Hub (+6.8m)"),
-            (int(w * 0.60), 160, 80, 65, "ENC_002 Residency Wall (+5.2m)"),
-            (int(w * 0.33), 260, 65, 50, "ENC_003 Boat Shed (+4.5m)"),
-            (int(w * 0.58), 350, 70, 45, "ENC_004 Bus Kiosks (+3.8m)")
+            (int(w * 0.60), 160, 80, 65, "ENC_002 Boundary Wall (+5.2m)"),
+            (int(w * 0.33), 260, 65, 50, "ENC_003 Parking Shed (+4.5m)"),
+            (int(w * 0.58), 350, 70, 45, "ENC_004 Transit Kiosks (+3.8m)")
         ]
         for ex, ey, ew, eh, elabel in encroachments:
             overlay = scene.copy()
@@ -176,7 +176,7 @@ class BlueprintLockedVisualizer:
         cv2.circle(scene, (gcp_x, gcp_y), 4, (140, 230, 80), -1)
         cv2.line(scene, (gcp_x - 24, gcp_y), (gcp_x + 24, gcp_y), (140, 230, 80), 1)
         cv2.line(scene, (gcp_x, gcp_y - 24), (gcp_x, gcp_y + 24), (140, 230, 80), 1)
-        cv2.putText(scene, "GCP_01 (16.9850N, 81.7820E)", (gcp_x + 12, gcp_y - 8), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (140, 230, 80), 1)
+        cv2.putText(scene, "GCP_01 Surampalem ADB Rd [17.0890N, 82.0667E]", (gcp_x + 12, gcp_y - 8), cv2.FONT_HERSHEY_SIMPLEX, 0.33, (140, 230, 80), 1)
 
         rgb = cv2.cvtColor(scene, cv2.COLOR_BGR2RGB)
         return Image.fromarray(rgb)

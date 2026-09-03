@@ -71,9 +71,9 @@ class MapController {
     }
 
     init() {
-        // Centered at Godavari Bund Road / NH-16 (Rajamahendravaram) real GPS coords with high-precision scrolling & smooth zoom
+        // Centered at Surampalem ADB Road Smart Corridor (17.0890° N, 82.0667° E) with high-precision scrolling & smooth zoom
         this.map = L.map(this.mapId, {
-            center: [16.9850, 81.7820],
+            center: [17.0890, 82.0667],
             zoom: 16,
             minZoom: 3,
             maxZoom: 22,
@@ -146,7 +146,7 @@ class MapController {
 
     snapToCorridor() {
         if (!this.map) return;
-        this.map.setView([16.9850, 81.7820], 16, { animate: true, duration: 1.0 });
+        this.map.setView([17.0890, 82.0667], 16, { animate: true, duration: 1.0 });
     }
 
     dropGPSInspector(latlng) {
@@ -385,9 +385,9 @@ document.addEventListener('DOMContentLoaded', () => {
         bindEvents();
         checkSystemHealth();
         
-        // Initial setup load: open live map and pre-load compliance layers & future visualizer
+        // Initial setup load: open live map and run universal dynamic audit on Surampalem corridor!
         switchViewport('viewport-map');
-        triggerComplianceAudit();
+        executeDynamicSpatialAudit(17.0890, 82.0667, null, "Surampalem ADB Road Smart Corridor (AP)");
         synthesizeFutureView('Realistic Daylight');
     }
 
@@ -909,7 +909,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function bindEvents() {
         document.getElementById('btn-step1-audit').addEventListener('click', () => {
             switchViewport('viewport-map');
-            triggerComplianceAudit();
+            const center = mapCtrl && mapCtrl.map ? mapCtrl.map.getCenter() : { lat: 17.0890, lng: 82.0667 };
+            const b = mapCtrl && mapCtrl.map ? mapCtrl.map.getBounds() : null;
+            const bbox = b ? [b.getSouth(), b.getWest(), b.getNorth(), b.getEast()] : null;
+            const locName = document.getElementById('active-location-name-badge')?.innerText || "Surampalem ADB Road Smart Corridor";
+            executeDynamicSpatialAudit(center.lat, center.lng, bbox, locName);
         });
 
         document.getElementById('btn-step2-render').addEventListener('click', () => {

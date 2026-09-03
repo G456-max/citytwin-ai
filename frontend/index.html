@@ -51,7 +51,7 @@
         <!-- Real Location Geocoding & Upload Bar -->
         <div class="flex-1 max-w-2xl flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 shadow-inner">
             <i class="fa-solid fa-magnifying-glass-location text-sky-400 text-sm"></i>
-            <input id="input-location-search" type="text" placeholder="Search any city, road, or GPS coords (e.g. 'Rajamahendravaram', '16.985, 81.782')..." 
+            <input id="input-location-search" type="text" placeholder="Search any city, road, or GPS coords (e.g. 'Surampalem', '17.089, 82.066')..." 
                    class="bg-transparent text-xs text-slate-200 placeholder-slate-500 focus:outline-none flex-1 font-sans">
             
             <button id="btn-search-location" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-3 py-1 rounded text-[11px] transition shadow-sm flex items-center gap-1.5 shrink-0">
@@ -60,12 +60,10 @@
 
             <!-- Quick City Corridor Presets -->
             <select id="select-city-preset" class="bg-slate-900 border border-slate-800 text-[11px] text-slate-300 px-2 py-1 rounded focus:outline-none focus:border-sky-500 transition max-w-[160px] font-mono">
-                <option value="">-- Corridors --</option>
-                <option value="17.0890,82.0667|Surampalem ADB Road (AP)">📍 Surampalem ADB Rd</option>
-                <option value="16.9850,81.7820|Rajamahendravaram NH-16 (AP)">📍 Rajamahendravaram</option>
+                <option value="17.0890,82.0667|Surampalem ADB Road Smart Corridor (AP)">📍 Surampalem ADB Rd</option>
                 <option value="16.9890,82.2475|Kakinada Port Highway (AP)">📍 Kakinada Port Rd</option>
                 <option value="17.0500,82.1670|Samalkota Industrial (AP)">📍 Samalkota Corridor</option>
-                <option value="17.6868,83.2185|Visakhapatnam NH-16 (AP)">📍 Visakhapatnam Beach</option>
+                <option value="17.6868,83.2185|Visakhapatnam Beach Road (AP)">📍 Visakhapatnam Beach</option>
                 <option value="16.5150,80.6150|Vijayawada Flyover (AP)">📍 Vijayawada Flyover</option>
                 <option value="17.4400,78.3489|Hyderabad Outer Ring Road">📍 Hyderabad ORR</option>
                 <option value="26.4720,80.3250|Kanpur GT Road (UP)">📍 Kanpur GT Road</option>
@@ -226,7 +224,7 @@
                     <div class="flex items-center gap-3">
                         <div class="flex items-center gap-1.5 bg-sky-950/60 text-sky-400 border border-sky-800/60 px-2.5 py-1 rounded-md text-[11px] font-mono">
                             <i class="fa-solid fa-location-dot text-rose-500 animate-pulse"></i>
-                            <span id="active-location-name-badge" class="font-bold">Rajamahendravaram NH-16 (AP, India)</span>
+                            <span id="active-location-name-badge" class="font-bold">Surampalem ADB Road Smart Corridor (AP, India)</span>
                         </div>
                         <span id="active-utm-zone-badge" class="text-[10px] text-slate-500 font-mono hidden md:inline">EPSG:32644 (UTM Zone 44N)</span>
                     </div>
@@ -279,11 +277,11 @@
                     <div class="flex items-center gap-3">
                         <div class="flex items-center gap-1.5 text-slate-400 bg-slate-900/90 px-2.5 py-1 rounded border border-slate-800">
                             <span class="text-slate-500 font-semibold">GPS:</span>
-                            <span id="map-live-gps" class="text-emerald-400 font-bold font-mono">16.98500° N, 81.78200° E</span>
+                            <span id="map-live-gps" class="text-emerald-400 font-bold font-mono">17.08900° N, 82.06670° E</span>
                         </div>
                         <div class="hidden xl:flex items-center gap-1.5 text-slate-400 bg-slate-900/90 px-2.5 py-1 rounded border border-slate-800">
                             <span class="text-slate-500 font-semibold">UTM:</span>
-                            <span id="map-live-utm" class="text-sky-400 font-mono">X: 432,719m | Y: 2,928,120m</span>
+                            <span id="map-live-utm" class="text-sky-400 font-mono">X: 432,800m | Y: 1,890,200m</span>
                         </div>
                     </div>
                 </div>
@@ -299,7 +297,7 @@
                     </div>
                     <div class="flex items-center gap-3">
                         <span class="text-slate-500">LAYERS:</span>
-                        <label class="flex items-center gap-1 cursor-pointer text-amber-300 hover:text-white"><input type="checkbox" id="toggle-layer-bldgs" checked class="accent-amber-500"> 🏢 18 Buildings</label>
+                        <label class="flex items-center gap-1 cursor-pointer text-amber-300 hover:text-white"><input type="checkbox" id="toggle-layer-bldgs" checked class="accent-amber-500"> 🏢 Structures</label>
                         <label class="flex items-center gap-1 cursor-pointer text-rose-400 hover:text-rose-300"><input type="checkbox" id="toggle-layer-viol" checked class="accent-rose-500"> ⛔ Violations</label>
                         <label class="flex items-center gap-1 cursor-pointer text-sky-400 hover:text-sky-300"><input type="checkbox" id="toggle-layer-row" checked class="accent-sky-500"> 🛣️ Road RoW</label>
                         <label class="flex items-center gap-1 cursor-pointer text-emerald-400 hover:text-emerald-300"><input type="checkbox" id="toggle-layer-canopy" checked class="accent-emerald-500"> 🌲 Canopy</label>
@@ -314,7 +312,7 @@
                         <!-- Floating In-Map Quick Search Locator -->
                         <div class="absolute top-3 left-14 z-[400] flex items-center gap-1.5 bg-slate-950/90 backdrop-blur-md p-1.5 rounded-lg border border-slate-750 shadow-2xl">
                             <i class="fa-solid fa-location-crosshairs text-sky-400 ml-1.5 text-xs"></i>
-                            <input id="input-map-quicksearch" type="text" placeholder="Locate on map (e.g. '16.985, 81.782' or 'Temple')..." 
+                            <input id="input-map-quicksearch" type="text" placeholder="Locate on map (e.g. '17.089, 82.066' or 'Campus')..." 
                                    class="bg-transparent text-xs text-slate-100 placeholder-slate-500 focus:outline-none w-52 md:w-64 font-sans px-1">
                             <button id="btn-map-quicksearch" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-2.5 py-1 rounded text-[10px] font-mono transition">
                                 Locate
@@ -343,7 +341,7 @@
                 <div class="px-4 py-2 border border-slate-800 rounded-xl bg-slate-950/90 flex flex-wrap items-center justify-between text-[10.5px] font-mono shrink-0 gap-3 w-full shadow-md">
                     <div class="flex items-center gap-2">
                         <span class="text-sky-400 font-bold flex items-center gap-1.5"><i class="fa-solid fa-satellite-dish"></i> SENSED CORRIDOR:</span>
-                        <span id="slider-sensing-location" class="bg-slate-900 px-2.5 py-0.5 rounded border border-slate-800 text-slate-200 font-semibold">Rajamahendravaram NH-16 (16.9850°N, 81.7820°E)</span>
+                        <span id="slider-sensing-location" class="bg-slate-900 px-2.5 py-0.5 rounded border border-slate-800 text-slate-200 font-semibold">Surampalem ADB Road Smart Corridor (17.0890°N, 82.0667°E)</span>
                     </div>
                     <div class="flex flex-wrap items-center gap-2 text-slate-400">
                         <span class="bg-slate-900 px-2 py-0.5 rounded border border-slate-800 text-rose-400"><i class="fa-solid fa-ban mr-1"></i> <span id="slider-enc-cleared">4 Encroachments Cleared (1,261 m²)</span></span>

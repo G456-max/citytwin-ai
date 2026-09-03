@@ -224,8 +224,8 @@ def generate_visual_render(request: Optional[RenderRequest] = None):
         message = "Procedural CPU fallback" if visualizer.use_fallback else "Stable Diffusion GPU acceleration"
 
         sensing_telemetry = {
-            "location_name": "Rajamahendravaram NH-16 / Godavari Bund Corridor",
-            "gps_centroid": "16.98500° N, 81.78200° E",
+            "location_name": "Surampalem ADB Road Smart Corridor",
+            "gps_centroid": "17.08900° N, 82.06670° E",
             "existing_width_m": 14.2,
             "sanctioned_width_m": 30.0,
             "encroachments_cleared": 4,
@@ -396,7 +396,7 @@ def download_compliance_pdf():
         pdf_path = CompliancePDFGenerator.generate_report(
             audit_results=audit_results,
             canopy_results=canopy_results,
-            project_name="Rajamahendravaram Godavari Bund widening",
+            project_name="Surampalem ADB Road Smart Highway Expansion",
             output_pdf_path=pdf_out
         )
 
