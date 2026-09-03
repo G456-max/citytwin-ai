@@ -76,3 +76,14 @@ class SimulateEncroachmentResponse(BaseModel):
     infringement_percentage: float
     compliance_grade: str
     feature: Dict[str, Any]
+
+class DynamicPDFRequest(BaseModel):
+    location_name: Optional[str] = "Surampalem ADB Road Smart Corridor"
+    gps_coords: Optional[str] = "17.08900° N, 82.06670° E"
+    utm_zone: Optional[str] = "EPSG:32644 (UTM Zone 44N)"
+    compliance_grade: Optional[str] = "F"
+    flags_count: Optional[int] = 4
+    total_encroachment_m2: Optional[float] = 1261.22
+    canopy_loss_m2: Optional[float] = 85.4
+    trees_mandated_count: Optional[int] = 36
+    violations: Optional[List[Dict[str, Any]]] = None

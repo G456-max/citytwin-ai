@@ -11,7 +11,8 @@ from typing import Optional
 
 from backend.schemas import (
     SystemHealthResponse, AuditResponse, RenderRequest, RenderResponse,
-    DynamicAuditRequest, DynamicAuditResponse, SimulateEncroachmentRequest, SimulateEncroachmentResponse
+    DynamicAuditRequest, DynamicAuditResponse, SimulateEncroachmentRequest, SimulateEncroachmentResponse,
+    DynamicPDFRequest
 )
 from backend.config import BASE_DIR, RAW_DIR, PROCESSED_DIR
 
@@ -386,50 +387,90 @@ def search_real_location(query: str):
         }]}
 
 # -------------------------------------------------------------------------
-# 6. Executive PDF Report Download Route
+# 6. Executive PDF Report Download Route (Dynamic Targeted Location)
 # -------------------------------------------------------------------------
 @app.get("/api/reports/download-pdf")
-def download_compliance_pdf():
-    """Generates and streams the formal municipal compliance report PDF."""
+def download_compliance_pdf(
+    location_name: Optional[str] = "Surampalem ADB Road Smart Corridor",
+    lat: Optional[float] = 17.0890,
+    lon: Optional[float] = 82.0667,
+    utm_zone: Optional[str] = "EPSG:32644 (UTM Zone 44N)"
+):
+    """Generates and streams the formal municipal compliance report PDF for the targeted location."""
     try:
-        # 1. Run audit calculations to gather data
-        real_struct_out = str(PROCESSED_DIR / "real_detected_structures.geojson")
-        segmenter = GeospatialSegmentationEngine()
-        structures_gdf = segmenter.extract_footprints_from_raster(ortho_path, real_struct_out)
-
-        auditor = CorridorDiscrepancyAuditor(row_path)
-        real_flags_out = str(PROCESSED_DIR / "discrepancy_flags.geojson")
-        audit_results = auditor.audit_structures(
-            structures_gdf,
-            target_utm_crs="EPSG:32644",
-            output_flags_path=real_flags_out
+        # Run dynamic audit on the targeted location coordinates
+        audit_res = DynamicCorridorAuditor.audit_location(
+            lat=lat,
+            lon=lon,
+            location_name=location_name
         )
 
-        # 2. Run canopy loss indicators
-        canopy_out = str(PROCESSED_DIR / "canopy_loss.geojson")
-        canopy_results = TreeCanopyAuditor.audit_canopy_loss(
-            orthomosaic_path=ortho_path,
-            row_path=row_path,
-            output_geojson_path=canopy_out
-        )
+        safe_name = "".join(c if c.isalnum() else "_" for c in location_name).strip("_")
+        pdf_filename = f"{safe_name}_Compliance_Certificate.pdf"
+        pdf_out = str(PROCESSED_DIR / pdf_filename)
 
-        # 3. Generate ReportLab PDF
-        pdf_out = str(PROCESSED_DIR / "compliance_audit_report.pdf")
+        canopy_data = {
+            "total_canopy_loss_area_m2": audit_res["canopy_loss_m2"],
+            "replanting_mandate_saplings": audit_res["trees_mandated_count"]
+        }
+
         pdf_path = CompliancePDFGenerator.generate_report(
-            audit_results=audit_results,
-            canopy_results=canopy_results,
-            project_name="Surampalem ADB Road Smart Highway Expansion",
-            output_pdf_path=pdf_out
+            audit_results=audit_res,
+            canopy_results=canopy_data,
+            project_name=f"{location_name} Widening Project",
+            output_pdf_path=pdf_out,
+            location_name=location_name,
+            gps_coords=f"{lat:.5f}° N, {lon:.5f}° E",
+            utm_zone=audit_res.get("utm_zone", utm_zone)
         )
 
         return FileResponse(
             path=pdf_path,
             media_type="application/pdf",
-            filename="Municipal_Corridor_Compliance_Report.pdf"
+            filename=pdf_filename
         )
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"PDF report generation failed: {str(e)}")
+
+@app.post("/api/reports/generate-dynamic-pdf")
+def generate_active_state_pdf(request: DynamicPDFRequest):
+    """Compiles active frontend audit state into a court-admissible PDF for the targeted location."""
+    try:
+        loc_name = request.location_name or "Surampalem ADB Road Smart Corridor"
+        safe_name = "".join(c if c.isalnum() else "_" for c in loc_name).strip("_")
+        pdf_filename = f"{safe_name}_Compliance_Certificate.pdf"
+        pdf_out = str(PROCESSED_DIR / pdf_filename)
+
+        audit_data = {
+            "total_violations": request.flags_count or 0,
+            "total_encroachment_area_m2": request.total_encroachment_m2 or 0.0,
+            "compliance_grade": request.compliance_grade or "F",
+            "violations": request.violations or []
+        }
+
+        canopy_data = {
+            "total_canopy_loss_area_m2": request.canopy_loss_m2 or 0.0,
+            "replanting_mandate_saplings": request.trees_mandated_count or 18
+        }
+
+        pdf_path = CompliancePDFGenerator.generate_report(
+            audit_results=audit_data,
+            canopy_results=canopy_data,
+            project_name=f"{loc_name} Expansion Project",
+            output_pdf_path=pdf_out,
+            location_name=loc_name,
+            gps_coords=request.gps_coords or "17.08900° N, 82.06670° E",
+            utm_zone=request.utm_zone or "EPSG:32644 (UTM Zone 44N)"
+        )
+
+        return FileResponse(
+            path=pdf_path,
+            media_type="application/pdf",
+            filename=pdf_filename
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Dynamic PDF compilation failed: {str(e)}")
 
 # -------------------------------------------------------------------------
 # 6. Serving Static Frontend Viewport

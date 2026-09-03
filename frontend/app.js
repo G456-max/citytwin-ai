@@ -878,12 +878,113 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function exportJSONReport() {
-        if (!auditData) return alert("Audit data missing to export.");
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(auditData, null, 4));
+        if (!auditData) return alert("Audit data missing to export. Please audit a location first.");
+        const locName = document.getElementById('active-location-name-badge')?.innerText || "Surampalem_Corridor";
+        const safeName = locName.replace(/[^a-zA-Z0-9]/g, '_');
+        
+        const exportPayload = {
+            metadata: {
+                system: "CityTwin AI Spatial Compliance Engine v3.0",
+                targeted_location: locName,
+                timestamp: new Date().toISOString(),
+                spatial_datum: document.getElementById('active-utm-zone-badge')?.innerText || "EPSG:32644",
+                compliance_grade: document.getElementById('compliance-grade-text')?.innerText || "F"
+            },
+            summary: {
+                total_violations: auditData.flags_count || 0,
+                encroached_area_m2: auditData.total_encroachment_m2 || 0.0,
+                canopy_loss_m2: auditData.canopy_loss_m2 || 0.0,
+                replanting_mandate_trees: auditData.trees_mandated_count || 18
+            },
+            discrepancy_features: auditData.geojson || {},
+            building_footprints: auditData.all_structures_geojson || {},
+            road_right_of_way: auditData.row_geojson || {}
+        };
+
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 4));
         const dlAnchor = document.createElement('a');
         dlAnchor.setAttribute("href", dataStr);
-        dlAnchor.setAttribute("download", `compliance_logs_${new Date().toISOString().slice(0, 10)}.json`);
+        dlAnchor.setAttribute("download", `CityTwin_${safeName}_Audit_${new Date().toISOString().slice(0, 10)}.json`);
+        document.body.appendChild(dlAnchor);
         dlAnchor.click();
+        dlAnchor.remove();
+    }
+
+    async function downloadTargetedLocationPDF() {
+        const btnPdf = document.getElementById('btn-step3-pdf');
+        const origHtml = btnPdf ? btnPdf.innerHTML : '';
+        if (btnPdf) {
+            btnPdf.disabled = true;
+            btnPdf.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Generating PDF...';
+        }
+
+        try {
+            const locName = document.getElementById('active-location-name-badge')?.innerText || "Surampalem ADB Road Smart Corridor";
+            const center = mapCtrl && mapCtrl.map ? mapCtrl.map.getCenter() : { lat: 17.0890, lng: 82.0667 };
+            const utmBadge = document.getElementById('active-utm-zone-badge')?.innerText || "EPSG:32644 (UTM Zone 44N)";
+            const grade = document.getElementById('compliance-grade-text')?.innerText || "F";
+            const flags = auditData ? auditData.flags_count : 4;
+            const area = auditData ? auditData.total_encroachment_m2 : 1261.22;
+            const canopyLoss = auditData ? auditData.canopy_loss_m2 : 85.0;
+            const trees = auditData ? auditData.trees_mandated_count : 36;
+
+            const violationsList = [];
+            if (auditData && auditData.geojson && auditData.geojson.features) {
+                auditData.geojson.features.forEach(f => {
+                    const p = f.properties || {};
+                    violationsList.push({
+                        encroachment_id: p.encroachment_id || "ENC_001",
+                        structure_name: p.structure_name || "Roadside Structure",
+                        centroid_lat: p.gps_centroid ? p.gps_centroid[0] : center.lat,
+                        centroid_lon: p.gps_centroid ? p.gps_centroid[1] : center.lng,
+                        max_intrusion_depth_m: p.max_penetration_m || 4.5,
+                        area_m2: p.encroached_area_m2 || 50.0,
+                        severity: (p.encroached_area_m2 || 50) > 100 ? "Critical" : "Medium",
+                        action_status: p.action_status || "FLAGGED_FOR_EVICTION"
+                    });
+                });
+            }
+
+            const resp = await fetch('/api/reports/generate-dynamic-pdf', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    location_name: locName,
+                    gps_coords: `${center.lat.toFixed(5)}° N, ${center.lng.toFixed(5)}° E`,
+                    utm_zone: utmBadge,
+                    compliance_grade: grade,
+                    flags_count: flags,
+                    total_encroachment_m2: area,
+                    canopy_loss_m2: canopyLoss,
+                    trees_mandated_count: trees,
+                    violations: violationsList
+                })
+            });
+
+            if (resp.ok) {
+                const blob = await resp.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                const safeName = locName.replace(/[^a-zA-Z0-9]/g, '_');
+                a.download = `${safeName}_Compliance_Certificate.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            } else {
+                const safeUrl = `/api/reports/download-pdf?location_name=${encodeURIComponent(locName)}&lat=${center.lat}&lon=${center.lng}`;
+                window.open(safeUrl, '_blank');
+            }
+        } catch (err) {
+            console.error("PDF generation failed: ", err);
+            const locName = document.getElementById('active-location-name-badge')?.innerText || "Surampalem ADB Road Smart Corridor";
+            window.open(`/api/reports/download-pdf?location_name=${encodeURIComponent(locName)}`, '_blank');
+        } finally {
+            if (btnPdf) {
+                btnPdf.disabled = false;
+                btnPdf.innerHTML = origHtml;
+            }
+        }
     }
 
     function switchViewport(viewportId) {
@@ -1015,7 +1116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.getElementById('btn-step3-pdf').addEventListener('click', () => {
-            window.open('/api/reports/download-pdf', '_blank');
+            downloadTargetedLocationPDF();
         });
 
         document.getElementById('btn-export-json').addEventListener('click', exportJSONReport);
