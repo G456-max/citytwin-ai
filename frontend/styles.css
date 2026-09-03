@@ -31,13 +31,17 @@ body {
     background: #334155;
 }
 
-/* Map Dark Theme Tile Inversion Filter */
+/* Map Dark Theme Tile Inversion Filter (applied only to street vectors) */
 .leaflet-container {
     background-color: #030712 !important;
 }
 
-.leaflet-tile-pane {
+.dark-tiles .leaflet-tile {
     filter: invert(100%) hue-rotate(190deg) brightness(85%) contrast(95%);
+}
+
+.satellite-tiles .leaflet-tile {
+    filter: none !important;
 }
 
 .leaflet-popup-content-wrapper {

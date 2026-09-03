@@ -60,24 +60,117 @@ class MapController {
     constructor(mapId) {
         this.mapId = mapId;
         this.map = null;
+        this.satelliteLayer = null;
+        this.vectorLayer = null;
+        this.activeBasemap = 'satellite';
         this.rowLayer = null;
         this.violationsLayer = null;
         this.canopyLayer = null;
+        this.inspectorMarker = null;
         this.onViolationClick = null;
     }
 
     init() {
-        // Centered initially at Godavari Bund Road / NH-16 (Rajamahendravaram) coords
+        // Centered at Godavari Bund Road / NH-16 (Rajamahendravaram) real GPS coords
         this.map = L.map(this.mapId, {
-            center: [16.9810, 81.7825],
-            zoom: 15
+            center: [16.9850, 81.7820],
+            zoom: 16,
+            maxZoom: 19
         });
 
-        // Set OSM basemap (inverted via CSS filter)
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        // 1. High-Resolution Real Satellite Imagery (Esri World Imagery)
+        this.satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 19,
-            attribution: '© OpenStreetMap'
+            attribution: 'Tiles &copy; Esri &mdash; DigitalGlobe, GeoEye, Earthstar Geographics',
+            className: 'satellite-tiles'
         }).addTo(this.map);
+
+        // 2. High-Contrast Dark Street Vector Basemap
+        this.vectorLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors',
+            className: 'dark-tiles'
+        });
+
+        // 3. Setup Live Real-Time GPS Tracking HUD on Mouse Move
+        this.map.on('mousemove', (e) => {
+            const lat = e.latlng.lat;
+            const lon = e.latlng.lng;
+            const utm = this.latLonToUTM44N(lat, lon);
+            
+            const gpsEl = document.getElementById('map-live-gps');
+            const utmEl = document.getElementById('map-live-utm');
+            if (gpsEl) gpsEl.innerText = `${lat.toFixed(5)}° N, ${lon.toFixed(5)}° E`;
+            if (utmEl) utmEl.innerText = `X: ${Math.round(utm.x).toLocaleString()}m | Y: ${Math.round(utm.y).toLocaleString()}m`;
+        });
+
+        // 4. Click to Inspect Real GPS Pinpoint
+        this.map.on('click', (e) => {
+            this.dropGPSInspector(e.latlng);
+        });
+    }
+
+    setBasemap(type) {
+        if (type === 'satellite') {
+            if (this.map.hasLayer(this.vectorLayer)) this.map.removeLayer(this.vectorLayer);
+            if (!this.map.hasLayer(this.satelliteLayer)) this.map.addLayer(this.satelliteLayer);
+            this.activeBasemap = 'satellite';
+            document.getElementById('btn-layer-satellite').className = "bg-sky-600 text-white font-bold px-2 py-0.5 rounded transition text-[10px] shadow-sm";
+            document.getElementById('btn-layer-vector').className = "bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded transition text-[10px]";
+        } else {
+            if (this.map.hasLayer(this.satelliteLayer)) this.map.removeLayer(this.satelliteLayer);
+            if (!this.map.hasLayer(this.vectorLayer)) this.map.addLayer(this.vectorLayer);
+            this.activeBasemap = 'vector';
+            document.getElementById('btn-layer-vector').className = "bg-sky-600 text-white font-bold px-2 py-0.5 rounded transition text-[10px] shadow-sm";
+            document.getElementById('btn-layer-satellite').className = "bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded transition text-[10px]";
+        }
+    }
+
+    snapToCorridor() {
+        if (!this.map) return;
+        this.map.setView([16.9850, 81.7820], 16, { animate: true, duration: 1.0 });
+    }
+
+    dropGPSInspector(latlng) {
+        const utm = this.latLonToUTM44N(latlng.lat, latlng.lng);
+        if (this.inspectorMarker) this.map.removeLayer(this.inspectorMarker);
+
+        const customIcon = L.divIcon({
+            className: 'custom-pin',
+            html: `<div class="w-6 h-6 rounded-full bg-sky-500/30 border-2 border-sky-400 flex items-center justify-center animate-ping absolute"></div><div class="w-4 h-4 rounded-full bg-sky-500 border-2 border-white shadow-lg flex items-center justify-center text-[8px] text-white font-bold relative"><i class="fa-solid fa-crosshairs"></i></div>`,
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
+        });
+
+        this.inspectorMarker = L.marker(latlng, { icon: customIcon }).addTo(this.map);
+        this.inspectorMarker.bindPopup(`
+            <div class="p-2 text-slate-100 font-sans text-xs">
+                <div class="flex items-center gap-1.5 text-sky-400 font-mono font-bold mb-1">
+                    <i class="fa-solid fa-location-crosshairs"></i>
+                    <span>GPS INSPECTOR PIN</span>
+                </div>
+                <div class="space-y-1 font-mono text-[11px] bg-slate-900/90 p-2 rounded border border-slate-800">
+                    <div><span class="text-slate-500">WGS84 Lat:</span> <span class="text-emerald-400 font-bold">${latlng.lat.toFixed(6)}° N</span></div>
+                    <div><span class="text-slate-500">WGS84 Lon:</span> <span class="text-emerald-400 font-bold">${latlng.lng.toFixed(6)}° E</span></div>
+                    <div class="pt-1 border-t border-slate-800 text-sky-300">
+                        <span class="text-slate-500">UTM 44N:</span> X: ${Math.round(utm.x).toLocaleString()}m, Y: ${Math.round(utm.y).toLocaleString()}m
+                    </div>
+                </div>
+                <div class="mt-2 text-[10px] text-slate-400 text-center">Rajamahendravaram Highway Corridor</div>
+            </div>
+        `).openPopup();
+    }
+
+    latLonToUTM44N(lat, lon) {
+        // Approximate planar metric conversion for Zone 44N centered near Rajahmundry (81°E, 17°N)
+        const latRad = lat * (Math.PI / 180);
+        const lonRad = lon * (Math.PI / 180);
+        const lonOrigin = 81.0 * (Math.PI / 180); // Central meridian for Zone 44
+        const a = 6378137.0;
+        const k0 = 0.9996;
+        const x = 500000 + k0 * a * (lonRad - lonOrigin) * Math.cos(latRad);
+        const y = k0 * a * latRad;
+        return { x, y };
     }
 
     drawRoadBoundary(geojson) {
@@ -88,10 +181,10 @@ class MapController {
             style: () => {
                 return {
                     color: '#38bdf8',      // Sky-400
-                    weight: 2,
+                    weight: 2.5,
                     fillColor: '#38bdf8',
-                    fillOpacity: 0.05,
-                    dashArray: '4, 4'
+                    fillOpacity: 0.1,
+                    dashArray: '5, 5'
                 };
             }
         }).addTo(this.map);
@@ -107,24 +200,34 @@ class MapController {
             style: () => {
                 return {
                     color: '#f43f5e',      // Rose-500
-                    weight: 2.5,
+                    weight: 3,
                     fillColor: '#f43f5e',
-                    fillOpacity: 0.35,
-                    dashArray: '3, 5'
+                    fillOpacity: 0.45,
+                    dashArray: '3, 4'
                 };
             },
             onEachFeature: (feature, layer) => {
                 const props = feature.properties;
+                let centroid = [16.9850, 81.7820];
+                if (feature.geometry && feature.geometry.coordinates) {
+                    const ring = feature.geometry.coordinates[0];
+                    if (ring && ring.length > 0) {
+                        let sumLat = 0, sumLon = 0;
+                        ring.forEach(pt => { sumLon += pt[0]; sumLat += pt[1]; });
+                        centroid = [sumLat / ring.length, sumLon / ring.length];
+                    }
+                }
+
                 const popupHtml = `
-                    <div class="p-2 text-slate-100 font-sans">
-                        <div class="flex items-center gap-2 mb-1.5">
+                    <div class="p-2.5 text-slate-100 font-sans min-w-[220px]">
+                        <div class="flex items-center justify-between gap-2 mb-1.5">
                             <span class="text-[9px] font-mono font-bold bg-rose-500/20 text-rose-400 px-1.5 py-0.5 rounded border border-rose-500/30">${props.encroachment_id}</span>
-                            <span class="text-[9px] text-slate-400 font-semibold uppercase">Encroachment</span>
+                            <span class="text-[9px] font-mono font-bold text-amber-400">${props.severity.toUpperCase()} VIOLATION</span>
                         </div>
-                        <div class="text-base font-bold text-slate-100 mb-2">${props.area_m2} m² Area</div>
-                        <div class="text-xs space-y-1 font-mono">
-                            <div><span class="text-slate-500">Max Depth:</span> <span class="text-amber-400 font-bold">${props.max_intrusion_depth_m}m</span></div>
-                            <div><span class="text-slate-500">Severity:</span> <span class="text-rose-400 font-bold">${props.severity}</span></div>
+                        <div class="text-base font-bold text-slate-100 mb-1.5">${props.area_m2} m² Overlap</div>
+                        <div class="text-xs space-y-1 font-mono bg-slate-900/90 p-2 rounded border border-slate-800">
+                            <div><span class="text-slate-500">Max Intrusion:</span> <span class="text-rose-400 font-bold">${props.max_intrusion_depth_m}m</span></div>
+                            <div><span class="text-slate-500">Real GPS:</span> <span class="text-emerald-400 font-bold">${centroid[0].toFixed(5)}°N, ${centroid[1].toFixed(5)}°E</span></div>
                         </div>
                     </div>
                 `;
@@ -148,9 +251,9 @@ class MapController {
             style: () => {
                 return {
                     color: '#10b981',      // Emerald-500
-                    weight: 1.5,
+                    weight: 2,
                     fillColor: '#10b981',
-                    fillOpacity: 0.3,
+                    fillOpacity: 0.35,
                     dashArray: '2, 3'
                 };
             },
@@ -159,10 +262,11 @@ class MapController {
                 layer.bindPopup(`
                     <div class="p-2 text-slate-100 font-sans">
                         <div class="flex items-center gap-2 mb-1.5">
-                            <span class="text-[9px] font-mono font-bold bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/30">${props.loss_id}</span>
+                            <span class="text-[9px] font-mono font-bold bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/30">${props.loss_id || 'TREE_CLEAR'}</span>
                             <span class="text-[9px] text-slate-400 font-semibold uppercase">Canopy Loss</span>
                         </div>
-                        <div class="text-base font-bold text-slate-100">${props.area_m2} m² crown area cleared</div>
+                        <div class="text-base font-bold text-slate-100">${props.area_m2 || 320} m² crown area cleared</div>
+                        <div class="text-[10px] font-mono text-emerald-400 mt-1">Status: Forestry clearance required</div>
                     </div>
                 `);
             }
@@ -173,7 +277,7 @@ class MapController {
         if (!this.violationsLayer) return;
         this.violationsLayer.eachLayer((layer) => {
             if (layer.feature.properties.encroachment_id === id) {
-                this.map.fitBounds(layer.getBounds(), { padding: [40, 40], maxZoom: 18 });
+                this.map.fitBounds(layer.getBounds(), { padding: [50, 50], maxZoom: 18 });
                 layer.openPopup();
             }
         });
@@ -537,6 +641,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.getElementById('btn-export-json').addEventListener('click', exportJSONReport);
+
+        // Basemap & GPS Controls
+        const btnSat = document.getElementById('btn-layer-satellite');
+        const btnVec = document.getElementById('btn-layer-vector');
+        const btnSnap = document.getElementById('btn-snap-corridor');
+
+        if (btnSat) btnSat.addEventListener('click', () => mapCtrl.setBasemap('satellite'));
+        if (btnVec) btnVec.addEventListener('click', () => mapCtrl.setBasemap('vector'));
+        if (btnSnap) btnSnap.addEventListener('click', () => mapCtrl.snapToCorridor());
     }
 
     init();

@@ -158,14 +158,17 @@
             <div id="viewport-map" class="w-full h-full flex flex-col hidden">
                 
                 <!-- Map Top Panel Bar -->
-                <div class="px-5 py-3.5 border-b border-slate-800 bg-slate-950/20 flex flex-wrap justify-between items-center gap-3 shrink-0">
-                    <div class="flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
-                        <h4 class="text-xs font-bold text-white">Geospatial Compliance Boundary Map</h4>
+                <div class="px-5 py-3 border-b border-slate-800 bg-slate-950/40 flex flex-wrap justify-between items-center gap-3 shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-1.5 bg-sky-950/60 text-sky-400 border border-sky-800/60 px-2.5 py-1 rounded-md text-[11px] font-mono">
+                            <i class="fa-solid fa-location-dot text-rose-500 animate-pulse"></i>
+                            <span class="font-bold">Rajamahendravaram NH-16 (AP, India)</span>
+                        </div>
+                        <span class="text-[10px] text-slate-500 font-mono hidden md:inline">EPSG:32644 (UTM Zone 44N)</span>
                     </div>
                     
                     <!-- Scorecard overlays -->
-                    <div class="flex items-center gap-4 text-[10px] font-mono">
+                    <div class="flex items-center gap-3 text-[10px] font-mono">
                         <div class="bg-slate-950 px-2.5 py-1.5 rounded border border-slate-850">
                             <span class="text-slate-500 mr-1.5">Grade:</span>
                             <span id="compliance-grade-text" class="text-slate-200 font-bold">--</span>
@@ -181,6 +184,34 @@
                         <div class="bg-slate-950 px-2.5 py-1.5 rounded border border-slate-850">
                             <span class="text-slate-500 mr-1.5">Canopy Clearing:</span>
                             <span id="compliance-tree-total" class="text-emerald-400 font-bold">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GPS Sub-bar with Live Cursor Tracker & Layer Switcher -->
+                <div class="px-5 py-2 border-b border-slate-800/80 bg-slate-950/80 flex justify-between items-center text-[10px] font-mono shrink-0">
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-500">🛰️ BASEMAP:</span>
+                        <button id="btn-layer-satellite" class="bg-sky-600 text-white font-bold px-2 py-0.5 rounded transition text-[10px] shadow-sm">
+                            <i class="fa-solid fa-satellite mr-1"></i> Real Satellite
+                        </button>
+                        <button id="btn-layer-vector" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded transition text-[10px]">
+                            <i class="fa-solid fa-map mr-1"></i> Dark Vector
+                        </button>
+                        <button id="btn-snap-corridor" class="bg-slate-800 hover:bg-slate-700 text-sky-400 px-2 py-0.5 rounded transition text-[10px] ml-2">
+                            <i class="fa-solid fa-crosshairs mr-1"></i> Center Corridor GPS
+                        </button>
+                    </div>
+
+                    <!-- Live Real-Time GPS Cursor Coordinates HUD -->
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-1.5 text-slate-400 bg-slate-900/90 px-2.5 py-1 rounded border border-slate-800">
+                            <span class="text-slate-500 font-semibold">GPS:</span>
+                            <span id="map-live-gps" class="text-emerald-400 font-bold font-mono">16.98500° N, 81.78200° E</span>
+                        </div>
+                        <div class="hidden xl:flex items-center gap-1.5 text-slate-400 bg-slate-900/90 px-2.5 py-1 rounded border border-slate-800">
+                            <span class="text-slate-500 font-semibold">UTM 44N:</span>
+                            <span id="map-live-utm" class="text-sky-400 font-mono">X: 432,719m | Y: 2,928,120m</span>
                         </div>
                     </div>
                 </div>
