@@ -716,9 +716,11 @@ document.addEventListener('DOMContentLoaded', () => {
         switchViewport('viewport-map');
 
         const searchBtn = document.getElementById('btn-search-location');
-        const origHTML = searchBtn.innerHTML;
-        searchBtn.disabled = true;
-        searchBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Targeting...';
+        const origHTML = searchBtn ? searchBtn.innerHTML : '';
+        if (searchBtn) {
+            searchBtn.disabled = true;
+            searchBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Targeting...';
+        }
 
         try {
             const resp = await fetch(`/api/location/search?query=${encodeURIComponent(query)}`);
@@ -766,8 +768,10 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) {
             console.error("Geocoding search failed: ", err);
         } finally {
-            searchBtn.disabled = false;
-            searchBtn.innerHTML = origHTML;
+            if (searchBtn) {
+                searchBtn.disabled = false;
+                searchBtn.innerHTML = origHTML;
+            }
         }
     }
 

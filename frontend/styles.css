@@ -31,9 +31,27 @@ body {
     background: #334155;
 }
 
-/* Map Dark Theme Tile Inversion Filter (applied only to street vectors) */
+/* Map Container Isolation & Clipping */
+#map {
+    isolation: isolate !important;
+    overflow: hidden !important;
+    position: relative !important;
+    z-index: 10 !important;
+}
+
 .leaflet-container {
     background-color: #030712 !important;
+    isolation: isolate !important;
+    z-index: 10 !important;
+}
+
+.leaflet-top, .leaflet-bottom {
+    z-index: 30 !important;
+}
+
+/* Modal Stacking Enforcement */
+#modal-impact-docs {
+    z-index: 99999 !important;
 }
 
 .dark-tiles .leaflet-tile {
