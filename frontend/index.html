@@ -217,7 +217,7 @@
                 </div>
 
                 <!-- GPS Sub-bar with Live Cursor Tracker & Layer Switcher -->
-                <div class="px-5 py-2 border-b border-slate-800/80 bg-slate-950/80 flex justify-between items-center text-[10px] font-mono shrink-0">
+                <div class="px-5 py-2 border-b border-slate-800/80 bg-slate-950/80 flex flex-wrap justify-between items-center text-[10px] font-mono shrink-0 gap-2">
                     <div class="flex items-center gap-2">
                         <span class="text-slate-500">🛰️ BASEMAP:</span>
                         <button id="btn-layer-satellite" class="bg-sky-600 text-white font-bold px-2 py-0.5 rounded transition text-[10px] shadow-sm">
@@ -244,11 +244,39 @@
                     </div>
                 </div>
 
+                <!-- AI Capabilities Ribbon & Layer Toggles -->
+                <div class="px-5 py-1.5 bg-slate-900/95 border-b border-slate-800 flex flex-wrap items-center justify-between text-[10px] font-mono shrink-0 gap-2">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-sky-400 font-bold flex items-center gap-1"><i class="fa-solid fa-brain"></i> AI ENGINES:</span>
+                        <span class="bg-slate-950 px-2 py-0.5 rounded border border-slate-800 text-emerald-400 font-semibold">🧠 UTM Metric Math (0% Hallucination)</span>
+                        <span class="bg-slate-950 px-2 py-0.5 rounded border border-slate-800 text-sky-400 font-semibold">📐 3-Point GCP Affine Snapping</span>
+                        <span class="bg-slate-950 px-2 py-0.5 rounded border border-slate-800 text-amber-400 font-semibold">🌲 HSV Canopy Filter (35°-85°)</span>
+                        <span class="bg-slate-950 px-2 py-0.5 rounded border border-slate-800 text-purple-400 font-semibold">🎨 ControlNet DEM Diffusion</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-slate-500">LAYERS:</span>
+                        <label class="flex items-center gap-1 cursor-pointer text-amber-300 hover:text-white"><input type="checkbox" id="toggle-layer-bldgs" checked class="accent-amber-500"> 🏢 18 Buildings</label>
+                        <label class="flex items-center gap-1 cursor-pointer text-rose-400 hover:text-rose-300"><input type="checkbox" id="toggle-layer-viol" checked class="accent-rose-500"> ⛔ Violations</label>
+                        <label class="flex items-center gap-1 cursor-pointer text-sky-400 hover:text-sky-300"><input type="checkbox" id="toggle-layer-row" checked class="accent-sky-500"> 🛣️ Road RoW</label>
+                        <label class="flex items-center gap-1 cursor-pointer text-emerald-400 hover:text-emerald-300"><input type="checkbox" id="toggle-layer-canopy" checked class="accent-emerald-500"> 🌲 Canopy</label>
+                    </div>
+                </div>
+
                 <!-- Map Viewport Split (Map + Sidebar logs side-by-side) -->
                 <div class="flex-1 flex min-h-0 relative overflow-hidden">
                     
                     <!-- The Interactive Map frame -->
-                    <div id="map" class="flex-1 h-full"></div>
+                    <div id="map" class="flex-1 h-full relative">
+                        <!-- Floating In-Map Quick Search Locator -->
+                        <div class="absolute top-3 left-14 z-[400] flex items-center gap-1.5 bg-slate-950/90 backdrop-blur-md p-1.5 rounded-lg border border-slate-750 shadow-2xl">
+                            <i class="fa-solid fa-location-crosshairs text-sky-400 ml-1.5 text-xs"></i>
+                            <input id="input-map-quicksearch" type="text" placeholder="Locate on map (e.g. '16.985, 81.782' or 'Temple')..." 
+                                   class="bg-transparent text-xs text-slate-100 placeholder-slate-500 focus:outline-none w-52 md:w-64 font-sans px-1">
+                            <button id="btn-map-quicksearch" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-2.5 py-1 rounded text-[10px] font-mono transition">
+                                Locate
+                            </button>
+                        </div>
+                    </div>
                     
                     <!-- Sidebar log inside the map view -->
                     <div class="w-72 border-l border-slate-800 flex flex-col min-h-0 bg-slate-950/20 shrink-0">

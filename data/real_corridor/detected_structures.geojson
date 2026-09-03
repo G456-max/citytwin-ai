@@ -1,10 +1,660 @@
 {
-"type": "FeatureCollection",
-"name": "detected_structures",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-"features": [
-{ "type": "Feature", "properties": { "id": "BLDG_001", "name": "Bund Commercial Hub" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 81.7826, 16.983 ], [ 81.7828, 16.983 ], [ 81.7828, 16.9833 ], [ 81.7826, 16.9833 ], [ 81.7826, 16.983 ] ] ] } },
-{ "type": "Feature", "properties": { "id": "BLDG_002", "name": "Venkateswara residency" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 81.7822, 16.986 ], [ 81.7826, 16.986 ], [ 81.7826, 16.9863 ], [ 81.7822, 16.9863 ], [ 81.7822, 16.986 ] ] ] } },
-{ "type": "Feature", "properties": { "id": "BLDG_003", "name": "Godavari Boat House Office" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 81.7823, 16.989 ], [ 81.7827, 16.989 ], [ 81.7827, 16.9893 ], [ 81.7823, 16.9893 ], [ 81.7823, 16.989 ] ] ] } }
-]
+  "type": "FeatureCollection",
+  "name": "detected_structures",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLDG_001",
+        "name": "Godavari Bund Commercial Hub",
+        "type": "commercial",
+        "floors": 3
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              81.7826,
+              16.983
+            ],
+            [
+              81.7828,
+              16.983
+            ],
+            [
+              81.7828,
+              16.9833
+            ],
+            [
+              81.7826,
+              16.9833
+            ],
+            [
+              81.7826,
+              16.983
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLDG_002",
+        "name": "Venkateswara Residency Apartments",
+        "type": "residential",
+        "floors": 4
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              81.7822,
+              16.986
+            ],
+            [
+              81.7826,
+              16.986
+            ],
+            [
+              81.7826,
+              16.9863
+            ],
+            [
+              81.7822,
+              16.9863
+            ],
+            [
+              81.7822,
+              16.986
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLDG_003",
+        "name": "Godavari Tourism Boat House",
+        "type": "tourism",
+        "floors": 2
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              81.7823,
+              16.989
+            ],
+            [
+              81.7827,
+              16.989
+            ],
+            [
+              81.7827,
+              16.9893
+            ],
+            [
+              81.7823,
+              16.9893
+            ],
+            [
+              81.7823,
+              16.989
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLDG_004",
+        "name": "Kotilingala Ghat Market Arcade",
+        "type": "commercial",
+        "floors": 2
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              81.7818,
+              16.9815
+            ],
+            [
+              81.7822,
+              16.9815
+            ],
+            [
+              81.7822,
+              16.9818
+            ],
+            [
+              81.7818,
+              16.9818
+            ],
+            [
+              81.7818,
+              16.9815
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLDG_005",
+        "name": "Pushkar Ghat Riverfront Pavilion",
+        "type": "civic",
+        "floors": 1
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              81.7812,
+              16.9825
+            ],
+            [
+              81.7815,
+              16.9825
+            ],
+            [
+              81.7815,
+              16.9828
+            ],
+            [
+              81.7812,
+              16.9828
+            ],
+            [
+              81.7812,
+              16.9825
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLDG_006",
+        "name": "Sri Rama Temple & Perimeter Wall",
+        "type": "religious",
+        "floors": 2
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              81.7831,
+              16.984
+            ],
+            [
+              81.7835,
+              16.984
+            ],
+            [
+              81.7835,
+              16.9844
+            ],
+            [
+              81.7831,
+              16.9844
+            ],
+            [
+              81.7831,
+              16.984
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLDG_007",
+        "name": "Godavari View Plaza Complex",
+        "type": "commercial",
+        "floors": 4
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              81.783,
+              16.987
+            ],
+            [
+              81.7834,
+              16.987
+            ],
+            [
+              81.7834,
+              16.9874
+            ],
+            [
+              81.783,
+              16.9874
+            ],
+            [
+              81.783,
+              16.987
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLDG_008",
+        "name": "Highway Transit Bus Shelter & Kiosks",
+        "type": "transit",
+        "floors": 1
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              81.7824,
+              16.9878
+            ],
+            [
+              81.7828,
+              16.9878
+            ],
+            [
+              81.7828,
+              16.988
+            ],
+            [
+              81.7824,
+              16.988
+            ],
+            [
+              81.7824,
+              16.9878
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLDG_009",
+        "name": "Godavari Delta Irrigation Sub-Office",
+        "type": "government",
+        "floors": 2
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              81.7833,
+              16.9895
+            ],
+            [
+              81.7837,
+              16.9895
+            ],
+            [
+              81.7837,
+              16.9899
+            ],
+            [
+              81.7833,
+              16.9899
+            ],
+            [
+              81.7833,
+              16.9895
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLDG_010",
+        "name": "Godavari Timber & Logistics Depot",
+        "type": "industrial",
+        "floors": 1
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              81.7835,
+              16.991
+            ],
+            [
+              81.784,
+              16.991
+            ],
+            [
+              81.784,
+              16.9915
+            ],
+            [
+              81.7835,
+              16.9915
+            ],
+            [
+              81.7835,
+              16.991
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLDG_011",
+        "name": "Riverbank Fishermen Co-op Sheds",
+        "type": "commercial",
+        "floors": 1
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              81.7816,
+              16.9882
+            ],
+            [
+              81.7819,
+              16.9882
+            ],
+            [
+              81.7819,
+              16.9885
+            ],
+            [
+              81.7816,
+              16.9885
+            ],
+            [
+              81.7816,
+              16.9882
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLDG_012",
+        "name": "Annapurna Residential Enclave",
+        "type": "residential",
+        "floors": 3
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              81.7836,
+              16.985
+            ],
+            [
+              81.784,
+              16.985
+            ],
+            [
+              81.784,
+              16.9854
+            ],
+            [
+              81.7836,
+              16.9854
+            ],
+            [
+              81.7836,
+              16.985
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLDG_013",
+        "name": "Highway Fuel Station & Canopy",
+        "type": "commercial",
+        "floors": 1
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              81.7825,
+              16.9902
+            ],
+            [
+              81.7829,
+              16.9902
+            ],
+            [
+              81.7829,
+              16.9905
+            ],
+            [
+              81.7825,
+              16.9905
+            ],
+            [
+              81.7825,
+              16.9902
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLDG_014",
+        "name": "Heritage Ghat Welcome Arch & Wall",
+        "type": "heritage",
+        "floors": 1
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              81.7819,
+              16.9805
+            ],
+            [
+              81.7823,
+              16.9805
+            ],
+            [
+              81.7823,
+              16.9807
+            ],
+            [
+              81.7819,
+              16.9807
+            ],
+            [
+              81.7819,
+              16.9805
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLDG_015",
+        "name": "Riverbend Cafe & Food Court",
+        "type": "commercial",
+        "floors": 2
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              81.7828,
+              16.9845
+            ],
+            [
+              81.7831,
+              16.9845
+            ],
+            [
+              81.7831,
+              16.9848
+            ],
+            [
+              81.7828,
+              16.9848
+            ],
+            [
+              81.7828,
+              16.9845
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLDG_016",
+        "name": "Municipal Water Pumping Station",
+        "type": "utility",
+        "floors": 1
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              81.7814,
+              16.987
+            ],
+            [
+              81.7817,
+              16.987
+            ],
+            [
+              81.7817,
+              16.9873
+            ],
+            [
+              81.7814,
+              16.9873
+            ],
+            [
+              81.7814,
+              16.987
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLDG_017",
+        "name": "Godavari Bund Green Nursery",
+        "type": "agriculture",
+        "floors": 1
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              81.7832,
+              16.982
+            ],
+            [
+              81.7836,
+              16.982
+            ],
+            [
+              81.7836,
+              16.9824
+            ],
+            [
+              81.7832,
+              16.9824
+            ],
+            [
+              81.7832,
+              16.982
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BLDG_018",
+        "name": "Electrical Distribution Substation",
+        "type": "utility",
+        "floors": 1
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              81.7838,
+              16.988
+            ],
+            [
+              81.7841,
+              16.988
+            ],
+            [
+              81.7841,
+              16.9883
+            ],
+            [
+              81.7838,
+              16.9883
+            ],
+            [
+              81.7838,
+              16.988
+            ]
+          ]
+        ]
+      }
+    }
+  ]
 }

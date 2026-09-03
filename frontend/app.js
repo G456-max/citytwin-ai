@@ -190,6 +190,56 @@ class MapController {
         }).addTo(this.map);
     }
 
+    drawAllBuildings(geojson) {
+        if (!this.map || !geojson) return;
+        if (this.buildingsLayer) this.map.removeLayer(this.buildingsLayer);
+
+        this.buildingsLayer = L.geoJSON(geojson, {
+            style: (feature) => {
+                return {
+                    color: '#fbbf24',      // Amber-400
+                    weight: 1.5,
+                    fillColor: '#fbbf24',
+                    fillOpacity: 0.2,
+                    dashArray: '2, 2'
+                };
+            },
+            onEachFeature: (feature, layer) => {
+                const props = feature.properties || {};
+                const name = props.name || props.id || 'Building Footprint';
+                const type = (props.type || 'Structure').toUpperCase();
+                const floors = props.floors ? `${props.floors} Floors` : 'Ground Structure';
+                
+                layer.bindPopup(`
+                    <div class="p-2.5 text-slate-100 font-sans min-w-[210px]">
+                        <div class="flex items-center justify-between gap-2 mb-1.5">
+                            <span class="text-[9px] font-mono font-bold bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/30">${props.id || 'BLDG'}</span>
+                            <span class="text-[9px] font-mono text-slate-400 font-bold">${type}</span>
+                        </div>
+                        <div class="text-sm font-bold text-white mb-1.5">${name}</div>
+                        <div class="text-xs space-y-1 font-mono bg-slate-900/90 p-2 rounded border border-slate-800">
+                            <div><span class="text-slate-500">Height:</span> <span class="text-slate-300 font-semibold">${floors}</span></div>
+                            <div><span class="text-slate-500">Classification:</span> <span class="text-emerald-400 font-bold">Real Building Footprint</span></div>
+                        </div>
+                    </div>
+                `);
+            }
+        }).addTo(this.map);
+    }
+
+    toggleLayer(layerName, show) {
+        if (!this.map) return;
+        if (layerName === 'buildings' && this.buildingsLayer) {
+            show ? (!this.map.hasLayer(this.buildingsLayer) && this.map.addLayer(this.buildingsLayer)) : this.map.removeLayer(this.buildingsLayer);
+        } else if (layerName === 'violations' && this.violationsLayer) {
+            show ? (!this.map.hasLayer(this.violationsLayer) && this.map.addLayer(this.violationsLayer)) : this.map.removeLayer(this.violationsLayer);
+        } else if (layerName === 'row' && this.rowLayer) {
+            show ? (!this.map.hasLayer(this.rowLayer) && this.map.addLayer(this.rowLayer)) : this.map.removeLayer(this.rowLayer);
+        } else if (layerName === 'canopy' && this.canopyLayer) {
+            show ? (!this.map.hasLayer(this.canopyLayer) && this.map.addLayer(this.canopyLayer)) : this.map.removeLayer(this.canopyLayer);
+        }
+    }
+
     updateViolations(geojson, onClickCallback) {
         if (!this.map) return;
         this.onViolationClick = onClickCallback;
@@ -359,18 +409,25 @@ document.addEventListener('DOMContentLoaded', () => {
             if (auditJson.status === 'success') {
                 auditData = auditJson;
                 
-                // Draw layers
+                // 1. Draw Road Right-of-Way boundary
+                if (auditJson.row_geojson && auditJson.row_geojson.features) {
+                    mapCtrl.drawRoadBoundary(auditJson.row_geojson);
+                }
+
+                // 2. Draw ALL 18 Real Building Footprints (None missed!)
+                if (auditJson.all_structures_geojson && auditJson.all_structures_geojson.features) {
+                    mapCtrl.drawAllBuildings(auditJson.all_structures_geojson);
+                }
+
+                // 3. Draw Encroachment Violations
                 if (auditJson.geojson && auditJson.geojson.features && auditJson.geojson.features.length > 0) {
-                    // Extract first boundary if present in data
                     mapCtrl.updateViolations(auditJson.geojson, (violationId) => {
                         highlightViolationCard(violationId);
                     });
                 }
                 
+                // 4. Draw Canopy
                 if (canopyJson.status === 'success') {
-                    // Fetch georeferenced data
-                    const canopyGeoJsonRes = await fetch('/api/audit/flags'); // returns cached geojson
-                    // Load tree outlines
                     fetchTreeCanopyOverlay(canopyJson);
                 }
 
@@ -777,6 +834,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (e.target.files && e.target.files[0]) {
                     handleGeoJSONUpload(e.target.files[0]);
                 }
+            });
+        }
+
+        // Layer Toggle Checkboxes
+        document.getElementById('toggle-layer-bldgs')?.addEventListener('change', (e) => mapCtrl.toggleLayer('buildings', e.target.checked));
+        document.getElementById('toggle-layer-viol')?.addEventListener('change', (e) => mapCtrl.toggleLayer('violations', e.target.checked));
+        document.getElementById('toggle-layer-row')?.addEventListener('change', (e) => mapCtrl.toggleLayer('row', e.target.checked));
+        document.getElementById('toggle-layer-canopy')?.addEventListener('change', (e) => mapCtrl.toggleLayer('canopy', e.target.checked));
+
+        // In-Map Quick Search Locator
+        const btnMapQuick = document.getElementById('btn-map-quicksearch');
+        const inputMapQuick = document.getElementById('input-map-quicksearch');
+        if (btnMapQuick && inputMapQuick) {
+            btnMapQuick.addEventListener('click', () => searchAndTargetLocation(inputMapQuick.value));
+            inputMapQuick.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') searchAndTargetLocation(inputMapQuick.value);
             });
         }
     }

@@ -11,6 +11,8 @@ class AuditResponse(BaseModel):
     total_encroachment_m2: float
     compliance_grade: str
     geojson: Dict[str, Any]
+    all_structures_geojson: Optional[Dict[str, Any]] = None
+    row_geojson: Optional[Dict[str, Any]] = None
 
 class RenderRequest(BaseModel):
     depth_image_path: Optional[str] = None

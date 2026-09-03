@@ -108,18 +108,35 @@ def run_compliance_audit():
         else:
             grade = "F"
 
-        # Load generated GeoJSON payload
+        # Load generated GeoJSON payload (encroachments)
         geojson_data = {}
         if os.path.exists(real_flags_out):
             with open(real_flags_out, "r", encoding="utf-8") as f:
                 geojson_data = json.load(f)
+
+        # Load ALL detected building footprints so NO building is missed on the map!
+        all_struct_data = {}
+        if os.path.exists(real_struct_out):
+            with open(real_struct_out, "r", encoding="utf-8") as f:
+                all_struct_data = json.load(f)
+        elif os.path.exists(str(RAW_DIR.parent / "real_corridor" / "detected_structures.geojson")):
+            with open(str(RAW_DIR.parent / "real_corridor" / "detected_structures.geojson"), "r", encoding="utf-8") as f:
+                all_struct_data = json.load(f)
+
+        # Load sanctioned road boundary
+        row_data = {}
+        if os.path.exists(row_path):
+            with open(row_path, "r", encoding="utf-8") as f:
+                row_data = json.load(f)
 
         return AuditResponse(
             status="success",
             flags_count=audit_results["total_violations"],
             total_encroachment_m2=total_encroached_m2,
             compliance_grade=grade,
-            geojson=geojson_data
+            geojson=geojson_data,
+            all_structures_geojson=all_struct_data,
+            row_geojson=row_data
         )
 
     except Exception as e:

@@ -27,7 +27,7 @@ class BlueprintLockedVisualizer:
         self.dtype = torch.float16 if self.device == "cuda" else torch.float32
         self.pipe = None
 
-        if not self.use_fallback:
+        if not self.use_fallback and self.device == "cuda":
             try:
                 print(f"Initializing Stable Diffusion on device: {self.device}...")
                 controlnet = ControlNetModel.from_pretrained(
@@ -39,25 +39,17 @@ class BlueprintLockedVisualizer:
                     model_id, 
                     controlnet=controlnet, 
                     torch_dtype=self.dtype,
-                    use_auth_token=use_auth_token,
                     local_files_only=True
                 )
-                
-                # Apply UniPCMultistepScheduler
                 self.pipe.scheduler = UniPCMultistepScheduler.from_config(self.pipe.scheduler.config)
-                
-                # Setup slicing optimizations
                 self.pipe.enable_attention_slicing()
                 self.pipe.enable_vae_slicing()
-                if self.device == "cuda":
-                    try:
-                        self.pipe.enable_xformers_memory_efficient_attention()
-                    except Exception:
-                        pass
                 self.pipe.to(self.device)
             except Exception as e:
-                print(f"Model initialization failed: {e}. Falling back to OpenCV graphics engine.")
+                print(f"CUDA model init skipped: {e}. Using high-speed procedural graphics engine.")
                 self.use_fallback = True
+        else:
+            self.use_fallback = True
 
     def synthesize_contextual_view(
         self, 
