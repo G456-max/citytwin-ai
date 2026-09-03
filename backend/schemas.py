@@ -58,3 +58,21 @@ class DynamicAuditResponse(BaseModel):
     canopy_geojson: Optional[Dict[str, Any]] = None
     canopy_loss_m2: float
     trees_mandated_count: int
+
+class SimulateEncroachmentRequest(BaseModel):
+    lat: float
+    lon: float
+    structure_name: Optional[str] = "Simulated Roadside Structure"
+    structure_type: Optional[str] = "Commercial Encroachment"
+    width_m: Optional[float] = 25.0
+    depth_m: Optional[float] = 18.0
+
+class SimulateEncroachmentResponse(BaseModel):
+    status: str
+    encroachment_id: str
+    structure_name: str
+    encroached_area_m2: float
+    max_penetration_m: float
+    infringement_percentage: float
+    compliance_grade: str
+    feature: Dict[str, Any]

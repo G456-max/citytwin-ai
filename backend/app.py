@@ -9,7 +9,10 @@ from fastapi.responses import HTMLResponse, FileResponse, StreamingResponse
 from pathlib import Path
 from typing import Optional
 
-from backend.schemas import SystemHealthResponse, AuditResponse, RenderRequest, RenderResponse, DynamicAuditRequest, DynamicAuditResponse
+from backend.schemas import (
+    SystemHealthResponse, AuditResponse, RenderRequest, RenderResponse,
+    DynamicAuditRequest, DynamicAuditResponse, SimulateEncroachmentRequest, SimulateEncroachmentResponse
+)
 from backend.config import BASE_DIR, RAW_DIR, PROCESSED_DIR
 
 # Import Core Engines
@@ -160,6 +163,25 @@ def run_dynamic_audit(request: DynamicAuditRequest):
         return DynamicAuditResponse(**results)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Dynamic spatial audit pipeline error: {str(e)}")
+
+# -------------------------------------------------------------------------
+# 2C. Interactive Encroachment Simulator (Click-to-Encroach Any Map Coordinate)
+# -------------------------------------------------------------------------
+@app.post("/api/audit/simulate_encroachment", response_model=SimulateEncroachmentResponse)
+def simulate_encroachment_point(request: SimulateEncroachmentRequest):
+    """Simulates an encroaching structure at ANY coordinate on the map."""
+    try:
+        result = DynamicCorridorAuditor.simulate_custom_encroachment(
+            lat=request.lat,
+            lon=request.lon,
+            structure_name=request.structure_name or "Simulated Roadside Structure",
+            structure_type=request.structure_type or "Commercial Encroachment",
+            width_m=request.width_m or 25.0,
+            depth_m=request.depth_m or 18.0
+        )
+        return SimulateEncroachmentResponse(**result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Simulated encroachment error: {str(e)}")
 
 # -------------------------------------------------------------------------
 # 3. Visual Texture Synthesizer Route

@@ -111,9 +111,16 @@ class MapController {
             if (utmEl) utmEl.innerText = `X: ${Math.round(utm.x).toLocaleString()}m | Y: ${Math.round(utm.y).toLocaleString()}m`;
         });
 
-        // 4. Click to Inspect Real GPS Pinpoint & One-Click Sector Audit
+        // 4. Click to Inspect Real GPS Pinpoint OR Place Simulated Encroachment
+        this.isEncroachMode = false;
         this.map.on('click', (e) => {
-            this.dropGPSInspector(e.latlng);
+            if (this.isEncroachMode) {
+                if (window.simulateCustomEncroachment) {
+                    window.simulateCustomEncroachment(e.latlng.lat, e.latlng.lng);
+                }
+            } else {
+                this.dropGPSInspector(e.latlng);
+            }
         });
 
         // 5. Auto-Audit on Map Pan / Move (if enabled)
@@ -174,9 +181,14 @@ class MapController {
                         <span class="text-slate-500">UTM:</span> X: ${Math.round(utm.x).toLocaleString()}m, Y: ${Math.round(utm.y).toLocaleString()}m
                     </div>
                 </div>
-                <button onclick="window.runSectorAudit(${latlng.lat}, ${latlng.lng})" class="mt-2.5 w-full bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold py-1.5 px-2 rounded text-[10px] font-mono flex items-center justify-center gap-1.5 transition shadow">
-                    <i class="fa-solid fa-bolt-lightning text-amber-300"></i> Audit This 1km² Sector
-                </button>
+                <div class="flex flex-col gap-1.5 mt-2.5">
+                    <button onclick="window.runSectorAudit(${latlng.lat}, ${latlng.lng})" class="w-full bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold py-1.5 px-2 rounded text-[10px] font-mono flex items-center justify-center gap-1.5 transition shadow">
+                        <i class="fa-solid fa-bolt-lightning text-amber-300"></i> Audit This 1km² Sector
+                    </button>
+                    <button onclick="window.simulateCustomEncroachment(${latlng.lat}, ${latlng.lng})" class="w-full bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-bold py-1.5 px-2 rounded text-[10px] font-mono flex items-center justify-center gap-1.5 transition shadow">
+                        <i class="fa-solid fa-person-digging text-amber-300"></i> 🏗️ Encroach This Exact Spot
+                    </button>
+                </div>
             </div>
         `).openPopup();
     }
@@ -558,6 +570,81 @@ document.addEventListener('DOMContentLoaded', () => {
     window.runSectorAudit = (lat, lon) => {
         executeDynamicSpatialAudit(lat, lon, null, `Target Sector (${parseFloat(lat).toFixed(4)}°N, ${parseFloat(lon).toFixed(4)}°E)`);
     };
+
+    async function simulateCustomEncroachment(lat, lon, structureName = "Roadside Commercial Shed", structureType = "Commercial") {
+        try {
+            const resp = await fetch('/api/audit/simulate_encroachment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    lat: parseFloat(lat),
+                    lon: parseFloat(lon),
+                    structure_name: structureName,
+                    structure_type: structureType,
+                    width_m: 28.0,
+                    depth_m: 16.0
+                })
+            });
+            const data = await resp.json();
+            if (data.status === 'success' && data.feature) {
+                // Add feature to current audit dataset
+                if (!auditData) auditData = { flags_count: 0, total_encroachment_m2: 0, compliance_grade: 'A+', geojson: { type: 'FeatureCollection', features: [] } };
+                if (!auditData.geojson) auditData.geojson = { type: 'FeatureCollection', features: [] };
+                if (!auditData.geojson.features) auditData.geojson.features = [];
+
+                auditData.geojson.features.unshift(data.feature);
+                auditData.flags_count = auditData.geojson.features.length;
+                auditData.total_encroachment_m2 = parseFloat((auditData.total_encroachment_m2 + data.encroached_area_m2).toFixed(2));
+                auditData.compliance_grade = data.compliance_grade;
+
+                // Update violations on map with glowing red polygons
+                mapCtrl.updateViolations(auditData.geojson, (violationId) => {
+                    highlightViolationCard(violationId);
+                });
+
+                // Update scorecards and triage list
+                const mockCanopy = { total_canopy_loss_m2: 45.0, replanting_mandate_saplings: Math.max(18, auditData.flags_count * 12) };
+                updateScorecards(auditData, mockCanopy);
+                populateTriageCards(auditData.geojson.features);
+
+                // Highlight new card
+                highlightViolationCard(data.encroachment_id);
+            }
+        } catch (err) {
+            console.error("Encroachment simulation failed: ", err);
+        }
+    }
+
+    async function stressTestEncroachAllAreas() {
+        const btn = document.getElementById('btn-stress-test-encroach');
+        const origText = btn ? btn.innerHTML : '';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Encroaching Sector...';
+        }
+
+        const center = mapCtrl && mapCtrl.map ? mapCtrl.map.getCenter() : { lat: 17.0890, lng: 82.0667 };
+        const offsets = [
+            { dlat: -0.0012, dlon: -0.0018, name: "North Gateway Dhaba", type: "Commercial" },
+            { dlat: -0.0006, dlon: -0.0008, name: "Boundary Wall Extension", type: "Residential" },
+            { dlat: 0.0000, dlon: 0.0002, name: "Automobile Service Kiosk", type: "Commercial" },
+            { dlat: 0.0007, dlon: 0.0010, name: "Illegal Transit Shed", type: "Transit" },
+            { dlat: 0.0014, dlon: 0.0022, name: "Unsanctioned Market Arcade", type: "Commercial" },
+            { dlat: 0.0020, dlon: 0.0030, name: "Perimeter Compound Enclosure", type: "Residential" }
+        ];
+
+        for (const pt of offsets) {
+            await simulateCustomEncroachment(center.lat + pt.dlat, center.lng + pt.dlon, pt.name, pt.type);
+        }
+
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = origText;
+        }
+    }
+
+    window.simulateCustomEncroachment = simulateCustomEncroachment;
+    window.stressTestEncroachAllAreas = stressTestEncroachAllAreas;
 
     async function fetchTreeCanopyOverlay(canopySummary) {
         try {
@@ -1020,6 +1107,26 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btnCloseModalFooter && modal) {
             btnCloseModalFooter.addEventListener('click', () => modal.classList.add('hidden'));
         }
+
+        // Encroachment Tool Modes
+        const btnToggleEncroach = document.getElementById('btn-toggle-encroach-mode');
+        if (btnToggleEncroach) {
+            btnToggleEncroach.addEventListener('click', () => {
+                if (!mapCtrl) return;
+                mapCtrl.isEncroachMode = !mapCtrl.isEncroachMode;
+                if (mapCtrl.isEncroachMode) {
+                    btnToggleEncroach.className = "bg-rose-600 text-white font-bold px-2.5 py-1 rounded-md text-[10.5px] transition shadow flex items-center gap-1.5 ring-2 ring-rose-400";
+                    btnToggleEncroach.innerHTML = '<i class="fa-solid fa-crosshairs text-amber-300 animate-spin"></i> <span>Click Map to Encroach!</span>';
+                } else {
+                    btnToggleEncroach.className = "bg-rose-900/70 hover:bg-rose-800 text-rose-200 border border-rose-700/60 font-bold px-2.5 py-1 rounded-md text-[10.5px] transition shadow flex items-center gap-1.5";
+                    btnToggleEncroach.innerHTML = '<i class="fa-solid fa-person-digging text-amber-400"></i> <span>🏗️ Click to Encroach</span>';
+                }
+            });
+        }
+
+        document.getElementById('btn-stress-test-encroach')?.addEventListener('click', () => {
+            stressTestEncroachAllAreas();
+        });
 
         // Dynamic Universal Spatial Audit Button
         document.getElementById('btn-audit-visible-area')?.addEventListener('click', () => {

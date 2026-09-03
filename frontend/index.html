@@ -252,9 +252,15 @@
 
                 <!-- GPS Sub-bar with Live Dynamic Universal Audit Trigger & Cursor Tracker -->
                 <div class="px-5 py-2 border-b border-slate-800/80 bg-slate-950/80 flex flex-wrap justify-between items-center text-[10px] font-mono shrink-0 gap-2">
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
                         <button id="btn-audit-visible-area" class="bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold px-3 py-1 rounded-md text-[10.5px] transition shadow flex items-center gap-1.5">
-                            <i class="fa-solid fa-bolt-lightning text-amber-300"></i> Audit Current Map Area
+                            <i class="fa-solid fa-bolt-lightning text-amber-300"></i> Audit Area
+                        </button>
+                        <button id="btn-toggle-encroach-mode" class="bg-rose-900/70 hover:bg-rose-800 text-rose-200 border border-rose-700/60 font-bold px-2.5 py-1 rounded-md text-[10.5px] transition shadow flex items-center gap-1.5">
+                            <i class="fa-solid fa-person-digging text-amber-400"></i> <span>🏗️ Click to Encroach</span>
+                        </button>
+                        <button id="btn-stress-test-encroach" class="bg-amber-950/70 hover:bg-amber-900 text-amber-300 border border-amber-800/60 font-bold px-2.5 py-1 rounded-md text-[10.5px] transition shadow flex items-center gap-1.5">
+                            <i class="fa-solid fa-fire text-rose-400"></i> <span>🚨 Encroach All Corridor Areas</span>
                         </button>
                         <label class="flex items-center gap-1.5 text-slate-400 hover:text-slate-200 cursor-pointer ml-1 select-none">
                             <input type="checkbox" id="toggle-auto-audit-pan" class="rounded accent-sky-500">
