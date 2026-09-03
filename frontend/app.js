@@ -364,10 +364,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         bindEvents();
         checkSystemHealth();
-        loadMockDroneFeed();
         
-        // Initial setup load
+        // Initial setup load: open live map and pre-load compliance layers & future visualizer
+        switchViewport('viewport-map');
         triggerComplianceAudit();
+        synthesizeFutureView('Realistic Daylight');
     }
 
     async function checkSystemHealth() {
@@ -691,17 +692,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function switchViewport(viewportId) {
-        document.getElementById('viewport-welcome').classList.add('hidden');
-        document.getElementById('viewport-map').classList.add('hidden');
-        document.getElementById('viewport-slider').classList.add('hidden');
+        const vWelcome = document.getElementById('viewport-welcome');
+        const vMap = document.getElementById('viewport-map');
+        const vSlider = document.getElementById('viewport-slider');
         
-        document.getElementById(viewportId).classList.remove('hidden');
+        if (vWelcome) vWelcome.classList.add('hidden');
+        if (vMap) vMap.classList.add('hidden');
+        if (vSlider) vSlider.classList.add('hidden');
+        
+        const target = document.getElementById(viewportId);
+        if (target) target.classList.remove('hidden');
         
         // Force Leaflet map resize calculation to reload tiles correctly on tab switch
         if (viewportId === 'viewport-map' && mapCtrl && mapCtrl.map) {
             setTimeout(() => {
                 mapCtrl.map.invalidateSize();
-            }, 100);
+            }, 150);
         }
     }
 
