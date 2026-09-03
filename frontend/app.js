@@ -380,10 +380,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const deviceSpan = document.getElementById('telemetry-device');
 
             if (data.status === 'healthy') {
-                dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
-                text.innerText = "ACCEL ACTIVE";
-                text.className = "text-emerald-400 font-bold";
-                deviceSpan.innerText = `${data.device_name} (${data.loaded_engines.length} engines loaded)`;
+                if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
+                if (text) {
+                    text.innerText = "ACCEL ACTIVE";
+                    text.className = "text-emerald-400 font-bold";
+                }
+                if (deviceSpan) deviceSpan.innerText = `${data.device_name} (${data.loaded_engines.length} engines loaded)`;
             }
         } catch (err) {
             console.error("System connection check failed: ", err);
@@ -391,9 +393,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function triggerComplianceAudit() {
-        const btn = document.getElementById('btn-run-audit');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Auditing...';
+        const btn = document.getElementById('btn-step1-audit');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Auditing...';
+        }
 
         showSidebarSkeletons();
 
@@ -439,8 +443,10 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Audit pipelines failed: ", err);
             showSidebarError();
         } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-calculator mr-2"></i> Run Corridor Audit';
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-road-barrier"></i> 1. Audit Highway Encroachments';
+            }
         }
     }
 
@@ -851,6 +857,34 @@ document.addEventListener('DOMContentLoaded', () => {
             inputMapQuick.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') searchAndTargetLocation(inputMapQuick.value);
             });
+        }
+
+        // Societal Engine 2: Tree Canopy Loss Action
+        const btnCanopy = document.getElementById('btn-audit-canopy');
+        if (btnCanopy) {
+            btnCanopy.addEventListener('click', () => {
+                switchViewport('viewport-map');
+                triggerComplianceAudit();
+                mapCtrl.toggleLayer('canopy', true);
+                const cToggle = document.getElementById('toggle-layer-canopy');
+                if (cToggle) cToggle.checked = true;
+            });
+        }
+
+        // Societal Impact Docs Modal Handlers
+        const btnShowModal = document.getElementById('btn-show-impact-modal');
+        const btnCloseModal = document.getElementById('btn-close-impact-modal');
+        const btnCloseModalFooter = document.getElementById('btn-close-impact-modal-footer');
+        const modal = document.getElementById('modal-impact-docs');
+
+        if (btnShowModal && modal) {
+            btnShowModal.addEventListener('click', () => modal.classList.remove('hidden'));
+        }
+        if (btnCloseModal && modal) {
+            btnCloseModal.addEventListener('click', () => modal.classList.add('hidden'));
+        }
+        if (btnCloseModalFooter && modal) {
+            btnCloseModalFooter.addEventListener('click', () => modal.classList.add('hidden'));
         }
     }
 
