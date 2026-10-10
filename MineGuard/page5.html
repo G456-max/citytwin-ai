@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MineGuard — Migration Priority</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --card: #111827;
+      --border: #1f2937;
+      --text: #f9fafb;
+      --text-muted: #9ca3af;
+      --accent: #06b6d4;
+      --accent-hover: #22d3ee;
+      --critical: #ef4444;
+      --high: #f59e0b;
+      --medium: #06b6d4;
+      --safe: #10b981;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px;
+    }
+    #app {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    header nav {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    header nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    header nav a:hover {
+      color: var(--accent);
+    }
+    #newScanLink {
+      color: var(--accent);
+      font-weight: 700;
+    }
+    #pageTitle {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .phase-block {
+      margin-bottom: 20px;
+    }
+    .phase-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .badge-red {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--critical);
+      border: 1px solid var(--critical);
+    }
+    .badge-amber {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--high);
+      border: 1px solid var(--high);
+    }
+    .badge-cyan {
+      background: rgba(6, 182, 212, 0.2);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+    .phase-divider {
+      border: 0;
+      border-top: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+    .system-row {
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(31, 41, 55, 0.6);
+      font-size: 14px;
+    }
+    .system-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+    .system-rank {
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+    .system-name {
+      font-weight: 700;
+      color: var(--text);
+    }
+    .algo-change {
+      margin-left: auto;
+    }
+    .algo-current {
+      color: var(--critical);
+      font-weight: 600;
+    }
+    .algo-arrow {
+      color: var(--text-muted);
+      margin: 0 4px;
+    }
+    .algo-replacement {
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .system-meta {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    .impact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    #fullMigration, #phase1Only {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px;
+    }
+    #fullMigration h4 {
+      color: var(--safe);
+      margin-bottom: 12px;
+      font-size: 15px;
+    }
+    #phase1Only h4 {
+      color: var(--high);
+      margin-bottom: 12px;
+      font-size: 15px;
+    }
+    .impact-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      color: var(--text-muted);
+      font-size: 14px;
+      border-bottom: 1px solid rgba(31, 41, 55, 0.4);
+    }
+    .impact-row span {
+      color: var(--text);
+      font-weight: 700;
+    }
+    .actions-grid {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    button {
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    #exportJsonButton {
+      background: var(--accent);
+      color: #000;
+      border: none;
+    }
+    #exportJsonButton:hover {
+      background: var(--accent-hover);
+    }
+    #exportPdfButton {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    #exportPdfButton:hover {
+      border-color: var(--accent);
+    }
+    #startNewScanButton {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    #startNewScanButton:hover {
+      border-color: var(--critical);
+      color: var(--critical);
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    #modeToggle {
+      display: inline-flex;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .mode-btn {
+      background: transparent;
+      color: var(--text-muted);
+      border: none;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    .mode-btn:hover {
+      transform: none;
+      box-shadow: none;
+      color: var(--text);
+    }
+    .mode-btn.active {
+      background: var(--accent);
+      color: var(--bg);
+    }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <header>
+    <div class="header-left">
+      <h1>MineGuard</h1>
+      
+    </div>
+    <nav>
+      <a href="page4.html">Back</a>
+      <button id="exportButton" style="background:transparent; color:var(--text-muted); border:1px solid var(--border); padding:6px 14px; border-radius:4px; cursor:pointer;">Export</button>
+      <a href="page1.html" id="newScanLink">New Scan</a>
+    </nav>
+  </header>
+
+  <h2 id="pageTitle">Migration Priority: mining-project</h2>
+  <p id="pageSubtitle" style="color:var(--text-muted); margin-bottom:24px;">5 systems to migrate. Est. total effort: 14 weeks.</p>
+
+  <div class="card" id="roadmapContainer">
+    <h3>MIGRATION ROADMAP</h3>
+    <div id="roadmapList"></div>
+  </div>
+
+  <div class="card" id="impactContainer">
+    <h3>IMPACT SUMMARY</h3>
+    <div class="impact-grid">
+      <div id="fullMigration">
+        <h4>If you migrate all 5:</h4>
+        <div class="impact-row">Systems protected: <span id="fullSystems">0/20</span></div>
+        <div class="impact-row">Cascade prevented: <span id="fullCascade">YES</span></div>
+        <div class="impact-row">Est. downtime avoided: <span id="fullDowntime">24 hours</span></div>
+        <div class="impact-row">Est. cost avoided: <span id="fullCost">$0.0M</span></div>
+      </div>
+
+      <div id="phase1Only">
+        <h4>If you migrate only Phase 1:</h4>
+        <div class="impact-row">Systems protected: <span id="phase1Systems">0/20</span></div>
+        <div class="impact-row">Cascade prevented: <span id="phase1Cascade">PARTIAL</span></div>
+        <div class="impact-row">Est. downtime avoided: <span id="phase1Downtime">6 hours</span></div>
+        <div class="impact-row">Est. cost avoided: <span id="phase1Cost">$0.0M</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="codeSnippetsContainer">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <div>
+        <h3 style="margin-bottom:4px;">NIST PQC MIGRATION CODE SNIPPETS</h3>
+        <p style="color:var(--text-muted); font-size:13px;">Production-grade drop-in replacements for vulnerable mining crypto libraries</p>
+      </div>
+      <button id="copySnippetBtn" style="padding:6px 14px; font-size:12px; background:var(--card); border:1px solid var(--border); color:var(--text);">Copy Snippet</button>
+    </div>
+
+    <div style="display:flex; gap:8px; margin-bottom:12px;">
+      <button class="snippet-tab active" data-tab="kem" style="padding:6px 14px; font-size:12px; background:var(--accent); color:var(--bg); border:none; border-radius:4px; font-weight:700;">ML-KEM-768 (Key Encapsulation)</button>
+      <button class="snippet-tab" data-tab="dsa" style="padding:6px 14px; font-size:12px; background:var(--card); color:var(--text-muted); border:1px solid var(--border); border-radius:4px; font-weight:600;">ML-DSA-65 (Digital Signatures)</button>
+      <button class="snippet-tab" data-tab="tls" style="padding:6px 14px; font-size:12px; background:var(--card); color:var(--text-muted); border:1px solid var(--border); border-radius:4px; font-weight:600;">Hybrid TLS 1.3</button>
+    </div>
+
+    <pre id="snippetCode" style="background:#0a0e1a; border:1px solid var(--border); border-radius:6px; padding:16px; font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; font-size:13px; color:#f9fafb; overflow-x:auto; line-height:1.5;">// Loading snippet...</pre>
+  </div>
+
+  <div class="card" id="nextStepsContainer">
+    <h3>NEXT STEPS</h3>
+    <div class="actions-grid">
+      <button id="exportJsonButton">Export Report (JSON)</button>
+      <button id="exportPdfButton">Export Report (PDF)</button>
+      <button id="startNewScanButton">Start New Scan</button>
+      <button id="newScanButton" style="display:none;">Start New Scan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  var currentProjectName = "mining-project";
+
+  function isLocalStorageAvailable() {
+    try {
+      var k = "__test__";
+      window.localStorage.setItem(k, k);
+      window.localStorage.removeItem(k);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function getMigrationPlan() {
+    return [
+      {
+        phase: 1,
+        phaseLabel: "IMMEDIATE (2026 Q4)",
+        phaseColor: "red",
+        systems: [
+          {
+            rank: 1,
+            name: "CA-Root",
+            currentAlgo: "RSA-4096",
+            replacement: "ML-KEM (FIPS 203)",
+            reason: "Cascade trigger. Fixing this stops 12 downstream failures.",
+            effort: "4 weeks"
+          }
+        ]
+      },
+      {
+        phase: 2,
+        phaseLabel: "HIGH PRIORITY (2027 Q1)",
+        phaseColor: "amber",
+        systems: [
+          {
+            rank: 2,
+            name: "OT-Gateway",
+            currentAlgo: "RSA-2048",
+            replacement: "ML-KEM (FIPS 203)",
+            reason: "Safety critical. Fixing this protects ventilation and gas monitoring.",
+            effort: "3 weeks"
+          },
+          {
+            rank: 3,
+            name: "Auth-Svc",
+            currentAlgo: "RSA-2048",
+            replacement: "ML-DSA (FIPS 204)",
+            reason: "Access control. Fixing this restores login for 8 dependent services.",
+            effort: "2 weeks"
+          }
+        ]
+      },
+      {
+        phase: 3,
+        phaseLabel: "MEDIUM PRIORITY (2027 Q2)",
+        phaseColor: "cyan",
+        systems: [
+          {
+            rank: 4,
+            name: "Ventilation",
+            currentAlgo: "RSA-2048",
+            replacement: "ML-KEM (FIPS 203)",
+            reason: "Safety system. Fixing this prevents degradation.",
+            effort: "3 weeks"
+          },
+          {
+            rank: 5,
+            name: "Haulage",
+            currentAlgo: "ECDSA",
+            replacement: "ML-DSA (FIPS 204)",
+            reason: "Production. Fixing this prevents haulage halt.",
+            effort: "2 weeks"
+          }
+        ]
+      }
+    ];
+  }
+
+  function init() {
+    console.log("Page 5 loaded");
+
+    var currentMode = (isLocalStorageAvailable() && localStorage.getItem("mg_mode")) || "real";
+    if (typeof setMode === "function") setMode(currentMode);
+    document.querySelectorAll(".mode-btn").forEach(function (btn) {
+      if (btn.getAttribute("data-mode") === currentMode) {
+        btn.classList.add("active");
+      } else {
+        btn.classList.remove("active");
+      }
+      btn.addEventListener("click", function () {
+        var m = btn.getAttribute("data-mode");
+        if (isLocalStorageAvailable()) localStorage.setItem("mg_mode", m);
+        if (typeof setMode === "function") setMode(m);
+        document.querySelectorAll(".mode-btn").forEach(function (b) {
+          b.classList.toggle("active", b.getAttribute("data-mode") === m);
+        });
+      });
+    });
+
+    setupCodeSnippets();
+
+    var scanPath = "/path/to/mining-project";
+    if (isLocalStorageAvailable()) {
+      var storedPath = localStorage.getItem("scanPath");
+      if (storedPath) scanPath = storedPath;
+      if (localStorage.getItem("cascadeResults")) console.log("Cascade results loaded");
+    }
+
+    currentProjectName = scanPath.split("/").pop() || "mining-project";
+
+    var pageTitleEl = document.getElementById("pageTitle");
+    if (pageTitleEl) pageTitleEl.textContent = "Migration Priority: " + currentProjectName;
+
+    var plan = getMigrationPlan();
+    renderRoadmap(plan);
+    renderImpactSummary();
+
+    // Run count-up animations
+    var animationsCompleted = 0;
+    function checkCompleted() {
+      animationsCompleted++;
+      if (animationsCompleted === 4) {
+        console.log("Count-up animation complete");
+      }
+    }
+
+    animateCountUp("fullSystems", 0, 18, 800, "/20", checkCompleted);
+    animateCountUp("fullCost", 0, 2.4, 800, "M", checkCompleted);
+    animateCountUp("phase1Systems", 0, 12, 800, "/20", checkCompleted);
+    animateCountUp("phase1Cost", 0, 0.6, 800, "M", checkCompleted);
+
+    // Event listeners
+    var expJson = document.getElementById("exportJsonButton");
+    if (expJson) expJson.addEventListener("click", exportJson);
+
+    var expPdf = document.getElementById("exportPdfButton");
+    if (expPdf) expPdf.addEventListener("click", function () {
+      console.log("PDF export clicked");
+      setTimeout(function () { window.location.href = "page6.html"; }, 500);
+    });
+
+    var startBtn = document.getElementById("startNewScanButton");
+    if (startBtn) startBtn.addEventListener("click", startNewScan);
+
+    var newScanLink = document.getElementById("newScanLink");
+    if (newScanLink) newScanLink.addEventListener("click", function (e) {
+      e.preventDefault();
+      startNewScan();
+    });
+
+    var exportBtn = document.getElementById("exportButton");
+    if (exportBtn) exportBtn.addEventListener("click", function () {
+      console.log("Export clicked");
+    });
+  }
+
+  function renderRoadmap(plan) {
+    var container = document.getElementById("roadmapList");
+    if (!container) return;
+    container.innerHTML = "";
+
+    plan = plan || getMigrationPlan();
+
+    plan.forEach(function (phaseItem) {
+      var block = document.createElement("div");
+      block.className = "phase-block";
+
+      var badge = document.createElement("span");
+      badge.className = "phase-badge badge-" + phaseItem.phaseColor;
+      badge.textContent = phaseItem.phaseLabel;
+
+      var hr = document.createElement("hr");
+      hr.className = "phase-divider";
+
+      block.appendChild(badge);
+      block.appendChild(hr);
+
+      phaseItem.systems.forEach(function (sys) {
+        var row = document.createElement("div");
+        row.className = "system-row";
+
+        var header = document.createElement("div");
+        header.className = "system-header";
+
+        var rank = document.createElement("span");
+        rank.className = "system-rank";
+        rank.textContent = sys.rank + ".";
+
+        var name = document.createElement("span");
+        name.className = "system-name";
+        name.textContent = sys.name;
+
+        var algo = document.createElement("span");
+        algo.className = "algo-change";
+        algo.innerHTML = '<span class="algo-current">' + sys.currentAlgo + '</span><span class="algo-arrow"> → </span><span class="algo-replacement">' + sys.replacement + '</span>';
+
+        header.appendChild(rank);
+        header.appendChild(name);
+        header.appendChild(algo);
+
+        var meta = document.createElement("div");
+        meta.className = "system-meta";
+
+        var reason = document.createElement("span");
+        reason.textContent = sys.reason;
+
+        var effort = document.createElement("span");
+        effort.textContent = "Effort: " + sys.effort;
+
+        meta.appendChild(reason);
+        meta.appendChild(effort);
+
+        row.appendChild(header);
+        row.appendChild(meta);
+        block.appendChild(row);
+      });
+
+      container.appendChild(block);
+    });
+  }
+
+  function renderImpactSummary() {
+    var fc = document.getElementById("fullCascade");
+    if (fc) fc.textContent = "YES";
+
+    var fd = document.getElementById("fullDowntime");
+    if (fd) fd.textContent = "24 hours";
+
+    var p1c = document.getElementById("phase1Cascade");
+    if (p1c) p1c.textContent = "PARTIAL";
+
+    var p1d = document.getElementById("phase1Downtime");
+    if (p1d) p1d.textContent = "6 hours";
+  }
+
+  function animateCountUp(elementId, start, end, duration, suffix, onComplete) {
+    var element = document.getElementById(elementId);
+    if (!element) return;
+    var startTime = performance.now();
+
+    function update(currentTime) {
+      var elapsed = currentTime - startTime;
+      var progress = Math.min(elapsed / duration, 1);
+      var current = start + (end - start) * progress;
+
+      if (suffix === "M") {
+        element.textContent = "$" + current.toFixed(1) + "M";
+      } else if (suffix === "/20") {
+        element.textContent = Math.round(current) + "/20";
+      } else {
+        element.textContent = Math.round(current) + suffix;
+      }
+
+      if (progress < 1) {
+        requestAnimationFrame(update);
+      } else {
+        if (onComplete) onComplete();
+      }
+    }
+
+    requestAnimationFrame(update);
+  }
+
+  function exportJson() {
+    var report = {
+      project: currentProjectName,
+      scanDate: new Date().toISOString(),
+      riskScore: localStorage.getItem("riskScore") || "87",
+      severity: localStorage.getItem("riskSeverity") || "CRITICAL",
+      migrationPlan: getMigrationPlan(),
+      impactSummary: {
+        fullMigration: { systemsProtected: "18/20", cascadePrevented: "YES", downtimeAvoided: "24 hours", costAvoided: 2.4 },
+        phase1Only: { systemsProtected: "12/20", cascadePrevented: "PARTIAL", downtimeAvoided: "6 hours", costAvoided: 0.6 }
+      }
+    };
+
+    var jsonStr = JSON.stringify(report, null, 2);
+    var blob = new Blob([jsonStr], { type: "application/json" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "mining-migration-report.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    console.log("JSON exported");
+
+    setTimeout(function () {
+      window.location.href = "page6.html";
+    }, 500);
+  }
+
+  function startNewScan() {
+    console.log("Starting new scan");
+    try {
+      if (isLocalStorageAvailable()) {
+        var recent = localStorage.getItem("recentScans");
+        localStorage.clear();
+        if (recent) localStorage.setItem("recentScans", recent);
+      }
+      window.location.href = "page1.html";
+    } catch (e) {
+      console.log("Navigation failed");
+    }
+  }
+
+  var snippetsData = {
+    kem: `// NIST FIPS 203: ML-KEM-768 Key Encapsulation (Replacing RSA-2048 / ECDH)\n// Safe drop-in replacement using @noble/post-quantum\nimport { ml_kem768 } from '@noble/post-quantum/ml-kem.js';\n\n// 1. Receiver generates keypair\nconst aliceKeys = ml_kem768.keygen();\n// Public key: 1,184 bytes, Secret key: 2,400 bytes\n\n// 2. Sender encapsulates a 32-byte shared secret using Alice's public key\nconst { cipherText, sharedSecret: bobSecret } = ml_kem768.encapsulate(aliceKeys.publicKey);\n// Ciphertext: 1,088 bytes (sent over network)\n\n// 3. Receiver decapsulates shared secret using Alice's secret key\nconst aliceSecret = ml_kem768.decapsulate(cipherText, aliceKeys.secretKey);\n\n// 4. Derive AES-256-GCM symmetric session key\nconsole.log("Shared secrets match:", bobSecret.every((b, i) => b === aliceSecret[i]));`,
+    dsa: `// NIST FIPS 204: ML-DSA-65 Digital Signatures (Replacing RSA-4096 / ECDSA)\n// Safe drop-in replacement using @noble/post-quantum\nimport { ml_dsa65 } from '@noble/post-quantum/ml-dsa.js';\n\n// 1. Certificate Authority / Firmware Signer generates signing keypair\nconst signerKeys = ml_dsa65.keygen();\n// Public key: 1,952 bytes, Secret key: 4,032 bytes\n\n// 2. Sign mining telemetry / firmware dispatch payload\nconst telemetryMessage = new TextEncoder().encode(JSON.stringify({\n  sensorId: "gas-monitor-04",\n  methanePpm: 12.4,\n  timestamp: Date.now()\n}));\n\nconst signature = ml_dsa65.sign(signerKeys.secretKey, telemetryMessage);\n// Signature: 3,309 bytes\n\n// 3. SCADA Gateway verifies authentic telemetry origin\nconst isValid = ml_dsa65.verify(signerKeys.publicKey, telemetryMessage, signature);\nconsole.log("Telemetry integrity verified:", isValid); // true`,
+    tls: `// Hybrid Key Exchange (X25519 + ML-KEM-768) for TLS 1.3 Mining Backhaul\n// Recommended transition mechanism maintaining classical security compliance\nimport { x25519 } from '@noble/curves/ed25519';\nimport { ml_kem768 } from '@noble/post-quantum/ml-kem.js';\n\n// 1. Client creates hybrid ephemeral keys\nconst clientClassical = x25519.utils.randomPrivateKey();\nconst clientClassicalPub = x25519.getPublicKey(clientClassical);\nconst clientPqcKeys = ml_kem768.keygen();\n\n// 2. Server generates hybrid shared secret\nconst serverClassical = x25519.utils.randomPrivateKey();\nconst serverClassicalPub = x25519.getPublicKey(serverClassical);\nconst classicalShared = x25519.getSharedSecret(serverClassical, clientClassicalPub);\n\nconst { cipherText, sharedSecret: pqcShared } = ml_kem768.encapsulate(clientPqcKeys.publicKey);\n\n// 3. Combiner function: dual HKDF-Extract ensures quantum + classical security\nconst combinedSecret = new Uint8Array(classicalShared.length + pqcShared.length);\ncombinedSecret.set(classicalShared, 0);\ncombinedSecret.set(pqcShared, classicalShared.length);`
+  };
+
+  function setupCodeSnippets() {
+    var codeEl = document.getElementById("snippetCode");
+    var tabs = document.querySelectorAll(".snippet-tab");
+
+    function showTab(tabKey) {
+      if (codeEl && snippetsData[tabKey]) {
+        codeEl.textContent = snippetsData[tabKey];
+      }
+      tabs.forEach(function (t) {
+        if (t.getAttribute("data-tab") === tabKey) {
+          t.style.background = "var(--accent)";
+          t.style.color = "var(--bg)";
+          t.style.border = "none";
+        } else {
+          t.style.background = "var(--card)";
+          t.style.color = "var(--text-muted)";
+          t.style.border = "1px solid var(--border)";
+        }
+      });
+    }
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener("click", function () {
+        showTab(tab.getAttribute("data-tab"));
+      });
+    });
+
+    var copyBtn = document.getElementById("copySnippetBtn");
+    if (copyBtn) {
+      copyBtn.addEventListener("click", function () {
+        var text = (codeEl && codeEl.textContent) || "";
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(text).then(function () {
+            copyBtn.textContent = "Copied!";
+            setTimeout(function () { copyBtn.textContent = "Copy Snippet"; }, 2000);
+          });
+        }
+      });
+    }
+
+    showTab("kem");
+  }
+
+  window.addEventListener("load", init);
+</script>
+
+  <footer style="margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 13px;">
+    MineGuard is for educational and planning purposes only.
+  </footer>
+
+  <script src="engine.js"></script>
+  <script src="engine-real.js"></script>
+</body>
+</html>

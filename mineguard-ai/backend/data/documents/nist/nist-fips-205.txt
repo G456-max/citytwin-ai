@@ -1,0 +1,15 @@
+NIST FIPS 205: STATELESS HASH-BASED DIGITAL SIGNATURE STANDARD (SLH-DSA)
+Published: August 13, 2024. U.S. National Institute of Standards and Technology.
+
+1. OVERVIEW AND PURPOSE
+FIPS 205 specifies the Stateless Hash-Based Digital Signature Algorithm (SLH-DSA), derived from SPHINCS+. Unlike lattice-based schemes, SLH-DSA relies solely on the security properties of standard cryptographic hash functions (such as SHA-256 and SHAKE-256).
+
+2. CRYPTOGRAPHIC PROPERTIES AND DIVERSITY
+Lattice-based schemes (ML-DSA, ML-KEM) share underlying mathematical structures. If an unforeseen breakthrough in algebraic lattice reduction occurs, lattice systems could become vulnerable. SLH-DSA provides an essential non-lattice hedge. Hash functions are not susceptible to Shor's algorithm, and Grover's algorithm only provides a quadratic speedup, which is completely counterbalanced by doubling the digest size (e.g., using SHA-256 or SHA-512).
+
+3. PARAMETER SETS AND TRADEOFFS
+SLH-DSA parameter sets offer varying tradeoffs between verification speed and signature size:
+- SLH-DSA-SHA2-128s / SLH-DSA-SHAKE-128s: Small signatures (~7,856 bytes), slower signing.
+- SLH-DSA-SHA2-128f / SLH-DSA-SHAKE-128f: Faster signing, larger signatures (~17,088 bytes).
+- SLH-DSA-SHA2-256s / 256f: Security Category 5 for long-term critical root certificates.
+While SLH-DSA signatures are larger and computationally heavier than ML-DSA, their statelessness avoids the state-synchronization vulnerabilities inherent in stateful hash schemes (LMS/XMSS).

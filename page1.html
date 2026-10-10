@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MineGuard — Scan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --card: #111827;
+      --border: #1f2937;
+      --text: #f9fafb;
+      --gray: #9ca3af;
+      --accent: #06b6d4;
+      --critical: #ef4444;
+      --high: #f59e0b;
+      --medium: #06b6d4;
+      --safe: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+      line-height: 1.6;
+    }
+
+    h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+    h2 { font-size: 20px; font-weight: 600; margin-bottom: 16px; }
+    h3 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+
+    a { color: var(--accent); text-decoration: none; margin-right: 16px; }
+    a:hover { text-decoration: underline; }
+
+    button {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 200ms ease;
+    }
+    button:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(6,182,212,0.3); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    input[type="text"] {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px;
+      border-radius: 8px;
+      width: 100%;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    input[type="text"]:focus { outline: none; border-color: var(--accent); }
+
+    input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-top: 24px;
+    }
+
+    .badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .badge.critical, .badge-critical { background: var(--critical); color: #fff; }
+    .badge.high, .badge-high { background: var(--high); color: var(--bg); }
+    .badge.medium, .badge-medium { background: var(--medium); color: var(--bg); }
+    .badge.safe, .badge-safe { background: var(--safe); color: var(--bg); }
+
+    table { width: 100%; border-collapse: collapse; }
+    td, th { padding: 12px 8px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { color: var(--gray); font-size: 12px; text-transform: uppercase; }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo { font-size: 20px; font-weight: 700; color: var(--text); }
+
+    #modeToggle {
+      display: inline-flex;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .mode-btn {
+      background: transparent;
+      color: var(--gray);
+      border: none;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    .mode-btn:hover {
+      transform: none;
+      box-shadow: none;
+      color: var(--text);
+    }
+
+    .mode-btn.active {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .scan-type { background:transparent; border:1px solid var(--border); color:var(--gray); margin-right:8px; }
+    .scan-type.active { background:var(--accent); color:var(--bg); }
+
+    .recent-scan-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .recent-scan-row:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <div class="logo">MineGuard</div>
+      
+    </div>
+    <div class="header-right">
+      <nav>
+        <a href="page2.html">Skip to Results</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="app">
+    <div style="display:flex; justify-content:space-between; align-items:baseline;">
+      <h1>Quantum Risk Scanner for Mining</h1>
+      
+    </div>
+    <p style="color:var(--gray); margin-bottom:24px;">Find weak encryption. Simulate what breaks first.</p>
+    
+    <div class="card">
+      <label for="projectPath">Project Path</label>
+      <input type="text" id="projectPath" value="/path/to/mining-project" placeholder="/path/to/mining-project">
+      
+      <label style="display:block; margin-top:16px;">Scan Type</label>
+      <div style="margin-top:8px;">
+        <button class="scan-type active" data-type="source" type="button">Source Code</button>
+        <button class="scan-type" data-type="config" type="button">Config</button>
+        <button class="scan-type" data-type="dependencies" type="button">Dependencies</button>
+      </div>
+      
+      <button id="startScanButton" style="width:100%; margin-top:24px;" type="button">START SCAN</button>
+      
+      <div id="progressContainer" style="display:none; margin-top:16px;">
+        <p id="progressText">Discovering cryptographic assets...</p>
+        <div style="background:var(--border); border-radius:4px; overflow:hidden; margin-top:8px;">
+          <div id="progressBar" style="height:8px; background:var(--accent); width:0%; transition:width 50ms linear;"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h3>Recent Scans</h3>
+      <div id="recentScans">Loading...</div>
+    </div>
+  </main>
+
+  <footer style="margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border); text-align: center; color: var(--gray); font-size: 13px;">
+    MineGuard is for educational and planning purposes only.
+  </footer>
+
+  <script src="engine.js"></script>
+  <script src="engine-real.js"></script>
+  <script>
+    var selectedScanType = "source";
+    var scanInterval = null;
+
+    function isLocalStorageAvailable() {
+      try {
+        var k = "__test__";
+        window.localStorage.setItem(k, k);
+        window.localStorage.removeItem(k);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function init() {
+      console.log("page1 loaded");
+
+      // Initialize mode
+      var currentMode = (isLocalStorageAvailable() && localStorage.getItem("mg_mode")) || "real";
+      if (typeof setMode === "function") {
+        setMode(currentMode);
+      }
+
+      // Mode toggle buttons
+      document.querySelectorAll(".mode-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var mode = btn.getAttribute("data-mode");
+          if (typeof setMode === "function") setMode(mode);
+        });
+      });
+
+      // Recent scans setup
+      var storedScans = null;
+      if (isLocalStorageAvailable()) {
+        var raw = localStorage.getItem("recentScans");
+        if (raw) {
+          try { storedScans = JSON.parse(raw); } catch (e) { storedScans = null; }
+        }
+        if (!storedScans || !Array.isArray(storedScans) || storedScans.length === 0) {
+          storedScans = [
+            { "path": "mining-erp", "score": 87, "severity": "CRITICAL" },
+            { "path": "haulage-system", "score": 62, "severity": "HIGH" },
+            { "path": "ventilation-ctrl", "score": 45, "severity": "MEDIUM" }
+          ];
+          localStorage.setItem("recentScans", JSON.stringify(storedScans));
+        }
+      }
+
+      renderRecentScans(storedScans);
+
+      // Scan type toggle
+      var scanTypeButtons = document.querySelectorAll(".scan-type");
+      scanTypeButtons.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          scanTypeButtons.forEach(function (b) { b.classList.remove("active"); });
+          btn.classList.add("active");
+          selectedScanType = btn.getAttribute("data-type") || "source";
+        });
+      });
+
+      // Start scan button
+      var startBtn = document.getElementById("startScanButton");
+      if (startBtn) {
+        startBtn.addEventListener("click", startScan);
+      }
+    }
+
+    function renderRecentScans(scans) {
+      var container = document.getElementById("recentScans");
+      if (!container) return;
+
+      if (!scans && isLocalStorageAvailable()) {
+        try { scans = JSON.parse(localStorage.getItem("recentScans")); } catch (e) { scans = []; }
+      }
+
+      if (!scans || scans.length === 0) {
+        container.textContent = "No recent scans";
+        return;
+      }
+
+      container.innerHTML = "";
+      var displayList = scans.slice(0, 3);
+
+      displayList.forEach(function (scan) {
+        var row = document.createElement("div");
+        row.className = "recent-scan-row";
+
+        var infoSpan = document.createElement("div");
+        infoSpan.innerHTML = '<strong>' + scan.path + '</strong> ' +
+                             '<span style="color:var(--gray); margin:0 8px;">Score: ' + scan.score + '</span> ' +
+                             '<span class="badge badge-' + (scan.severity ? scan.severity.toLowerCase() : 'high') + '">' + scan.severity + '</span>';
+
+        var viewLink = document.createElement("a");
+        viewLink.href = "page2.html";
+        viewLink.className = "view-link";
+        viewLink.textContent = "View";
+        viewLink.addEventListener("click", function (e) {
+          viewRecentScan(scan.path);
+        });
+
+        row.appendChild(infoSpan);
+        row.appendChild(viewLink);
+        container.appendChild(row);
+      });
+    }
+
+    function viewRecentScan(scanPath) {
+      if (isLocalStorageAvailable()) {
+        localStorage.setItem("scanPath", scanPath || "/path/to/mining-project");
+      }
+      window.location.href = "page2.html";
+    }
+    window.viewRecentScan = viewRecentScan;
+
+    function startScan() {
+      var input = document.getElementById("projectPath");
+      var path = input ? input.value.trim() : "";
+
+      if (!path) {
+        alert("Please enter a project path");
+        return;
+      }
+      if (!path.includes("/")) {
+        alert("Please enter a valid path");
+        return;
+      }
+
+      var startBtn = document.getElementById("startScanButton");
+      if (startBtn) {
+        startBtn.disabled = true;
+        startBtn.textContent = "Scanning...";
+      }
+
+      var progressContainer = document.getElementById("progressContainer");
+      if (progressContainer) {
+        progressContainer.style.display = "block";
+      }
+
+      runScan();
+    }
+
+    function runScan() {
+      var progressBar = document.getElementById("progressBar");
+      var progressText = document.getElementById("progressText");
+      var progress = 0;
+      var step = 100 / (3000 / 50);
+
+      scanInterval = setInterval(function () {
+        progress += step;
+        if (progress >= 100) progress = 100;
+
+        if (progressBar) progressBar.style.width = progress + "%";
+
+        if (progressText) {
+          if (progress < 25) {
+            progressText.textContent = "Discovering cryptographic assets...";
+          } else if (progress < 50) {
+            progressText.textContent = "Analyzing algorithms...";
+          } else if (progress < 75) {
+            progressText.textContent = "Calculating risk scores...";
+          } else {
+            progressText.textContent = "Generating recommendations...";
+          }
+        }
+
+        if (progress >= 100) {
+          clearInterval(scanInterval);
+          onScanComplete();
+        }
+      }, 50);
+    }
+
+    function onScanComplete() {
+      if (scanInterval) {
+        clearInterval(scanInterval);
+        scanInterval = null;
+      }
+
+      var input = document.getElementById("projectPath");
+      var path = input ? input.value.trim() : "/path/to/mining-project";
+
+      if (isLocalStorageAvailable()) {
+        localStorage.setItem("scanPath", path);
+        localStorage.setItem("scanType", selectedScanType);
+        localStorage.setItem("scanDate", new Date().toISOString().split("T")[0]);
+      }
+
+      var startBtn = document.getElementById("startScanButton");
+      if (startBtn) {
+        startBtn.textContent = "Scan Complete";
+      }
+
+      setTimeout(function () {
+        window.location.href = "page2.html";
+      }, 500);
+    }
+
+    window.addEventListener("load", init);
+  </script>
+</body>
+</html>

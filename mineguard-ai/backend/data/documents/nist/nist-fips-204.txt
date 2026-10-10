@@ -1,0 +1,16 @@
+NIST FIPS 204: MODULE-LATTICE-BASED DIGITAL SIGNATURE STANDARD (ML-DSA)
+Published: August 13, 2024. U.S. National Institute of Standards and Technology.
+
+1. OVERVIEW AND PURPOSE
+FIPS 204 specifies the Module-Lattice-Based Digital Signature Algorithm (ML-DSA), derived from the CRYSTALS-Dilithium algorithm. It is the primary post-quantum digital signature standard for identity verification, Public Key Infrastructure (PKI), TLS certificates, VPN handshakes, and digitally signed transactions.
+
+2. MATHEMATICAL UNDERPINNINGS
+ML-DSA relies on the hardness of the Module Short Integer Solution (M-SIS) and Module Learning With Errors (M-LWE) problems in module lattices. Classical signature algorithms like RSA (PKCS#1 v1.5, PSS) and ECDSA (secp256r1, secp384r1) are completely vulnerable to polynomial-time factorization and discrete log cracking via Shor's algorithm on a Cryptanalytically Relevant Quantum Computer (CRQC).
+
+3. PARAMETER SETS
+- ML-DSA-44: Security Category 2. Public key: 1,312 bytes; Signature: 2,420 bytes.
+- ML-DSA-65: Security Category 3. Public key: 1,952 bytes; Signature: 3,309 bytes. General-purpose standard for root CAs, leaf certificates, and industrial authentication gateways.
+- ML-DSA-87: Security Category 5. Public key: 2,592 bytes; Signature: 4,627 bytes. Highest assurance level, mandatory for top-tier root trust anchors and safety interlock signing.
+
+4. OPERATIONAL CONSIDERATIONS
+Because ML-DSA public keys and signatures are substantially larger than classical RSA-2048 or ECDSA signatures, network MTU limits, fragmentation in industrial protocols (Modbus/TCP, CIP, DNP3), and embedded RAM constraints must be accommodated during engineering migrations.

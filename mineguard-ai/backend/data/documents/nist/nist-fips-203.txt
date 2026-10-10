@@ -1,0 +1,17 @@
+NIST FIPS 203: MODULE-LATTICE-BASED KEY-ENCAPSULATION MECHANISM STANDARD (ML-KEM)
+Published: August 13, 2024. U.S. National Institute of Standards and Technology.
+
+1. OVERVIEW AND PURPOSE
+Federal Information Processing Standard (FIPS) 203 specifies the Module-Lattice-Based Key-Encapsulation Mechanism (ML-KEM). ML-KEM is designed to protect sensitive electronic data against both classical and quantum computing adversaries. It replaces classical key agreement protocols, including Diffie-Hellman (DH), Elliptic Curve Diffie-Hellman (ECDH), and RSA key encapsulation.
+
+2. CRYPTOGRAPHIC FOUNDATION
+ML-KEM is mathematically grounded in the hardness of the Module Learning With Errors (M-LWE) problem over structured polynomial rings. M-LWE is conjectured to be resistant to polynomial-time quantum algorithms, including Shor's algorithm, which polynomial-solves discrete logarithms and integer factorization.
+
+3. PARAMETER SETS AND SECURITY CATEGORIES
+NIST defines three primary parameter sets:
+- ML-KEM-512: NIST Security Category 1 (equivalent classical brute-force security to AES-128). Public key size: 800 bytes; Ciphertext size: 768 bytes; Shared secret: 32 bytes.
+- ML-KEM-768: NIST Security Category 3 (equivalent classical brute-force security to AES-192). Public key size: 1,184 bytes; Ciphertext size: 1,088 bytes; Shared secret: 32 bytes. Recommended for general enterprise and industrial applications.
+- ML-KEM-1024: NIST Security Category 5 (equivalent classical brute-force security to AES-256). Public key size: 1,568 bytes; Ciphertext size: 1,568 bytes; Shared secret: 32 bytes. Recommended for national security and ultra-critical safety systems.
+
+4. MIGRATION AND HYBRID DEPLOYMENT
+NIST explicitly endorses hybrid key exchange during the transition window, combining ML-KEM-768 with classical ECDH (such as X25519). A hybrid mechanism ensures that data remains secure as long as either the classical or post-quantum primitive remains unbroken.

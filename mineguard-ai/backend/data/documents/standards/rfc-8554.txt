@@ -1,0 +1,7 @@
+RFC 8554: LEIGHTON-MICALI HASH-BASED SIGNATURES (LMS)
+Internet Engineering Task Force (IETF).
+
+1. LEIGHTON-MICALI SIGNATURE SPECIFICATION
+RFC 8554 specifies LMS and Hierarchical Signature Schemes (HSS). LMS is a stateful hash-based signature scheme using Leighton-Micali One-Time Signatures (LM-OTS) and cryptographic Merkle trees.
+2. INDUSTRIAL FIRMWARE APPLICATION
+Due to its low verification complexity and lean memory footprint, LMS is the chosen algorithm for post-quantum secure boot in safety-critical industrial controllers, mining OT interlocks, and aerospace telecommunications.

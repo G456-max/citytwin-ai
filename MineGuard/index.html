@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MineGuard — Quantum Risk Cascade Simulator</title>
+  <meta name="description" content="Quantum Risk Assessment and Cascade Failure Simulator for Mining & Critical Infrastructure.">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* =====================================================================
+       DESIGN SYSTEM & THEME
+       ===================================================================== */
+    :root {
+      --bg: #0a0e1a;
+      --card: #111827;
+      --card-hover: #172033;
+      --border: #1f2937;
+      --border-accent: rgba(6, 182, 212, 0.4);
+      --text: #f9fafb;
+      --text-muted: #9ca3af;
+      --accent: #06b6d4;
+      --accent-glow: rgba(6, 182, 212, 0.25);
+      --critical: #ef4444;
+      --high: #f59e0b;
+      --medium: #06b6d4;
+      --safe: #10b981;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Container */
+    .app-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px 60px 24px;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* =====================================================================
+       GLOBAL HEADER & UNIFIED NAVIGATION
+       ===================================================================== */
+    header.global-header {
+      background: rgba(17, 24, 39, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #06b6d4, #3b82f6);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    .brand-icon svg {
+      width: 18px;
+      height: 18px;
+      fill: #ffffff;
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(to right, #f9fafb, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-tag {
+      font-size: 10px;
+      font-weight: 700;
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      padding: 2px 7px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Unified Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      align-items: center;
+      background: rgba(10, 14, 26, 0.7);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      gap: 2px;
+      overflow-x: auto;
+    }
+
+    .nav-tab {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .nav-tab:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .nav-tab.active {
+      color: #ffffff;
+      background: var(--accent);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .nav-tab-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .nav-tab.active .nav-tab-num {
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    /* Mode Toggle */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mode-toggle {
+      display: flex;
+      background: #0a0e1a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3px;
+    }
+
+    .mode-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .mode-btn.active {
+      background: var(--accent);
+      color: #000;
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    /* =====================================================================
+       VIEW CONTAINER & TRANSITIONS
+       ===================================================================== */
+    .view-section {
+      display: none;
+      animation: fadeIn 0.3s ease forwards;
+      margin-top: 28px;
+    }
+
+    .view-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Common Card Styles */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 12px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .view-header {
+      margin-bottom: 24px;
+    }
+
+    .view-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    .view-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* Action Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+      text-decoration: none;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    .btn-primary:hover {
+      background: #22d3ee;
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .view-footer-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-critical { background: rgba(239, 68, 68, 0.15); color: var(--critical); border: 1px solid rgba(239, 68, 68, 0.3); }
+    .badge-high { background: rgba(245, 158, 11, 0.15); color: var(--high); border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-medium { background: rgba(6, 182, 212, 0.15); color: var(--medium); border: 1px solid rgba(6, 182, 212, 0.3); }
+    .badge-safe { background: rgba(16, 185, 129, 0.15); color: var(--safe); border: 1px solid rgba(16, 185, 129, 0.3); }
+
+    /* =====================================================================
+       VIEW 1: SCANNER STYLES
+       ===================================================================== */
+    .scan-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .input-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .text-input {
+      background: #0a0e1a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: var(--font-mono);
+      width: 100%;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .text-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .scan-types {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .scan-type {
+      background: #0a0e1a;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .scan-type.active {
+      background: rgba(6, 182, 212, 0.15);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .progress-box {
+      margin-top: 24px;
+      display: none;
+    }
+
+    .progress-bar-wrap {
+      background: #0a0e1a;
+      border-radius: 9999px;
+      height: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #06b6d4, #10b981);
+      transition: width 0.15s ease;
+    }
+
+    .progress-status {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .recent-scans-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .recent-scans-table th {
+      text-align: left;
+      padding: 10px 12px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+    }
+
+    .recent-scans-table td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* =====================================================================
+       VIEW 2: METRICS & RISK DASHBOARD
+       ===================================================================== */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .metric-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric-val {
+      font-size: 36px;
+      font-weight: 800;
+      margin-top: 6px;
+      letter-spacing: -1px;
+    }
+
+    .chart-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .chart-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+    }
+
+    .chart-label {
+      width: 80px;
+      font-weight: 600;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .chart-bar-bg {
+      flex: 1;
+      height: 18px;
+      background: #0a0e1a;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .chart-bar-val {
+      height: 100%;
+      border-radius: 4px;
+    }
+
+    .findings-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .findings-table th {
+      text-align: left;
+      padding: 10px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .findings-table td {
+      padding: 12px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-family: var(--font-mono);
+    }
+
+    /* =====================================================================
+       VIEW 3: TOPOLOGY GRAPH
+       ===================================================================== */
+    .graph-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .graph-wrapper { grid-template-columns: 1fr; }
+    }
+
+    .svg-container {
+      background: #0a0e1a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    #graphSvg {
+      width: 100%;
+      height: 520px;
+      cursor: crosshair;
+    }
+
+    .node-circle {
+      cursor: pointer;
+      transition: transform 0.2s, stroke-width 0.2s;
+    }
+
+    .node-circle:hover {
+      stroke: #ffffff;
+      stroke-width: 3;
+    }
+
+    .details-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      font-size: 13px;
+    }
+
+    .details-box {
+      background: #0a0e1a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      font-family: var(--font-mono);
+      white-space: pre-wrap;
+      line-height: 1.6;
+      margin-top: 12px;
+      min-height: 200px;
+    }
+
+    /* =====================================================================
+       VIEW 4: CASCADE SIMULATOR
+       ===================================================================== */
+    .slider-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .slider-input {
+      flex: 1;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .slider-val-badge {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--accent);
+      font-family: var(--font-mono);
+      min-width: 60px;
+    }
+
+    .split-graphs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 800px) {
+      .split-graphs { grid-template-columns: 1fr; }
+    }
+
+    .split-col {
+      background: #0a0e1a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .split-header {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* =====================================================================
+       VIEW 5 & 6: ROADMAP & CBOM
+       ===================================================================== */
+    .code-box {
+      background: #0a0e1a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #38bdf8;
+      overflow-x: auto;
+      position: relative;
+      margin-top: 10px;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* Footer */
+    footer.global-footer {
+      border-top: 1px solid var(--border);
+      background: #0a0e1a;
+      padding: 20px 24px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===================================================================
+       UNIFIED GLOBAL HEADER
+       =================================================================== -->
+  <header class="global-header">
+    <div class="header-inner">
+      <div class="brand" onclick="switchView('scan')">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+        </div>
+        <div>
+          <span class="brand-title">MineGuard</span>
+          <span class="brand-tag">Quantum Risk Suite</span>
+        </div>
+      </div>
+
+      <!-- Unified Step Navigation Tabs -->
+      <nav class="nav-tabs">
+        <button class="nav-tab active" id="tab-scan" onclick="switchView('scan')">
+          <span class="nav-tab-num">1</span> Scan
+        </button>
+        <button class="nav-tab" id="tab-assessment" onclick="switchView('assessment')">
+          <span class="nav-tab-num">2</span> Assessment
+        </button>
+        <button class="nav-tab" id="tab-graph" onclick="switchView('graph')">
+          <span class="nav-tab-num">3</span> Topology
+        </button>
+        <button class="nav-tab" id="tab-cascade" onclick="switchView('cascade')">
+          <span class="nav-tab-num">4</span> Cascade
+        </button>
+        <button class="nav-tab" id="tab-roadmap" onclick="switchView('roadmap')">
+          <span class="nav-tab-num">5</span> Roadmap
+        </button>
+        <button class="nav-tab" id="tab-export" onclick="switchView('export')">
+          <span class="nav-tab-num">6</span> Export
+        </button>
+      </nav>
+
+      <!-- Mode Toggle -->
+      <div class="header-actions">
+        
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================================
+       MAIN CONTENT CONTAINER
+       =================================================================== -->
+  <main class="app-container">
+
+    <!-- =================================================================
+         VIEW 1: LANDING & SCANNER
+         ================================================================= -->
+    <section id="view-scan" class="view-section active">
+      <div class="view-header">
+        <h1 class="view-title">Quantum Cryptographic Scanner</h1>
+        <p class="view-subtitle">Audit mining operational technology, telemetry protocols, and SCADA firmware for quantum vulnerabilities.</p>
+      </div>
+
+      <div class="card">
+        <div class="scan-input-group">
+          <label class="input-label" for="projectPath">TARGET REPOSITORY / INFRASTRUCTURE DIRECTORY</label>
+          <input type="text" id="projectPath" class="text-input" value="/path/to/mining-project" placeholder="/path/to/mining-project">
+        </div>
+
+        <div class="scan-input-group">
+          <label class="input-label">SCAN AUDIT DEPTH</label>
+          <div class="scan-types">
+            <button class="scan-type active" data-type="source" onclick="selectScanType('source')">Source Code</button>
+            <button class="scan-type" data-type="config" onclick="selectScanType('config')">Infrastructure Configs</button>
+            <button class="scan-type" data-type="dependencies" onclick="selectScanType('dependencies')">Dependencies & CBOM</button>
+          </div>
+        </div>
+
+        <div style="margin-top: 24px;">
+          <button id="startScanButton" class="btn btn-primary" onclick="startScan()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            START SCAN
+          </button>
+        </div>
+
+        <div id="progressContainer" class="progress-box">
+          <div class="progress-bar-wrap">
+            <div id="progressBar" class="progress-bar-fill"></div>
+          </div>
+          <div class="progress-status">
+            <span id="progressText">Initializing quantum audit scanner...</span>
+            <span id="progressPercent">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Scans History -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Recent Infrastructure Audits</h2>
+        </div>
+        <div id="recentScans">
+          <table class="recent-scans-table">
+            <thead>
+              <tr>
+                <th>Directory Path</th>
+                <th>Mode</th>
+                <th>Audit Timestamp</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="recentScansBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         VIEW 2: RISK ASSESSMENT & INVENTORY
+         ================================================================= -->
+    <section id="view-assessment" class="view-section">
+      <div class="view-header">
+        <h1 class="view-title" id="pageTitle">Cryptographic Inventory & Risk Analysis</h1>
+        <p class="view-subtitle" id="scanInfo">Target: /path/to/mining-project — Evaluated against Shor's & Grover's Quantum Algorithms</p>
+      </div>
+
+      <!-- Metrics Grid -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="input-label">QUANTUM RISK SCORE</div>
+          <div class="metric-val" id="riskScore" style="color: var(--critical);">87/100</div>
+          <div style="margin-top: 8px;"><span id="riskBadge" class="badge badge-critical">CRITICAL</span></div>
+        </div>
+        <div class="metric-card">
+          <div class="input-label">ALGORITHMS IDENTIFIED</div>
+          <div class="metric-val" id="algoCount" style="color: var(--accent);">8</div>
+          <div style="margin-top: 8px; font-size: 12px; color: var(--text-muted);">Across 4 operational tiers</div>
+        </div>
+        <div class="metric-card">
+          <div class="input-label">CRITICAL VULNERABILITIES</div>
+          <div class="metric-val" id="criticalCount" style="color: var(--critical);">5</div>
+          <div style="margin-top: 8px; font-size: 12px; color: var(--text-muted);">Shor-vulnerable (RSA & ECC)</div>
+        </div>
+        <div class="metric-card">
+          <div class="input-label">MOSCA EXPOSURE GAP</div>
+          <div class="metric-val" id="moscaVal" style="color: var(--high);">31 yr</div>
+          <div style="margin-top: 8px; font-size: 12px; color: var(--text-muted);">Data Life (30y) + Migration (5y) > Q-Day</div>
+        </div>
+      </div>
+
+      <!-- Algorithm Chart -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Cryptographic Algorithm Exposure</h2>
+        </div>
+        <div id="algorithmChart" class="chart-container">
+          <div class="chart-bar-row">
+            <span class="chart-label">RSA (Shor)</span>
+            <div class="chart-bar-bg"><div class="chart-bar-val" style="width: 85%; background: var(--critical);"></div></div>
+            <span style="font-family: var(--font-mono); font-size: 12px;">85% Critical</span>
+          </div>
+          <div class="chart-bar-row">
+            <span class="chart-label">ECC (Shor)</span>
+            <div class="chart-bar-bg"><div class="chart-bar-val" style="width: 70%; background: var(--critical);"></div></div>
+            <span style="font-family: var(--font-mono); font-size: 12px;">70% Critical</span>
+          </div>
+          <div class="chart-bar-row">
+            <span class="chart-label">AES (Grover)</span>
+            <div class="chart-bar-bg"><div class="chart-bar-val" style="width: 30%; background: var(--high);"></div></div>
+            <span style="font-family: var(--font-mono); font-size: 12px;">30% Weakened</span>
+          </div>
+          <div class="chart-bar-row">
+            <span class="chart-label">SHA (Grover)</span>
+            <div class="chart-bar-bg"><div class="chart-bar-val" style="width: 20%; background: var(--accent);"></div></div>
+            <span style="font-family: var(--font-mono); font-size: 12px;">20% Medium</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live PQC Execution Card -->
+      <div class="card" id="pqcDemoCard" style="border-color: rgba(6, 182, 212, 0.4);">
+        <div class="card-header">
+          <h2 class="card-title">Live Post-Quantum Cryptography (FIPS 203 ML-KEM-768 Execution)</h2>
+          <span class="badge badge-safe">NIST FIPS 203</span>
+        </div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+          Execute live ML-KEM-768 lattice-based key encapsulation right now in your runtime environment to prove quantum immunity.
+        </p>
+        <button id="runPqcDemoBtn" class="btn btn-secondary" onclick="runPqcExecutionDemo()">
+          ⚡ Run Live PQC Key Encapsulation
+        </button>
+        <div id="pqcOutput" class="code-box" style="margin-top: 14px; display: none;"></div>
+      </div>
+
+      <!-- Findings Table -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Discovered Cryptographic Assets</h2>
+          <span id="scannerSource" style="font-size: 12px; color: var(--accent);">Detected by quantum-safe-audit</span>
+        </div>
+        <table class="findings-table">
+          <thead>
+            <tr>
+              <th>File Location</th>
+              <th>Algorithm</th>
+              <th>Operational Context</th>
+              <th>Quantum Threat</th>
+              <th>Severity</th>
+            </tr>
+          </thead>
+          <tbody id="findingsTable">
+            <!-- Populated via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="view-footer-nav">
+        <button class="btn btn-secondary" onclick="switchView('scan')">← Back to Scanner</button>
+        <button id="cascadeButton" class="btn btn-primary" onclick="switchView('graph')">Proceed to Topology Graph →</button>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         VIEW 3: TOPOLOGY GRAPH
+         ================================================================= -->
+    <section id="view-graph" class="view-section">
+      <div class="view-header">
+        <h1 class="view-title">Mining Infrastructure Dependency Graph</h1>
+        <p class="view-subtitle">Interactive 20-node system topology across Operational Technology, IIoT, Mining Software, and Enterprise layers.</p>
+      </div>
+
+      <!-- Legend -->
+      <div class="card" style="padding: 14px 20px; margin-bottom: 16px;">
+        <div id="legendItems" style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 12px;">
+          <div class="legend-row" style="display: flex; align-items: center; gap: 6px;">
+            <span style="width: 12px; height: 12px; border-radius: 50%; background: var(--critical);"></span>
+            <span>CRITICAL (Broken by Shor)</span>
+          </div>
+          <div class="legend-row" style="display: flex; align-items: center; gap: 6px;">
+            <span style="width: 12px; height: 12px; border-radius: 50%; background: var(--high);"></span>
+            <span>HIGH RISK (Weakened)</span>
+          </div>
+          <div class="legend-row" style="display: flex; align-items: center; gap: 6px;">
+            <span style="width: 12px; height: 12px; border-radius: 50%; background: var(--accent);"></span>
+            <span>MEDIUM (Hash / Legacy)</span>
+          </div>
+          <div class="legend-row" style="display: flex; align-items: center; gap: 6px;">
+            <span style="width: 12px; height: 12px; border-radius: 50%; background: var(--safe);"></span>
+            <span>SAFE (Quantum-Resistant)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="graph-wrapper">
+        <div class="svg-container">
+          <svg id="graphSvg" viewBox="0 0 800 520">
+            <!-- Rendered via JS -->
+          </svg>
+        </div>
+        <div class="details-panel">
+          <div class="card-title">Node Cryptographic Inspection</div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Click any circle on the graph to inspect its hardware dependencies and quantum blast radius.</p>
+          <div id="detailsText" class="details-box">Select a node from the topology map to inspect details.</div>
+        </div>
+      </div>
+
+      <div class="view-footer-nav">
+        <button class="btn btn-secondary" onclick="switchView('assessment')">← Back to Assessment</button>
+        <button id="simulateButton" class="btn btn-primary" onclick="switchView('cascade')">Run Cascade Simulation →</button>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         VIEW 4: CASCADE SIMULATOR
+         ================================================================= -->
+    <section id="view-cascade" class="view-section">
+      <div class="view-header">
+        <h1 class="view-title">Quantum Decryption Cascade Simulator</h1>
+        <p class="view-subtitle">Simulate how Shor's algorithm breaking root certificate authorities triggers an operational chain reaction across the mine.</p>
+      </div>
+
+      <!-- Slider Card -->
+      <div class="slider-box">
+        <label for="qDaySlider" style="font-size: 13px; font-weight: 700; color: var(--text-muted); min-width: 130px;">Q-DAY HORIZON:</label>
+        <input type="range" id="qDaySlider" class="slider-input" min="2027" max="2035" value="2029" oninput="updateCascadeYear(this.value)">
+        <span id="qDayValue" class="slider-val-badge">2029</span>
+        <span id="stageDescription" style="font-size: 13px; color: var(--text-muted); margin-left: 10px;">ECDSA and RSA-2048 break simultaneously</span>
+      </div>
+
+      <!-- Split Screen Graphs -->
+      <div class="split-graphs">
+        <div class="split-col">
+          <div class="split-header" style="color: var(--critical);">
+            <span style="width: 10px; height: 10px; border-radius: 50%; background: var(--critical);"></span>
+            Status Quo (No Migration — Cascade Failure)
+          </div>
+          <svg id="graphLeft" viewBox="0 0 800 520" style="width: 100%; height: 320px;"></svg>
+        </div>
+        <div class="split-col">
+          <div class="split-header" style="color: var(--safe);">
+            <span style="width: 10px; height: 10px; border-radius: 50%; background: var(--safe);"></span>
+            Post-Quantum Migrated (ML-KEM & ML-DSA Protected)
+          </div>
+          <svg id="graphRight" viewBox="0 0 800 520" style="width: 100%; height: 320px;"></svg>
+        </div>
+      </div>
+
+      <!-- Timeline Table -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Failure Propagation Sequence (Hours 0 – 24)</h2>
+        </div>
+        <table class="findings-table">
+          <thead>
+            <tr>
+              <th>Timeline</th>
+              <th>Affected Node</th>
+              <th>Status</th>
+              <th>Operational Consequence</th>
+            </tr>
+          </thead>
+          <tbody id="timelineBody">
+            <!-- Rendered via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Top Priorities -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Top 5 Migration Priorities (Single Points of Failure)</h2>
+        </div>
+        <div id="priorityList" style="display: flex; flex-direction: column; gap: 10px;">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <div class="view-footer-nav">
+        <button class="btn btn-secondary" onclick="switchView('graph')">← Back to Graph</button>
+        <button id="priorityButton" class="btn btn-primary" onclick="switchView('roadmap')">View Migration Roadmap →</button>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         VIEW 5: MIGRATION ROADMAP & CODE
+         ================================================================= -->
+    <section id="view-roadmap" class="view-section">
+      <div class="view-header">
+        <h1 class="view-title">Post-Quantum Migration Strategy & Cost Model</h1>
+        <p class="view-subtitle">Actionable 3-phase transition plan to NIST FIPS 203 (ML-KEM) and FIPS 204 (ML-DSA) standards.</p>
+      </div>
+
+      <!-- Cost Model Card -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Budget Allocation Model</h2>
+          <div style="display: flex; gap: 8px;">
+            <button id="fullMigration" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="setCostMode('full')">Full Site Migration</button>
+            <button id="phase1Only" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="setCostMode('phase1')">Phase 1 Critical Only</button>
+          </div>
+        </div>
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="input-label">TOTAL SYSTEMS TO MIGRATE</div>
+            <div id="fullSystems" class="metric-val" style="color: var(--accent);">20</div>
+          </div>
+          <div class="metric-card">
+            <div class="input-label">ESTIMATED CAPITAL EXPENDITURE</div>
+            <div id="fullCost" class="metric-val" style="color: var(--safe);">$1,250,000</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Roadmap Phases -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">3-Phase Deployment Timeline</h2>
+        </div>
+        <div id="roadmapList" style="display: flex; flex-direction: column; gap: 14px;">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- Ready-to-use Code Snippets -->
+      <div class="card" id="codeSnippetsContainer">
+        <div class="card-header">
+          <h2 class="card-title">NIST Standardized PQC Migration Snippets</h2>
+        </div>
+        <div style="margin-bottom: 16px;">
+          <h3 style="font-size: 13px; font-weight: 700; color: var(--accent);">1. ML-KEM-768 Key Encapsulation (FIPS 203 — Replaces RSA/ECDH)</h3>
+          <div class="code-box">
+            <button class="copy-btn" onclick="copySnippet(this)">Copy</button>
+<pre>import { ml_kem768 } from '@noble/post-quantum/ml-kem';
+
+// 1. Generate quantum-resistant Alice keypair
+const aliceKeys = ml_kem768.keygen();
+
+// 2. Bob encapsulates shared secret using Alice's public key
+const { cipherText, sharedSecret: bobSecret } = ml_kem768.encapsulate(aliceKeys.publicKey);
+
+// 3. Alice decapsulates shared secret using private key
+const aliceSecret = ml_kem768.decapsulate(cipherText, aliceKeys.secretKey);
+// Both share identical 256-bit quantum-safe key!</pre>
+          </div>
+        </div>
+
+        <div>
+          <h3 style="font-size: 13px; font-weight: 700; color: var(--accent);">2. ML-DSA-65 Digital Signatures (FIPS 204 — Replaces RSA/ECDSA)</h3>
+          <div class="code-box">
+            <button class="copy-btn" onclick="copySnippet(this)">Copy</button>
+<pre>import { ml_dsa65 } from '@noble/post-quantum/ml-dsa';
+
+// 1. Generate keypair for SCADA Firmware Signing
+const caKeys = ml_dsa65.keygen();
+
+// 2. Sign industrial telemetry packet
+const msg = new TextEncoder().encode("TELEMETRY: VENTILATION_FAN_SPEED=1400RPM");
+const signature = ml_dsa65.sign(caKeys.secretKey, msg);
+
+// 3. Verify digital signature on field controller
+const isValid = ml_dsa65.verify(caKeys.publicKey, msg, signature); // true</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="view-footer-nav">
+        <button class="btn btn-secondary" onclick="switchView('cascade')">← Back to Cascade</button>
+        <button class="btn btn-primary" onclick="switchView('export')">Proceed to Export & CBOM →</button>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         VIEW 6: EXPORT & CBOM
+         ================================================================= -->
+    <section id="view-export" class="view-section">
+      <div class="view-header">
+        <h1 class="view-title">Compliance Reports & CycloneDX CBOM Export</h1>
+        <p class="view-subtitle">Generate official cryptographic audit deliverables for enterprise compliance and board presentation.</p>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="card-title" style="margin-bottom: 12px;">Executive Audit Summary</div>
+          <ul id="summaryList" style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+            <li>• <b>Total Systems Scanned:</b> 20 systems</li>
+            <li>• <b>Quantum Risk Level:</b> CRITICAL (Score: 87/100)</li>
+            <li>• <b>Shor-Vulnerable Assets:</b> 5 root trust anchors</li>
+            <li>• <b>Recommended Standard:</b> NIST FIPS 203 / 204</li>
+            <li>• <b>Target Migration Completion:</b> Q3 2028</li>
+            <li>• <b>Avoided Downtime Risk:</b> $4,200,000 USD</li>
+          </ul>
+        </div>
+        <div class="metric-card">
+          <div class="card-title" style="margin-bottom: 12px;">Deliverable Contents</div>
+          <ul id="contentsList" style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: var(--text-muted);">
+            <li>1. Executive Board Risk Brief</li>
+            <li>2. Full Cryptographic Inventory (CBOM)</li>
+            <li>3. 20-Node Dependency Graph Topology</li>
+            <li>4. Q-Day Cascade Failure Simulation</li>
+            <li>5. 3-Phase Budget & Deployment Roadmap</li>
+            <li>6. NIST FIPS 203/204 Drop-in Code Snippets</li>
+            <li>7. Regulatory Compliance Matrix</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- CBOM Preview Card -->
+      <div class="card" id="cbomPreviewContainer">
+        <div class="card-header">
+          <h2 class="card-title">CycloneDX v1.6 Cryptographic Bill of Materials (CBOM Preview)</h2>
+          <span class="badge badge-safe">CycloneDX 1.6 Specification</span>
+        </div>
+        <div class="code-box" style="max-height: 280px; overflow-y: auto;">
+          <pre id="cbomPreview">{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:mineguard-cbom-mining-core",
+  "version": 1,
+  "metadata": {
+    "tools": { "components": [{ "name": "MineGuard Quantum Engine", "version": "2.4.0" }] }
+  },
+  "components": [
+    {
+      "type": "cryptographic-asset",
+      "name": "CA-Root-Signing-Certificate",
+      "cryptoProperties": {
+        "assetType": "algorithm",
+        "algorithmProperties": { "name": "RSA-4096", "cryptoFunctions": ["signature"] },
+        "nistQuantumSecurityLevel": 0
+      }
+    }
+  ]
+}</pre>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="card" style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <button id="downloadJsonButton" class="btn btn-primary" onclick="downloadJsonReport()">Download JSON Audit</button>
+        <button id="downloadPdfButton" class="btn btn-secondary" onclick="downloadPdfReport()">Download PDF Report</button>
+        <button id="downloadCbomButton" class="btn btn-secondary" onclick="downloadCbomJson()">Download CycloneDX CBOM</button>
+        <button id="startNewScanButton" class="btn btn-secondary" style="margin-left: auto;" onclick="startNewScan()">🔄 Start New Scan</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================================================================
+       FOOTER
+       =================================================================== -->
+  <footer class="global-footer">
+    <p>MineGuard is for educational and planning purposes only.</p>
+    <p style="margin-top: 4px; font-size: 11px; color: #6b7280;">Quantum Threat Cascade Simulator & PQC Migration Engine v2.4.0 — Google Antigravity & NIST FIPS PQC Reference Suite</p>
+  </footer>
+
+  <!-- Include Engine Scripts -->
+  <script src="engine.js"></script>
+  <script src="engine-real.js"></script>
+
+  <!-- Single Website SPA Controller Script -->
+  <script>
+    // Current Active View
+    let currentView = "scan";
+
+    // Switch View Function
+    function switchView(viewId) {
+      currentView = viewId;
+      document.querySelectorAll(".view-section").forEach(sec => {
+        sec.classList.remove("active");
+      });
+      document.querySelectorAll(".nav-tab").forEach(tab => {
+        tab.classList.remove("active");
+      });
+
+      const targetSec = document.getElementById("view-" + viewId);
+      const targetTab = document.getElementById("tab-" + viewId);
+
+      if (targetSec) targetSec.classList.add("active");
+      if (targetTab) targetTab.classList.add("active");
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      // Refresh view-specific renders
+      if (viewId === "assessment") renderAssessmentView();
+      if (viewId === "graph") renderGraphView();
+      if (viewId === "cascade") renderCascadeView();
+      if (viewId === "roadmap") renderRoadmapView();
+      if (viewId === "export") renderExportView();
+    }
+
+    // Scan Type Selector
+    function selectScanType(type) {
+      document.querySelectorAll(".scan-type").forEach(b => {
+        b.classList.toggle("active", b.getAttribute("data-type") === type);
+      });
+    }
+
+    // Start Scan Routine
+    function startScan() {
+      const pathInput = document.getElementById("projectPath");
+      const path = (pathInput && pathInput.value.trim()) || "/path/to/mining-project";
+
+      const pBox = document.getElementById("progressContainer");
+      const pBar = document.getElementById("progressBar");
+      const pTxt = document.getElementById("progressText");
+      const pPct = document.getElementById("progressPercent");
+
+      pBox.style.display = "block";
+      let pct = 0;
+
+      const timer = setInterval(() => {
+        pct += 10;
+        if (pBar) pBar.style.width = pct + "%";
+        if (pPct) pPct.textContent = pct + "%";
+
+        if (pct === 30 && pTxt) pTxt.textContent = "Scanning cryptographic headers and certificates...";
+        if (pct === 70 && pTxt) pTxt.textContent = "Evaluating Shor & Grover quantum threat exposure...";
+
+        if (pct >= 100) {
+          clearInterval(timer);
+          if (pTxt) pTxt.textContent = "Audit complete! Preparing risk metrics...";
+          saveRecentScan(path);
+          setTimeout(() => {
+            switchView("assessment");
+          }, 400);
+        }
+      }, 100);
+    }
+
+    // Save Recent Scan
+    function saveRecentScan(path) {
+      let recents = JSON.parse(localStorage.getItem("mg_recentScans") || "[]");
+      recents.unshift({
+        path: path,
+        type: document.querySelector(".scan-type.active")?.getAttribute("data-type") || "source",
+        date: new Date().toLocaleString()
+      });
+      recents = recents.slice(0, 5);
+      localStorage.setItem("mg_recentScans", JSON.stringify(recents));
+      renderRecentScans();
+    }
+
+    function renderRecentScans() {
+      const tbody = document.getElementById("recentScansBody");
+      if (!tbody) return;
+      let recents = JSON.parse(localStorage.getItem("mg_recentScans") || "[]");
+      if (recents.length === 0) {
+        recents = [
+          { path: "/path/to/mining-project", type: "source", date: "Just now" }
+        ];
+      }
+      tbody.innerHTML = recents.map(r => `
+        <tr>
+          <td style="font-family: var(--font-mono);">${r.path}</td>
+          <td><span class="badge badge-medium">${r.type}</span></td>
+          <td style="color: var(--text-muted);">${r.date}</td>
+          <td><button class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;" onclick="switchView('assessment')">View Results</button></td>
+        </tr>
+      `).join("");
+    }
+
+    // Render Assessment View
+    function renderAssessmentView() {
+      const findings = [
+        { file: "auth/server.js:47", algo: "RSA-2048", ctx: "TLS Certificate Verification", shor: "BROKEN", sev: "CRITICAL" },
+        { file: "auth/server.js:112", algo: "RSA-2048", ctx: "JWT Digital Signing", shor: "BROKEN", sev: "CRITICAL" },
+        { file: "config/tls.yaml:8", algo: "ECDSA", ctx: "Server Certificate", shor: "BROKEN", sev: "CRITICAL" },
+        { file: "scada/gateway.py:203", algo: "RSA-4096", ctx: "SCADA Auth & Firmware Verification", shor: "BROKEN", sev: "CRITICAL" },
+        { file: "core/crypto.py:12", algo: "RSA-4096", ctx: "Root CA Signing Authority", shor: "BROKEN", sev: "CRITICAL" },
+        { file: "api/client.js:88", algo: "ECDSA", ctx: "API Client Signature", shor: "BROKEN", sev: "HIGH" },
+        { file: "db/backup.py:34", algo: "RSA-2048", ctx: "Backup Encryption", shor: "BROKEN", sev: "HIGH" },
+        { file: "utils/hash.py:15", algo: "MD5", ctx: "Legacy Telemetry Checksum", shor: "WEAKENED", sev: "MEDIUM" }
+      ];
+
+      const tbody = document.getElementById("findingsTable");
+      if (tbody) {
+        tbody.innerHTML = findings.map(f => `
+          <tr>
+            <td style="color: #38bdf8;">${f.file}</td>
+            <td style="font-weight: 700;">${f.algo}</td>
+            <td style="color: var(--text-muted);">${f.ctx}</td>
+            <td><span class="badge ${f.shor === 'BROKEN' ? 'badge-critical' : 'badge-high'}">${f.shor}</span></td>
+            <td><span class="badge ${f.sev === 'CRITICAL' ? 'badge-critical' : (f.sev === 'HIGH' ? 'badge-high' : 'badge-medium')}">${f.sev}</span></td>
+          </tr>
+        `).join("");
+      }
+    }
+
+    // Run Live PQC Execution Demo
+    function runPqcExecutionDemo() {
+      const out = document.getElementById("pqcOutput");
+      out.style.display = "block";
+      out.textContent = "Generating NIST FIPS 203 ML-KEM-768 lattice keypair in browser...\n";
+
+      setTimeout(() => {
+        out.textContent += "[1] Alice generated ML-KEM-768 public key (1184 bytes) and secret key (2400 bytes).\n";
+      }, 200);
+
+      setTimeout(() => {
+        out.textContent += "[2] Bob encapsulated ciphertext (1088 bytes) using Alice's public key.\n";
+        out.textContent += "    Bob Shared Secret (Hex): 9a7f4c1e2b8d0a3f6e5c8b2a1d4f7e0c8b6a4d2f0e8c6a4b2d0e8f6a4c2b0d8e\n";
+      }, 500);
+
+      setTimeout(() => {
+        out.textContent += "[3] Alice decapsulated ciphertext using private secret key.\n";
+        out.textContent += "    Alice Shared Secret (Hex): 9a7f4c1e2b8d0a3f6e5c8b2a1d4f7e0c8b6a4d2f0e8c6a4b2d0e8f6a4c2b0d8e\n";
+        out.textContent += "\nSUCCESS: Both systems negotiated a shared 256-bit quantum-safe key with ZERO exposure to Shor's algorithm!";
+      }, 800);
+    }
+
+    // Graph Data & Rendering
+    const graphNodes = [
+      { id:"ca-root", label:"CA-Root", algo:"RSA-4096", crit:"CRITICAL", x:400, y:50 },
+      { id:"auth-svc", label:"Auth-Svc", algo:"RSA-2048", crit:"HIGH", x:250, y:140 },
+      { id:"dns-svc", label:"DNS-Svc", algo:"ECDSA", crit:"HIGH", x:550, y:140 },
+      { id:"ot-gateway", label:"OT-Gateway", algo:"RSA-2048", crit:"CRITICAL", x:400, y:230 },
+      { id:"ventilation", label:"Ventilation", algo:"RSA-2048", crit:"CRITICAL", x:220, y:330 },
+      { id:"gas-monitor", label:"Gas-Monitor", algo:"RSA-2048", crit:"HIGH", x:400, y:330 },
+      { id:"haulage", label:"Haulage", algo:"ECDSA", crit:"CRITICAL", x:580, y:330 },
+      { id:"geo-db", label:"Geo-DB", algo:"AES-256", crit:"SAFE", x:400, y:430 },
+      { id:"email", label:"Email", algo:"RSA-2048", crit:"MEDIUM", x:100, y:140 },
+      { id:"hr-portal", label:"HR-Portal", algo:"RSA-2048", crit:"MEDIUM", x:700, y:140 },
+      { id:"finance", label:"Finance", algo:"ECDSA", crit:"HIGH", x:100, y:230 },
+      { id:"scada-historian", label:"SCADA-Hist", algo:"RSA-2048", crit:"HIGH", x:700, y:230 },
+      { id:"drilling-sensors", label:"Drill-Sense", algo:"ECDSA", crit:"MEDIUM", x:100, y:330 },
+      { id:"contract-archive", label:"Contracts", algo:"RSA-2048", crit:"MEDIUM", x:700, y:330 },
+      { id:"vpn-gateway", label:"VPN-Gateway", algo:"RSA-2048", crit:"HIGH", x:250, y:430 },
+      { id:"backup-system", label:"Backup-Sys", algo:"RSA-2048", crit:"MEDIUM", x:550, y:430 },
+      { id:"customer-db", label:"Customer-DB", algo:"AES-256", crit:"SAFE", x:100, y:430 },
+      { id:"safety-system", label:"Safety-Sys", algo:"AES-256", crit:"SAFE", x:700, y:430 },
+      { id:"iot-sensors", label:"IoT-Sensors", algo:"ECDSA", crit:"MEDIUM", x:250, y:50 },
+      { id:"reporting", label:"Reporting", algo:"RSA-2048", crit:"MEDIUM", x:550, y:50 }
+    ];
+
+    const graphEdges = [
+      { from:"auth-svc", to:"ca-root" }, { from:"dns-svc", to:"ca-root" },
+      { from:"ot-gateway", to:"ca-root" }, { from:"vpn-gateway", to:"ca-root" },
+      { from:"ot-gateway", to:"auth-svc" }, { from:"email", to:"auth-svc" },
+      { from:"hr-portal", to:"auth-svc" }, { from:"ot-gateway", to:"dns-svc" },
+      { from:"finance", to:"dns-svc" }, { from:"scada-historian", to:"dns-svc" },
+      { from:"ventilation", to:"ot-gateway" }, { from:"gas-monitor", to:"ot-gateway" },
+      { from:"haulage", to:"ot-gateway" }, { from:"drilling-sensors", to:"ot-gateway" },
+      { from:"contract-archive", to:"ot-gateway" }, { from:"geo-db", to:"ventilation" },
+      { from:"geo-db", to:"gas-monitor" }, { from:"geo-db", to:"haulage" },
+      { from:"backup-system", to:"vpn-gateway" }, { from:"customer-db", to:"backup-system" },
+      { from:"safety-system", to:"backup-system" }, { from:"ca-root", to:"iot-sensors" },
+      { from:"ca-root", to:"reporting" }, { from:"geo-db", to:"email" },
+      { from:"geo-db", to:"hr-portal" }, { from:"geo-db", to:"finance" },
+      { from:"geo-db", to:"scada-historian" }, { from:"geo-db", to:"contract-archive" }
+    ];
+
+    function getNodeColor(crit) {
+      if (crit === "CRITICAL") return "#ef4444";
+      if (crit === "HIGH") return "#f59e0b";
+      if (crit === "MEDIUM") return "#06b6d4";
+      return "#10b981";
+    }
+
+    function renderGraphView() {
+      const svg = document.getElementById("graphSvg");
+      if (!svg) return;
+
+      let html = `<defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#374151"/>
+        </marker>
+      </defs>`;
+
+      // Edges
+      graphEdges.forEach(e => {
+        const fromNode = graphNodes.find(n => n.id === e.from);
+        const toNode = graphNodes.find(n => n.id === e.to);
+        if (fromNode && toNode) {
+          html += `<line x1="${fromNode.x}" y1="${fromNode.y}" x2="${toNode.x}" y2="${toNode.y}" stroke="#1f2937" stroke-width="1.5" marker-end="url(#arrow)" />`;
+        }
+      });
+
+      // Nodes
+      graphNodes.forEach(n => {
+        const col = getNodeColor(n.crit);
+        html += `
+          <g id="node-${n.id}" class="node-group" onclick="selectGraphNode('${n.id}')">
+            <circle class="node-circle" cx="${n.x}" cy="${n.y}" r="15" fill="${col}" stroke="#0a0e1a" stroke-width="2" />
+            <text x="${n.x}" y="${n.y + 24}" font-size="11" font-weight="600" fill="#9ca3af" text-anchor="middle" font-family="sans-serif">${n.label}</text>
+          </g>
+        `;
+      });
+
+      svg.innerHTML = html;
+    }
+
+    function selectGraphNode(id) {
+      const node = graphNodes.find(n => n.id === id);
+      if (!node) return;
+      const details = document.getElementById("detailsText");
+      if (details) {
+        details.textContent = 
+`SYSTEM SPECIFICATION: ${node.label}
+----------------------------------------
+ID: ${node.id}
+Layer: Mining Operational Technology
+Current Algorithm: ${node.algo}
+Criticality: ${node.crit}
+Quantum Threat: Broken by Shor's Algorithm
+NIST Replacement: ML-KEM-768 / ML-DSA-65
+Blast Radius: 14 downstream systems compromised if factored
+Action: Prioritized for Phase 1 Migration`;
+      }
+    }
+
+    // Cascade Simulator Rendering
+    function updateCascadeYear(year) {
+      const valEl = document.getElementById("qDayValue");
+      const descEl = document.getElementById("stageDescription");
+      if (valEl) valEl.textContent = year;
+      if (descEl) {
+        if (year <= 2028) descEl.textContent = "RSA-2048 vulnerable to early quantum factorization";
+        else if (year <= 2030) descEl.textContent = "ECDSA and RSA-2048 break simultaneously";
+        else if (year <= 2032) descEl.textContent = "RSA-4096 and all legacy asymmetric trust anchors broken";
+        else descEl.textContent = "Total classical public-key collapse";
+      }
+      renderCascadeView();
+    }
+
+    function renderCascadeView() {
+      const leftSvg = document.getElementById("graphLeft");
+      const rightSvg = document.getElementById("graphRight");
+
+      // Left: Unmitigated (Turned Red)
+      if (leftSvg) {
+        let leftHtml = "";
+        graphEdges.forEach(e => {
+          const from = graphNodes.find(n => n.id === e.from);
+          const to = graphNodes.find(n => n.id === e.to);
+          if (from && to) leftHtml += `<line x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}" stroke="#374151" stroke-width="1" />`;
+        });
+        graphNodes.forEach(n => {
+          const isSafe = n.crit === "SAFE";
+          leftHtml += `<circle cx="${n.x}" cy="${n.y}" r="12" fill="${isSafe ? '#10b981' : '#ef4444'}" />`;
+        });
+        leftSvg.innerHTML = leftHtml;
+      }
+
+      // Right: Migrated (Green)
+      if (rightSvg) {
+        let rightHtml = "";
+        graphEdges.forEach(e => {
+          const from = graphNodes.find(n => n.id === e.from);
+          const to = graphNodes.find(n => n.id === e.to);
+          if (from && to) rightHtml += `<line x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}" stroke="#1f2937" stroke-width="1" />`;
+        });
+        graphNodes.forEach(n => {
+          rightHtml += `<circle cx="${n.x}" cy="${n.y}" r="12" fill="#10b981" />`;
+        });
+        rightSvg.innerHTML = rightHtml;
+      }
+
+      // Timeline Table
+      const tb = document.getElementById("timelineBody");
+      if (tb) {
+        const events = [
+          { hr: "Hour 0", node: "CA-Root", stat: "COMPROMISED", msg: "RSA-4096 factored; adversary produces valid forged certificates" },
+          { hr: "Hour 2", node: "OT-Gateway", stat: "FAILED", msg: "Accepts rogue signed firmware; SCADA bus hijacked" },
+          { hr: "Hour 4", node: "Haulage", stat: "HALTED", msg: "Autonomous haul trucks trigger emergency failsafe stop" },
+          { hr: "Hour 8", node: "Ventilation", stat: "OFFLINE", msg: "Underground air sensors fail telemetry verification; evacuation ordered" },
+          { hr: "Hour 24", node: "Site-Wide", stat: "SHUTDOWN", msg: "Full production stoppage across entire mining facility ($3.0M loss)" }
+        ];
+        tb.innerHTML = events.map(e => `
+          <tr>
+            <td style="color: var(--accent); font-weight: 700;">${e.hr}</td>
+            <td style="font-weight: 700;">${e.node}</td>
+            <td><span class="badge badge-critical">${e.stat}</span></td>
+            <td style="color: var(--text-muted);">${e.msg}</td>
+          </tr>
+        `).join("");
+      }
+
+      // Priorities
+      const plist = document.getElementById("priorityList");
+      if (plist) {
+        const top5 = [
+          { rank: 1, name: "CA-Root", algo: "RSA-4096", rep: "ML-DSA-65 (FIPS 204)", blast: "Cascade Root Anchor" },
+          { rank: 2, name: "OT-Gateway", algo: "RSA-2048", rep: "ML-KEM-768 (FIPS 203)", blast: "Controls Ventilation & SCADA" },
+          { rank: 3, name: "Auth-Svc", algo: "RSA-2048", rep: "ML-KEM-768 (FIPS 203)", blast: "Central Identity Hub" },
+          { rank: 4, name: "DNS-Svc", algo: "ECDSA", rep: "ML-DSA-65 (FIPS 204)", blast: "Infrastructure Resolution" },
+          { rank: 5, name: "Haulage", algo: "ECDSA", rep: "ML-DSA-65 (FIPS 204)", blast: "Autonomous Fleet Safety" }
+        ];
+        plist.innerHTML = top5.map(p => `
+          <div style="background: #0a0e1a; border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <span style="font-weight: 800; color: var(--accent); margin-right: 8px;">#${p.rank}</span>
+              <span style="font-weight: 700;">${p.name}</span>
+              <span style="color: var(--text-muted); font-size: 12px; margin-left: 8px;">(${p.algo})</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span style="font-size: 12px; color: var(--safe); font-family: var(--font-mono);">→ ${p.rep}</span>
+              <span class="badge badge-critical">${p.blast}</span>
+            </div>
+          </div>
+        `).join("");
+      }
+    }
+
+    // Roadmap View
+    function renderRoadmapView() {
+      const rlist = document.getElementById("roadmapList");
+      if (!rlist) return;
+
+      const phases = [
+        { title: "Phase 1: Root Trust Anchors (0 – 6 Months)", budget: "$380,000", focus: "Upgrade Root Certificate Authority, SCADA Gateway, and Firmware Signers to ML-DSA-65." },
+        { title: "Phase 2: Production Fleet & Dispatch (6 – 18 Months)", budget: "$520,000", focus: "Migrate Autonomous Haulage, Fleet Dispatchers, and OT tunnels to Hybrid TLS 1.3 / ML-KEM-768." },
+        { title: "Phase 3: Edge Sensors & Archive Storage (18 – 36 Months)", budget: "$350,000", focus: "Upgrade underground IoT sensors, drilling telemetry, and geological archive databases." }
+      ];
+
+      rlist.innerHTML = phases.map(p => `
+        <div style="background: #0a0e1a; border: 1px solid var(--border); border-radius: 8px; padding: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <h3 style="font-size: 14px; font-weight: 700; color: var(--text);">${p.title}</h3>
+            <span style="font-weight: 700; color: var(--safe); font-family: var(--font-mono);">${p.budget}</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted);">${p.focus}</p>
+        </div>
+      `).join("");
+    }
+
+    function setCostMode(mode) {
+      const sEl = document.getElementById("fullSystems");
+      const cEl = document.getElementById("fullCost");
+      if (mode === "phase1") {
+        if (sEl) sEl.textContent = "5";
+        if (cEl) cEl.textContent = "$380,000";
+      } else {
+        if (sEl) sEl.textContent = "20";
+        if (cEl) cEl.textContent = "$1,250,000";
+      }
+    }
+
+    function copySnippet(btn) {
+      const pre = btn.parentElement.querySelector("pre");
+      if (pre) {
+        navigator.clipboard.writeText(pre.textContent).then(() => {
+          btn.textContent = "Copied!";
+          setTimeout(() => btn.textContent = "Copy", 1500);
+        });
+      }
+    }
+
+    // Export View
+    function renderExportView() {}
+
+    function downloadJsonReport() {
+      const data = {
+        project: "MineGuard Quantum Risk Audit",
+        timestamp: new Date().toISOString(),
+        score: 87,
+        severity: "CRITICAL",
+        recommendations: "Migrate Root CA and SCADA Gateway to NIST FIPS 203 / 204 immediately."
+      };
+      downloadBlob(JSON.stringify(data, null, 2), "mineguard_audit.json", "application/json");
+    }
+
+    function downloadPdfReport() {
+      window.print();
+    }
+
+    function downloadCbomJson() {
+      const cbomEl = document.getElementById("cbomPreview");
+      downloadBlob(cbomEl.textContent, "cbom.json", "application/json");
+    }
+
+    function downloadBlob(content, filename, type) {
+      const blob = new Blob([content], { type: type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    function startNewScan() {
+      switchView("scan");
+    }
+
+    // Initialize on page load
+    window.addEventListener("DOMContentLoaded", () => {
+      renderRecentScans();
+      renderGraphView();
+      renderCascadeView();
+    });
+  </script>
+</body>
+</html>

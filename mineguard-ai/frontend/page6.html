@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MineGuard — Report</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════
+       SHARED DESIGN SYSTEM
+       ═══════════════════════════════════════════════════════════════════ */
+    :root {
+      --bg: #0a0e1a;
+      --card: #111827;
+      --border: #1f2937;
+      --text: #f9fafb;
+      --gray: #9ca3af;
+      --accent: #06b6d4;
+      --critical: #ef4444;
+      --high: #f59e0b;
+      --medium: #06b6d4;
+      --safe: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.5;
+      padding: 0 16px 40px;
+    }
+
+    header {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+    }
+
+    header nav {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    header nav a {
+      color: var(--gray);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    header nav a:hover {
+      color: var(--accent);
+    }
+
+    #app {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .btn-primary:hover {
+      background: #22d3ee;
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--gray);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       PAGE 6 CSS (SUCCESS BANNER, ANIMATION, SUMMARY, DOWNLOADS)
+       ═══════════════════════════════════════════════════════════════════ */
+    /* Success section */
+    .success-section {
+      text-align: center;
+      padding: 48px 0 24px;
+      animation: fadeUp 500ms ease-out;
+    }
+    .checkmark-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .checkmark {
+      width: 72px;
+      height: 72px;
+    }
+    .checkmark-circle {
+      stroke: var(--safe);
+      stroke-width: 2;
+      stroke-dasharray: 160;
+      stroke-dashoffset: 160;
+      animation: drawCircle 600ms ease-out forwards;
+    }
+    .checkmark-check {
+      stroke: var(--safe);
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 40;
+      stroke-dashoffset: 40;
+      animation: drawCheck 400ms ease-out 500ms forwards;
+    }
+    @keyframes drawCircle {
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes drawCheck {
+      to { stroke-dashoffset: 0; }
+    }
+    .success-section h1 {
+      font-size: 24px;
+      margin-bottom: 6px;
+      animation: fadeUp 500ms ease-out 200ms both;
+    }
+    .success-section .subtitle {
+      color: var(--gray);
+      font-size: 14px;
+      animation: fadeUp 500ms ease-out 300ms both;
+    }
+
+    /* Summary */
+    .summary-card h3,
+    .contents-card h3,
+    .download-card h3,
+    .card h3 {
+      color: var(--gray);
+      font-size: 12px;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .summary-item:nth-last-child(-n+2) { border-bottom: none; }
+    .summary-label { color: var(--gray); }
+    .summary-value { color: var(--text); font-weight: 600; }
+
+    /* Contents */
+    .contents-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .content-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      padding: 8px 0;
+      animation: fadeUp 300ms ease-out both;
+    }
+    .content-check {
+      color: var(--safe);
+      font-size: 16px;
+      font-weight: 700;
+      width: 20px;
+    }
+
+    /* Downloads */
+    .download-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .btn-block { width: 100%; text-align: center; }
+
+    /* Next steps */
+    .next-steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .next-step {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 13px;
+    }
+    .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(6,182,212,0.15);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    .step-text { color: var(--text); }
+
+    /* CTA */
+    .cta-container { text-align: center; margin: 40px 0 60px; }
+
+    footer.page-footer {
+      text-align: center;
+      color: var(--gray);
+      font-size: 12px;
+      margin-top: 32px;
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+      .summary-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">MineGuard</div>
+    <nav>
+      <a href="page5.html">← Back</a>
+      <a href="page1.html" id="newScanTopLink">New Scan</a>
+      <a href="page1.html" id="newScanLink" style="display:none;"></a>
+    </nav>
+  </header>
+
+  <main id="app">
+    <!-- SUCCESS BANNER -->
+    <section class="success-section">
+      <div class="checkmark-container">
+        <svg class="checkmark" viewBox="0 0 52 52">
+          <circle class="checkmark-circle" cx="26" cy="26" r="24" fill="none"/>
+          <path class="checkmark-check" fill="none" d="M14 27 l8 8 l16 -16"/>
+        </svg>
+      </div>
+      <h1 id="pageTitle">Report Generated: mining-project</h1>
+      <p class="subtitle">Your quantum risk assessment is ready.</p>
+    </section>
+
+    <!-- REPORT SUMMARY -->
+    <section class="card summary-card">
+      <h3>REPORT SUMMARY</h3>
+      <div id="summaryList" class="summary-grid">
+        <div class="summary-item">
+          <span class="summary-label">Project</span>
+          <span class="summary-value" id="summaryProject">—</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Scan Date</span>
+          <span class="summary-value" id="summaryDate">—</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Risk Score</span>
+          <span class="summary-value" id="summaryScore">—</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Vulnerable Algorithms</span>
+          <span class="summary-value" id="summaryAlgos">—</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Critical Systems</span>
+          <span class="summary-value" id="summaryCritical">—</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Migration Plan</span>
+          <span class="summary-value" id="summaryMigration">—</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- REPORT CONTENTS -->
+    <section class="card contents-card">
+      <h3>REPORT CONTENTS</h3>
+      <div id="contentsList" class="contents-list"></div>
+    </section>
+
+    <!-- DOWNLOAD REPORT -->
+    <section class="card download-card">
+      <h3>DOWNLOAD REPORT</h3>
+      <div class="download-buttons">
+        <button id="downloadJsonButton" class="btn-primary btn-block">
+          Download JSON
+        </button>
+        <button id="downloadPdfButton" class="btn-secondary btn-block">
+          Download PDF
+        </button>
+        <button id="downloadCbomButton" class="btn-secondary btn-block">
+          Download CBOM (CycloneDX 1.7)
+        </button>
+      </div>
+    </section>
+
+    <!-- NEXT STEPS -->
+    <section class="card">
+      <h3>NEXT STEPS</h3>
+      <div class="next-steps-list">
+        <div class="next-step">
+          <span class="step-num">1</span>
+          <span class="step-text">Share this report with your security team</span>
+        </div>
+        <div class="next-step">
+          <span class="step-num">2</span>
+          <span class="step-text">Start with Phase 1 migration (CA-Root)</span>
+        </div>
+        <div class="next-step">
+          <span class="step-num">3</span>
+          <span class="step-text">Re-scan after migration to verify</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <div class="cta-container">
+      <button id="newScanButton" class="btn-primary">
+        Start New Scan
+      </button>
+    </div>
+
+    <footer class="page-footer">
+      <p>MineGuard is for educational and planning purposes only.</p>
+    </footer>
+  </main>
+
+  <script src="engine.js"></script>
+  <script>
+    /* ═══════════════════════════════════════════════════════════════════
+       PAGE 6 LOGIC
+       ═══════════════════════════════════════════════════════════════════ */
+
+    window.addEventListener("load", init);
+
+    function init() {
+      console.log("Page 6 loaded");
+
+      const scanPath = localStorage.getItem("mg_scanPath") || localStorage.getItem("scanPath") || "/path/to/mining-project";
+      const projectName = scanPath.split("/").filter(Boolean).pop() || "mining-project";
+      const riskScore = localStorage.getItem("mg_riskScore") || localStorage.getItem("riskScore") || "95";
+      const riskSeverity = localStorage.getItem("mg_riskSeverity") || localStorage.getItem("riskSeverity") || "CRITICAL";
+
+      const titleEl = document.getElementById("pageTitle");
+      if (titleEl) {
+        titleEl.textContent = "Report Generated: " + projectName;
+      }
+
+      renderSummary(projectName, riskScore, riskSeverity);
+      renderContents();
+      attachListeners();
+
+      console.log("Report data loaded for:", projectName);
+    }
+
+    function renderSummary(projectName, riskScore, riskSeverity) {
+      const scanDate = localStorage.getItem("scanDate") || localStorage.getItem("mg_scanDate") || new Date().toISOString().split("T")[0];
+      const projEl = document.getElementById("summaryProject");
+      const dateEl = document.getElementById("summaryDate");
+      const scoreEl = document.getElementById("summaryScore");
+      const algosEl = document.getElementById("summaryAlgos");
+      const critEl = document.getElementById("summaryCritical");
+      const migEl = document.getElementById("summaryMigration");
+
+      if (projEl) projEl.textContent = projectName;
+      if (dateEl) dateEl.textContent = scanDate;
+      if (scoreEl) scoreEl.textContent = riskScore + "/100 (" + riskSeverity + ")";
+      if (algosEl) algosEl.textContent = "12";
+      if (critEl) critEl.textContent = "4";
+      if (migEl) migEl.textContent = "5 systems, 14 weeks";
+    }
+
+    function renderContents() {
+      const contents = [
+        "Executive Summary",
+        "Cryptographic Inventory",
+        "Risk Assessment (Mosca's Inequality)",
+        "Dependency Graph (20 mining systems)",
+        "Cascade Simulation (BFS propagation)",
+        "Migration Roadmap (3 phases)",
+        "NIST Recommendations (FIPS 203/204/205)"
+      ];
+
+      const listEl = document.getElementById("contentsList");
+      if (listEl) {
+        listEl.innerHTML = contents.map((c, i) => `
+          <div class="content-item" style="animation-delay: ${300 + i * 80}ms;">
+            <span class="content-check">✓</span>
+            <span>${c}</span>
+          </div>
+        `).join("");
+      }
+    }
+
+    function attachListeners() {
+      const jsonBtn = document.getElementById("downloadJsonButton");
+      const pdfBtn = document.getElementById("downloadPdfButton");
+      const cbomBtn = document.getElementById("downloadCbomButton");
+      const newScanBtn = document.getElementById("newScanButton");
+      const topLink = document.getElementById("newScanTopLink");
+      const altLink = document.getElementById("newScanLink");
+
+      if (jsonBtn) jsonBtn.addEventListener("click", downloadJson);
+      if (pdfBtn) pdfBtn.addEventListener("click", downloadPdf);
+      if (cbomBtn) cbomBtn.addEventListener("click", downloadCbom);
+
+      if (newScanBtn) newScanBtn.addEventListener("click", startNewScan);
+      if (topLink) topLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        startNewScan();
+      });
+      if (altLink) altLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        startNewScan();
+      });
+    }
+
+    function getReportData() {
+      const scanPath = localStorage.getItem("mg_scanPath") || localStorage.getItem("scanPath") || "/path/to/mining-project";
+      const riskScore = parseInt(localStorage.getItem("mg_riskScore") || localStorage.getItem("riskScore") || "95");
+      const riskSeverity = localStorage.getItem("mg_riskSeverity") || localStorage.getItem("riskSeverity") || "CRITICAL";
+      const cascade = JSON.parse(localStorage.getItem("mg_cascadeResults") || localStorage.getItem("cascadeResults") || "{}");
+
+      return {
+        reportMetadata: {
+          tool: "MineGuard",
+          version: "1.0",
+          generatedAt: new Date().toISOString(),
+          project: scanPath
+        },
+        executiveSummary: {
+          riskScore: riskScore,
+          severity: riskSeverity,
+          moscaExposed: true,
+          vulnerableAlgorithms: ["RSA-2048", "RSA-4096", "ECDSA", "MD5"],
+          criticalSystems: ["CA-Root", "OT-Gateway", "Ventilation", "Haulage"],
+          recommendedAction: "Begin Phase 1 migration immediately"
+        },
+        cryptographicInventory: [
+          { file: "auth/server.js", line: 47, algorithm: "RSA-2048", severity: "HIGH" },
+          { file: "auth/server.js", line: 112, algorithm: "RSA-2048", severity: "HIGH" },
+          { file: "config/tls.yaml", line: 8, algorithm: "ECDSA", severity: "HIGH" },
+          { file: "scada/gateway.py", line: 203, algorithm: "RSA-4096", severity: "HIGH" },
+          { file: "utils/hash.py", line: 15, algorithm: "MD5", severity: "MEDIUM" },
+          { file: "api/client.js", line: 88, algorithm: "ECDSA", severity: "HIGH" },
+          { file: "db/backup.py", line: 34, algorithm: "RSA-2048", severity: "HIGH" },
+          { file: "core/crypto.py", line: 12, algorithm: "RSA-4096", severity: "HIGH" }
+        ],
+        cascadeSimulation: {
+          qDay: cascade.qDay || 2029,
+          totalDown: cascade.totalDown || 18,
+          totalSystems: cascade.totalSystems || 20,
+          safetyImpact: true,
+          estimatedDowntimeHours: cascade.estimatedDowntimeHours || 36,
+          estimatedCostUSD: cascade.estimatedCostUSD || 2400000
+        },
+        migrationRoadmap: [
+          { rank: 1, system: "CA-Root", from: "RSA-4096", to: "ML-KEM (FIPS 203)", phase: "IMMEDIATE", effort: "4 weeks" },
+          { rank: 2, system: "OT-Gateway", from: "RSA-2048", to: "ML-KEM (FIPS 203)", phase: "HIGH", effort: "3 weeks" },
+          { rank: 3, system: "Auth-Svc", from: "RSA-2048", to: "ML-DSA (FIPS 204)", phase: "HIGH", effort: "2 weeks" },
+          { rank: 4, system: "Ventilation", from: "RSA-2048", to: "ML-KEM (FIPS 203)", phase: "MEDIUM", effort: "3 weeks" },
+          { rank: 5, system: "Haulage", from: "ECDSA", to: "ML-DSA (FIPS 204)", phase: "MEDIUM", effort: "2 weeks" }
+        ],
+        nistCompliance: {
+          standards: ["FIPS 203 (ML-KEM)", "FIPS 204 (ML-DSA)", "FIPS 205 (SLH-DSA)"],
+          deadline: "2030 (deprecation), 2035 (disallowed)",
+          source: "NIST IR 8547"
+        }
+      };
+    }
+
+    function downloadJson() {
+      const report = getReportData();
+      const blob = new Blob([JSON.stringify(report, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "mining-quantum-report.json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      console.log("JSON downloaded: mining-quantum-report.json");
+    }
+
+    function downloadCbom() {
+      const scanPath = localStorage.getItem("mg_scanPath") || localStorage.getItem("scanPath") || "/path/to/mining-project";
+      const projectName = scanPath.split("/").filter(Boolean).pop() || "mining-project";
+
+      const cbom = {
+        bomFormat: "CycloneDX",
+        specVersion: "1.7",
+        version: 1,
+        metadata: {
+          timestamp: new Date().toISOString(),
+          tools: [
+            { name: "MineGuard", version: "1.0", vendor: "MineGuard" }
+          ],
+          component: {
+            type: "application",
+            name: projectName,
+            version: "1.0"
+          }
+        },
+        components: [
+          {
+            type: "cryptographic-asset",
+            name: "RSA-2048",
+            cryptoProperties: {
+              algorithm: "RSA",
+              keySize: 2048,
+              quantumVulnerable: true,
+              recommendedReplacement: "ML-KEM (FIPS 203) / ML-DSA (FIPS 204)"
+            }
+          },
+          {
+            type: "cryptographic-asset",
+            name: "RSA-4096",
+            cryptoProperties: {
+              algorithm: "RSA",
+              keySize: 4096,
+              quantumVulnerable: true,
+              recommendedReplacement: "ML-KEM (FIPS 203) / ML-DSA (FIPS 204)"
+            }
+          },
+          {
+            type: "cryptographic-asset",
+            name: "ECDSA-P256",
+            cryptoProperties: {
+              algorithm: "ECDSA",
+              curve: "P-256",
+              quantumVulnerable: true,
+              recommendedReplacement: "ML-DSA (FIPS 204) / SLH-DSA (FIPS 205)"
+            }
+          },
+          {
+            type: "cryptographic-asset",
+            name: "MD5",
+            cryptoProperties: {
+              algorithm: "MD5",
+              quantumVulnerable: true,
+              recommendedReplacement: "SHA-3 / SHA-256"
+            }
+          },
+          {
+            type: "cryptographic-asset",
+            name: "AES-256",
+            cryptoProperties: {
+              algorithm: "AES",
+              keySize: 256,
+              quantumVulnerable: false,
+              note: "Grover's algorithm reduces to 128-bit effective security — still safe"
+            }
+          }
+        ]
+      };
+
+      const blob = new Blob([JSON.stringify(cbom, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "mining-cbom.json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      console.log("CBOM downloaded: mining-cbom.json");
+    }
+
+    function downloadPdf() {
+      console.log("PDF download clicked — placeholder for now");
+      alert("PDF export is available in the full version. Use JSON or CBOM for now.");
+    }
+
+    function startNewScan() {
+      const recentScans = localStorage.getItem("mg_recentScans") || localStorage.getItem("recentScans");
+      localStorage.clear();
+      if (recentScans) {
+        localStorage.setItem("mg_recentScans", recentScans);
+        localStorage.setItem("recentScans", recentScans);
+      }
+
+      console.log("Starting new scan — localStorage cleared");
+      window.location.href = "page1.html";
+    }
+
+    // Attach to window for automated testing and global invocation
+    window.downloadJson = downloadJson;
+    window.downloadCbom = downloadCbom;
+    window.downloadPdf = downloadPdf;
+    window.startNewScan = startNewScan;
+  </script>
+</body>
+</html>

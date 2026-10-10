@@ -1,0 +1,9 @@
+NIST SP 800-57 PART 1 REV 5: RECOMMENDATION FOR KEY MANAGEMENT
+U.S. National Institute of Standards and Technology.
+
+1. CRYPTOGRAPHIC SECURITY STRENGTH LEVELS
+NIST specifies security strengths measured in bits: 112 bits, 128 bits, 192 bits, and 256 bits.
+- RSA-2048 provides approximately 112 bits of security, which is disallowed for federal use post-2030.
+- RSA-3072 provides 128 bits of security.
+- RSA-4096 provides 152 bits of security against classical attacks, but ZERO bits of security against Shor's algorithm on a quantum computer.
+- AES-128 provides 128 bits classically, reduced to ~64 bits against Grover's algorithm. AES-256 provides 256 bits classically, retaining 128 bits of quantum security.

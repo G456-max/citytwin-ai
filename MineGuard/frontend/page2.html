@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MineGuard — Feature 2: Cascade Simulator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #111827;
+      --border: #1f2937;
+      --accent: #f59e0b;
+      --accent-red: #ef4444;
+      --accent-green: #10b981;
+      --text: #f9fafb;
+      --text-muted: #9ca3af;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: rgba(17, 24, 39, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #fff;
+    }
+    .brand span {
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .nav-links {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .nav-link:hover { color: #fff; }
+    .badge-feature {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--accent-red);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    main {
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 32px auto;
+      padding: 0 24px;
+    }
+    .slider-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 28px;
+      text-align: center;
+    }
+    .slider-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .slider-val {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 16px;
+    }
+    input[type="range"] {
+      width: 100%;
+      max-width: 500px;
+      height: 8px;
+      border-radius: 4px;
+      background: #1f2937;
+      outline: none;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .slider-ticks {
+      display: flex;
+      justify-content: space-between;
+      max-width: 500px;
+      margin: 8px auto 0;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .split-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    @media (max-width: 850px) {
+      .split-grid { grid-template-columns: 1fr; }
+    }
+    .split-col {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .col-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .col-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+    .status-badge {
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .status-down {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--accent-red);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .status-safe {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .nodes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .node-box {
+      background: #0d131f;
+      border: 1px solid var(--border);
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .node-box.failed {
+      border-color: rgba(239, 68, 68, 0.6);
+      background: rgba(239, 68, 68, 0.08);
+    }
+    .node-box.survived {
+      border-color: rgba(16, 185, 129, 0.6);
+      background: rgba(16, 185, 129, 0.08);
+    }
+    .node-name {
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+    }
+    .node-algo {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .timeline-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .timeline-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0d131f;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .time-tag {
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .action-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .btn-action {
+      background: #2563eb;
+      color: #fff;
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-action:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+    }
+    .btn-back {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .btn-back:hover { color: #fff; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      MineGuard <span>AI</span>
+    </div>
+    <div class="nav-links">
+      <a href="page1.html" class="nav-link">← Scanner</a>
+      <div class="badge-feature">Feature 2 of 4 • Cascade Simulator</div>
+    </div>
+  </header>
+
+  <main>
+    <div class="slider-card">
+      <div class="slider-title">Simulate Quantum Threat Horizon (Q-Day)</div>
+      <div class="slider-val" id="qDayDisplay">2029</div>
+      <input type="range" id="qDaySlider" min="2027" max="2035" value="2029" oninput="updateSimulation()">
+      <div class="slider-ticks">
+        <span>2027</span>
+        <span>2028</span>
+        <span style="color: var(--accent); font-weight:700;">2029</span>
+        <span>2031</span>
+        <span>2033</span>
+        <span>2035</span>
+      </div>
+      <div style="margin-top: 14px; font-size: 0.9rem; color: var(--text-muted);" id="qDayNote">
+        Demo Note: Drag to 2029. Entire mine shuts down in 24 hours.
+      </div>
+    </div>
+
+    <div class="split-grid">
+      <!-- LEFT: UNMITIGATED CASCADE -->
+      <div class="split-col">
+        <div class="col-header">
+          <div>
+            <div class="col-title" style="color: var(--accent-red);">Baseline (No Migration)</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Unprotected Infrastructure</div>
+          </div>
+          <span class="status-badge status-down" id="leftStatus">5 / 6 DOWN</span>
+        </div>
+
+        <div class="nodes-grid" id="leftNodes">
+          <!-- Injected via JS -->
+        </div>
+
+        <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">FAILURE TIMELINE</div>
+        <div class="timeline-list" id="leftTimeline">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
+      <!-- RIGHT: WITH MIGRATION -->
+      <div class="split-col">
+        <div class="col-header">
+          <div>
+            <div class="col-title" style="color: var(--accent-green);">Protected (With Migration)</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">CA-Root Migrated to ML-DSA</div>
+          </div>
+          <span class="status-badge status-safe" id="rightStatus">0 / 6 DOWN</span>
+        </div>
+
+        <div class="nodes-grid" id="rightNodes">
+          <!-- Injected via JS -->
+        </div>
+
+        <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">FAILURE TIMELINE</div>
+        <div class="timeline-list" id="rightTimeline">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <a href="page1.html" class="btn-back">← Back to Scanner</a>
+      <a href="page3.html" class="btn-action">
+        Features 3 & 4: Priority & Planner →
+      </a>
+    </div>
+  </main>
+
+  <script src="api.js"></script>
+  <script>
+    const SYSTEM_NODES = [
+      { id: "ca-root", name: "CA-Root", algorithm: "RSA-4096" },
+      { id: "auth-svc", name: "Auth-Svc", algorithm: "RSA-2048" },
+      { id: "ot-gateway", name: "OT-Gateway", algorithm: "RSA-2048" },
+      { id: "ventilation", name: "Ventilation", algorithm: "RSA-2048" },
+      { id: "haulage", name: "Haulage", algorithm: "ECDSA" },
+      { id: "geo-db", name: "Geo-DB", algorithm: "AES-256" }
+    ];
+
+    async function updateSimulation() {
+      const qDay = document.getElementById('qDaySlider').value;
+      document.getElementById('qDayDisplay').innerText = qDay;
+      localStorage.setItem('mineguard_qday', qDay);
+
+      // Left: Unmitigated
+      const leftCascade = await apiCascade(qDay, []);
+      renderSide('left', leftCascade);
+
+      // Right: Protected (with 5 systems migrated via roadmap)
+      const rightCascade = await apiCascade(qDay, ["ca-root", "auth-svc", "ot-gateway", "ventilation", "haulage"]);
+      renderSide('right', rightCascade);
+    }
+
+    function renderSide(prefix, data) {
+      document.getElementById(`${prefix}Status`).innerText = `${data.total_down} / ${data.total_systems} DOWN`;
+
+      // Render Nodes
+      const nodesDiv = document.getElementById(`${prefix}Nodes`);
+      nodesDiv.innerHTML = '';
+      const failedSet = new Set(data.failed);
+
+      SYSTEM_NODES.forEach(n => {
+        const isFailed = failedSet.has(n.id);
+        const nodeEl = document.createElement('div');
+        nodeEl.className = `node-box ${isFailed ? 'failed' : 'survived'}`;
+        nodeEl.innerHTML = `
+          <div class="node-name" style="color: ${isFailed ? '#f87171' : '#34d399'}">${n.name}</div>
+          <div class="node-algo">${n.algorithm}</div>
+          <div style="font-size: 0.65rem; margin-top: 4px; font-weight:700; color: ${isFailed ? '#ef4444' : '#10b981'}">
+            ${isFailed ? 'COMPROMISED' : 'OPERATIONAL'}
+          </div>
+        `;
+        nodesDiv.appendChild(nodeEl);
+      });
+
+      // Render Timeline
+      const timelineDiv = document.getElementById(`${prefix}Timeline`);
+      timelineDiv.innerHTML = '';
+
+      if (data.timeline.length === 0) {
+        timelineDiv.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; padding: 8px;">No systems compromised. Operations 100% nominal.</div>`;
+      } else {
+        data.timeline.forEach(t => {
+          const item = document.createElement('div');
+          item.className = 'timeline-item';
+          const nodeName = SYSTEM_NODES.find(n => n.id === t.node)?.name || t.node;
+          item.innerHTML = `
+            <span><span class="time-tag">+${t.hour}h:</span> System <strong>${nodeName}</strong> breached</span>
+            <span style="color: var(--accent-red); font-size: 0.75rem;">FAILED</span>
+          `;
+          timelineDiv.appendChild(item);
+        });
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedQDay = localStorage.getItem('mineguard_qday') || 2029;
+      document.getElementById('qDaySlider').value = savedQDay;
+      updateSimulation();
+    });
+  </script>
+</body>
+</html>

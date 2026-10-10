@@ -1,0 +1,8 @@
+NIST SP 800-208: RECOMMENDATION FOR STATEFUL HASH-BASED SIGNATURE SCHEMES
+Published: October 2020. NIST Special Publication.
+
+1. SCOPE AND INDUSTRIAL APPLICATION
+NIST SP 800-208 approves stateful hash-based signature algorithms LMS (Leighton-Micali Signatures) and XMSS (eXtended Merkle Signature Scheme) for restricted operational environments. These environments include code signing, firmware validation in Industrial Internet of Things (IIoT), Programmable Logic Controllers (PLCs), and safety-critical embedded systems.
+
+2. STATE MANAGEMENT HAZARD
+Unlike traditional signatures, stateful hash signatures consume one-time signing keys. Reusing a one-time signing key catastrophically compromises the entire signing tree. Therefore, SP 800-208 mandates that private keys MUST be maintained in certified Hardware Security Modules (HSMs) that guarantee atomic non-volatile state increments. Stateful signatures MUST NOT be used for general-purpose applications like web server TLS or dynamic messaging.

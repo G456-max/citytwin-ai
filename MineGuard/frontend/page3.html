@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MineGuard — Features 3 & 4: Priority + Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #111827;
+      --border: #1f2937;
+      --accent: #f59e0b;
+      --accent-red: #ef4444;
+      --accent-green: #10b981;
+      --accent-blue: #3b82f6;
+      --text: #f9fafb;
+      --text-muted: #9ca3af;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: rgba(17, 24, 39, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #fff;
+    }
+    .brand span {
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .nav-links {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .nav-link:hover { color: #fff; }
+    .badge-feature {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    main {
+      flex: 1;
+      max-width: 1100px;
+      width: 100%;
+      margin: 32px auto;
+      padding: 0 24px;
+    }
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title span {
+      color: var(--accent);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+    /* FEATURE 3: PRIORITY LIST */
+    .priority-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .priority-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0d131f;
+      border: 1px solid #1a2234;
+      padding: 16px 20px;
+      border-radius: 8px;
+      transition: border-color 0.2s;
+    }
+    .priority-item:first-child {
+      border-color: rgba(245, 158, 11, 0.5);
+      background: rgba(245, 158, 11, 0.05);
+    }
+    .priority-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .rank-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #1f2937;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.9rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .priority-item:first-child .rank-circle {
+      background: var(--accent);
+      color: #000;
+    }
+    .sys-name {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 2px;
+    }
+    .sys-reason {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    .action-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+    }
+    .action-first {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--accent-red);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .action-high {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .action-med {
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    /* FEATURE 4: PLANNER */
+    .summary-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .metric-card {
+      background: #0d131f;
+      border: 1px solid var(--border);
+      padding: 16px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .metric-label {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .metric-val {
+      font-size: 1.75rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: #fff;
+    }
+    .roadmap-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 850px) {
+      .roadmap-grid { grid-template-columns: 1fr; }
+      .summary-metrics { grid-template-columns: 1fr; }
+    }
+    .phase-card {
+      background: #0d131f;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      position: relative;
+    }
+    .phase-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .phase-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .phase-meta {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-family: 'JetBrains Mono', monospace;
+      border-bottom: 1px solid #1a2234;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+    .phase-systems {
+      list-style: none;
+      margin-bottom: 12px;
+    }
+    .phase-systems li {
+      font-size: 0.85rem;
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .phase-systems li::before {
+      content: "•";
+      color: var(--accent);
+    }
+    .phase-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* ACTION BAR */
+    .action-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+    }
+    .btn-export {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-export:hover {
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+      transform: translateY(-1px);
+    }
+    .btn-reset {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .btn-reset:hover {
+      color: #fff;
+      border-color: #4b5563;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      MineGuard <span>AI</span>
+    </div>
+    <div class="nav-links">
+      <a href="page2.html" class="nav-link">← Cascade Simulator</a>
+      <div class="badge-feature">Features 3 & 4 • Priority + Planner</div>
+    </div>
+  </header>
+
+  <main>
+    <!-- FEATURE 3: RISK SCORER / PRIORITY LIST -->
+    <div class="section-title">
+      Feature 3: Mitigation Priority <span>Ranked by Cascade Blast Radius</span>
+    </div>
+    <div class="card">
+      <div class="priority-list" id="priorityList">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+
+    <!-- FEATURE 4: MIGRATION PLANNER -->
+    <div class="section-title">
+      Feature 4: 3-Phase Migration Roadmap <span>Budget & Timeline Optimized</span>
+    </div>
+    <div class="card">
+      <div class="summary-metrics">
+        <div class="metric-card">
+          <div class="metric-label">Scope</div>
+          <div class="metric-val" id="metricScope">5 Systems</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Total Duration</div>
+          <div class="metric-val" id="metricDuration" style="color: var(--accent);">14 Weeks</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Estimated Budget</div>
+          <div class="metric-val" id="metricCost" style="color: var(--accent-green);">$210,000</div>
+        </div>
+      </div>
+
+      <div class="roadmap-grid" id="roadmapGrid">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <button class="btn-reset" onclick="startNewScan()">↺ Start New Scan</button>
+      <button class="btn-export" onclick="exportReport()">
+        <span>Download Full Plan (JSON)</span>
+      </button>
+    </div>
+  </main>
+
+  <script src="api.js"></script>
+  <script>
+    let globalPriorities = [];
+    let globalPlan = null;
+
+    async function loadData() {
+      // 1. Fetch Priorities (Feature 3)
+      const priData = await apiPriority();
+      globalPriorities = priData.priorities;
+      renderPriorities(globalPriorities);
+
+      // 2. Fetch Plan (Feature 4)
+      const planData = await apiPlan(globalPriorities);
+      globalPlan = planData;
+      renderPlan(globalPlan);
+    }
+
+    function renderPriorities(priorities) {
+      const container = document.getElementById('priorityList');
+      container.innerHTML = '';
+
+      priorities.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'priority-item';
+        let actionClass = 'action-med';
+        if (p.action === 'MIGRATE FIRST') actionClass = 'action-first';
+        else if (p.action === 'HIGH') actionClass = 'action-high';
+
+        item.innerHTML = `
+          <div class="priority-left">
+            <div class="rank-circle">${p.rank}</div>
+            <div>
+              <div class="sys-name">${p.system} <span style="font-size:0.75rem; color:var(--text-muted); font-family:'JetBrains Mono'">${p.algorithm} → ${p.replacement}</span></div>
+              <div class="sys-reason">${p.reason}</div>
+            </div>
+          </div>
+          <span class="action-tag ${actionClass}">${p.action}</span>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function renderPlan(plan) {
+      document.getElementById('metricScope').innerText = `${plan.total_systems} Systems`;
+      document.getElementById('metricDuration').innerText = `${plan.total_weeks} Weeks`;
+      document.getElementById('metricCost').innerText = `$${plan.total_cost_usd.toLocaleString()}`;
+
+      const grid = document.getElementById('roadmapGrid');
+      grid.innerHTML = '';
+
+      plan.phases.forEach(ph => {
+        const card = document.createElement('div');
+        card.className = 'phase-card';
+        const systemsHtml = ph.systems.map(s => `<li><strong>${s}</strong></li>`).join('');
+
+        card.innerHTML = `
+          <div class="phase-badge">Phase ${ph.phase} • ${ph.timeframe}</div>
+          <div class="phase-title">${ph.label}</div>
+          <div class="phase-meta">
+            <span>${ph.effort_weeks} Weeks</span>
+            <span style="color:var(--accent-green);">$${ph.cost_usd.toLocaleString()}</span>
+          </div>
+          <ul class="phase-systems">
+            ${systemsHtml}
+          </ul>
+          <div class="phase-desc">${ph.deliverable}</div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function exportReport() {
+      const scanCached = JSON.parse(localStorage.getItem('mineguard_scan') || '{}');
+      const qDayCached = localStorage.getItem('mineguard_qday') || 2029;
+
+      const reportPayload = {
+        project: scanCached.project_path || "/path/to/mining-project",
+        generated_at: new Date().toISOString(),
+        summary: {
+          q_day: parseInt(qDayCached, 10),
+          risk_score: scanCached.risk?.score || 95,
+          severity: scanCached.risk?.severity || "CRITICAL",
+          total_systems: 5,
+          total_weeks: globalPlan?.total_weeks || 14,
+          total_cost_usd: globalPlan?.total_cost_usd || 210000
+        },
+        findings: scanCached.findings || [],
+        priorities: globalPriorities,
+        migration_roadmap: globalPlan?.phases || []
+      };
+
+      const blob = new Blob([JSON.stringify(reportPayload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `mineguard-migration-plan.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function startNewScan() {
+      localStorage.removeItem('mineguard_scan');
+      localStorage.removeItem('mineguard_qday');
+      window.location.href = 'page1.html';
+    }
+
+    window.addEventListener('DOMContentLoaded', loadData);
+  </script>
+</body>
+</html>

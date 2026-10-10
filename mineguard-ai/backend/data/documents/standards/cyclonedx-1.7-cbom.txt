@@ -1,0 +1,11 @@
+CYCLONEDX 1.7 CRYPTOGRAPHIC BILL OF MATERIALS (CBOM) SPECIFICATION
+OWASP Foundation / CycloneDX Working Group.
+
+1. SCHEMA ARCHITECTURE FOR CRYPTOGRAPHIC ASSETS
+CycloneDX 1.7 introduces first-class representation for Cryptographic Bills of Materials (CBOM). A CBOM provides automated, machine-readable transparency into:
+- Cryptographic Assets: Algorithms, cipher suites, private/public keys, certificates, protocols, and hardware tokens.
+- Quantum Vulnerability Metadata: Flags classifying algorithms as "quantum-vulnerable", "classical-safe", or "post-quantum-secure".
+- Parameter Specifications: Modulus size, curve identifier, security strength in bits, execution mode, and implementation dependencies.
+
+2. INTEROPERABILITY AND AUTOMATION
+CBOMs formatted in CycloneDX 1.7 enable automated vulnerability scanners and risk cascading engines to ingest software and firmware inventories, map them to NIST FIPS 203/204/205 equivalents, and compute algorithmic deprecation metrics.

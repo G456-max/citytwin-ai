@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MineGuard — Cascade Simulator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --card: #111827;
+      --border: #1f2937;
+      --text: #f9fafb;
+      --gray: #9ca3af;
+      --text-muted: #9ca3af;
+      --accent: #06b6d4;
+      --accent-hover: #22d3ee;
+      --critical: #ef4444;
+      --high: #f59e0b;
+      --medium: #06b6d4;
+      --safe: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+      line-height: 1.6;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    #modeToggle {
+      display: inline-flex;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .mode-btn {
+      background: transparent;
+      color: var(--gray);
+      border: none;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border-radius: 0;
+      box-shadow: none;
+      transition: all 150ms ease;
+    }
+
+    .mode-btn:hover {
+      transform: none;
+      box-shadow: none;
+      color: var(--text);
+    }
+
+    .mode-btn.active {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    header nav {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    header nav a {
+      color: var(--gray);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 150ms ease;
+    }
+
+    header nav a:hover {
+      color: var(--accent);
+    }
+
+    header nav a[href="page5.html"] {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    button {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 200ms ease;
+    }
+
+    button:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 20px rgba(6,182,212,0.3);
+    }
+
+    button.btn-secondary {
+      background: transparent;
+      color: var(--gray);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 13px;
+      box-shadow: none;
+    }
+
+    button.btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--text);
+      transform: none;
+      box-shadow: none;
+    }
+
+    button.btn-primary {
+      background: var(--accent);
+      color: #000;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 14px 28px;
+      border-radius: 6px;
+      width: 100%;
+      display: block;
+    }
+
+    button.btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-top: 24px;
+    }
+
+    .scan-info {
+      padding: 8px 0 20px 0;
+    }
+
+    .scan-info h1 {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .subtitle {
+      color: var(--gray);
+      font-size: 14px;
+    }
+
+    /* Slider Card */
+    .slider-card {
+      padding: 20px 24px;
+      margin-top: 0;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .slider-header label {
+      color: var(--gray);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .qday-value {
+      color: var(--accent);
+      font-size: 28px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--border);
+      border-radius: 3px;
+      outline: none;
+      accent-color: var(--accent);
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 0 12px rgba(6,182,212,0.5);
+      transition: transform 150ms;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      border: none;
+    }
+
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      color: var(--gray);
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .stage-desc {
+      margin-top: 16px;
+      padding: 10px 14px;
+      background: rgba(6,182,212,0.06);
+      border-left: 3px solid var(--accent);
+      border-radius: 4px;
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* Split Screen */
+    .split-screen {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 24px;
+    }
+
+    .panel-left, .panel-right {
+      margin-top: 0;
+      padding: 20px;
+    }
+
+    .panel-left {
+      border-left: 4px solid var(--critical);
+    }
+
+    .panel-right {
+      border-left: 4px solid var(--safe);
+    }
+
+    .panel-title {
+      font-size: 14px;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .critical-title { color: var(--critical); }
+    .safe-title { color: var(--safe); }
+
+    .panel-status {
+      margin-top: 12px;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      color: var(--gray);
+    }
+
+    .status-critical { color: var(--critical); font-weight: 700; }
+    .status-safe { color: var(--safe); font-weight: 700; }
+
+    /* SVG nodes & edges */
+    #graphLeft, #graphRight {
+      width: 100%;
+      height: 440px;
+      display: block;
+      user-select: none;
+    }
+
+    .cascade-node {
+      cursor: pointer;
+      stroke-width: 2;
+      stroke: #1f2937;
+      transition: fill 250ms ease, r 250ms ease, filter 250ms ease;
+    }
+
+    .cascade-node.failed {
+      filter: drop-shadow(0 0 10px rgba(239,68,68,0.7));
+    }
+
+    .cascade-node.safe {
+      filter: drop-shadow(0 0 8px rgba(16,185,129,0.5));
+    }
+
+    .cascade-label {
+      font-size: 10px;
+      fill: var(--text);
+      text-anchor: middle;
+      pointer-events: none;
+      font-weight: 600;
+    }
+
+    /* Timeline */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin-top: 12px;
+    }
+
+    th, td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: var(--bg);
+      color: var(--gray);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    #timelineBody tr {
+      transition: background 150ms;
+    }
+
+    #timelineBody tr:hover {
+      background: rgba(6,182,212,0.04);
+    }
+
+    .status-FAILED, .status-DOWN, .status-INACCESSIBLE, .timeline-failed {
+      color: var(--critical);
+      font-weight: 700;
+    }
+
+    .status-DEGRADED, .timeline-degraded {
+      color: var(--high);
+      font-weight: 700;
+    }
+
+    .timeline-final {
+      background: rgba(239,68,68,0.08);
+      font-weight: 700;
+    }
+
+    /* Priority */
+    .priority-row {
+      display: grid;
+      grid-template-columns: 32px 1fr 140px 100px 1fr;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .priority-row:last-child {
+      border-bottom: none;
+    }
+
+    .priority-rank {
+      color: var(--gray);
+      font-weight: 700;
+    }
+
+    .priority-name {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .priority-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .badge-migrate-first, .badge-MIGRATE-FIRST {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--critical);
+      border: 1px solid var(--critical);
+    }
+
+    .badge-high, .badge-HIGH {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--high);
+      border: 1px solid var(--high);
+    }
+
+    .badge-medium, .badge-MEDIUM {
+      background: rgba(6, 182, 212, 0.2);
+      color: var(--medium);
+      border: 1px solid var(--medium);
+    }
+
+    .priority-effort {
+      color: var(--gray);
+      font-size: 12px;
+    }
+
+    .priority-reason, .priority-note {
+      color: var(--gray);
+      font-size: 12px;
+    }
+
+    /* CTA */
+    .cta-container {
+      text-align: center;
+      margin: 36px 0;
+    }
+
+    @media (max-width: 768px) {
+      .split-screen { grid-template-columns: 1fr; }
+      .priority-row { grid-template-columns: 30px 1fr; }
+      #graphLeft, #graphRight { height: 350px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <div class="logo">MineGuard</div>
+      
+    </div>
+    <nav>
+      <a href="page3.html">← Back</a>
+      <button id="exportButton" class="btn-secondary" type="button">Export</button>
+      <a href="page5.html">Priority →</a>
+    </nav>
+  </header>
+
+  <main id="app">
+    <!-- TITLE -->
+    <section class="scan-info">
+      <h1 id="pageTitle">Cascade Simulator: mining-project</h1>
+      <p class="subtitle">Drag the slider to change Q-Day. Watch what breaks first.</p>
+    </section>
+
+    <!-- Q-DAY SLIDER -->
+    <section class="card slider-card" id="sliderContainer">
+      <div class="slider-header">
+        <label>Q-Day:</label>
+        <span id="qDayValue" class="qday-value">2029</span>
+      </div>
+      <input type="range" id="qDaySlider" min="2027" max="2035" value="2029" step="1">
+      <div class="slider-labels">
+        <span>2027</span><span>2029</span><span>2031</span><span>2033</span><span>2035</span>
+      </div>
+      <div id="stageDescription" class="stage-desc">
+        RSA-2048 + ECDSA fail. 14 systems affected.
+      </div>
+    </section>
+
+    <!-- SPLIT SCREEN -->
+    <section class="split-screen" id="splitScreen">
+      <div class="card panel-left" id="leftPanel">
+        <h3 class="panel-title critical-title">⚠ WITHOUT MIGRATION</h3>
+        <svg id="graphLeft" viewBox="0 0 800 520" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="panel-status">
+          <div>Status: <span id="leftStatus" class="status-critical">CRITICAL</span></div>
+          <div>Systems down: <span id="leftDown" class="status-critical">18/20</span></div>
+        </div>
+      </div>
+
+      <div class="card panel-right" id="rightPanel">
+        <h3 class="panel-title safe-title">✓ WITH MIGRATION</h3>
+        <svg id="graphRight" viewBox="0 0 800 520" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="panel-status">
+          <div>Status: <span id="rightStatus" class="status-safe">OPERATIONAL</span></div>
+          <div>Systems down: <span id="rightDown" class="status-safe">2/20</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAILURE TIMELINE -->
+    <section class="card" id="timelineContainer">
+      <h3 style="font-size:16px; font-weight:700; color:var(--text);">Failure Timeline</h3>
+      <table id="timelineTable">
+        <thead>
+          <tr>
+            <th>Hour</th>
+            <th>System</th>
+            <th>Status</th>
+            <th>Reason</th>
+          </tr>
+        </thead>
+        <tbody id="timelineBody"></tbody>
+      </table>
+    </section>
+
+    <!-- MIGRATION PRIORITY -->
+    <section class="card" id="priorityContainer">
+      <h3 style="font-size:16px; font-weight:700; color:var(--text);">Migration Priority</h3>
+      <div id="priorityList"></div>
+    </section>
+
+    <!-- NIST PQC BENCHMARKS -->
+    <section class="card" id="pqcComparisonContainer">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <div>
+          <h3 style="font-size:16px; font-weight:700; color:var(--text); margin-bottom:4px;">NIST PQC Algorithm Benchmarks (FIPS 203 / 204 / 205)</h3>
+          <p style="color:var(--gray); font-size:13px;">Cryptographic overhead & OT network footprint constraints for mining infrastructure</p>
+        </div>
+        <span class="priority-badge badge-medium" style="padding:4px 8px; border-radius:4px; font-size:12px; font-weight:700;">NIST STANDARDIZED</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Algorithm</th>
+            <th>Type / Standard</th>
+            <th>NIST Level</th>
+            <th>Public Key</th>
+            <th>Ciphertext / Sig</th>
+            <th>Speed (Ops/s)</th>
+            <th>Mining OT Assessment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>ML-KEM-512</strong></td>
+            <td>KEM (FIPS 203)</td>
+            <td>Category 1</td>
+            <td>800 bytes</td>
+            <td>768 bytes</td>
+            <td>~24,000 /s</td>
+            <td><span style="color:var(--gray);">Lightweight / IoT sensors</span></td>
+          </tr>
+          <tr style="background: rgba(6, 182, 212, 0.08);">
+            <td><strong style="color:var(--accent);">ML-KEM-768</strong></td>
+            <td>KEM (FIPS 203)</td>
+            <td>Category 3</td>
+            <td>1,184 bytes</td>
+            <td>1,088 bytes</td>
+            <td>~18,500 /s</td>
+            <td><span style="color:var(--safe); font-weight:700;">★ RECOMMENDED (SCADA / OT Core)</span></td>
+          </tr>
+          <tr>
+            <td><strong>ML-KEM-1024</strong></td>
+            <td>KEM (FIPS 203)</td>
+            <td>Category 5</td>
+            <td>1,568 bytes</td>
+            <td>1,568 bytes</td>
+            <td>~12,000 /s</td>
+            <td><span style="color:var(--gray);">High security / CA Root archive</span></td>
+          </tr>
+          <tr>
+            <td><strong>ML-DSA-44</strong></td>
+            <td>Signatures (FIPS 204)</td>
+            <td>Category 2</td>
+            <td>1,312 bytes</td>
+            <td>2,420 bytes</td>
+            <td>~7,500 /s</td>
+            <td><span style="color:var(--gray);">Constrained controllers</span></td>
+          </tr>
+          <tr style="background: rgba(6, 182, 212, 0.08);">
+            <td><strong style="color:var(--accent);">ML-DSA-65</strong></td>
+            <td>Signatures (FIPS 204)</td>
+            <td>Category 3</td>
+            <td>1,952 bytes</td>
+            <td>3,309 bytes</td>
+            <td>~5,200 /s</td>
+            <td><span style="color:var(--safe); font-weight:700;">★ RECOMMENDED (Firmware & Auth)</span></td>
+          </tr>
+          <tr>
+            <td><strong>ML-DSA-87</strong></td>
+            <td>Signatures (FIPS 204)</td>
+            <td>Category 5</td>
+            <td>2,592 bytes</td>
+            <td>4,627 bytes</td>
+            <td>~3,100 /s</td>
+            <td><span style="color:var(--gray);">Ultra-secure Root PKI</span></td>
+          </tr>
+          <tr>
+            <td><strong>SLH-DSA-128s</strong></td>
+            <td>Stateless Hash (FIPS 205)</td>
+            <td>Category 1</td>
+            <td>32 bytes</td>
+            <td>7,856 bytes</td>
+            <td>~150 /s</td>
+            <td><span style="color:var(--high);">Fallback only (Large Sig packet size)</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top:12px; font-size:12px; color:var(--gray); line-height:1.5;">
+        💡 <strong>Mining OT Context:</strong> Standard Ethernet / Wi-Fi underground shafts easily accommodate ML-KEM-768's 1,088-byte ciphertext payload without MTU fragmentation (standard MTU = 1500 bytes). For RS-485 serial links, hybrid TLS or gateway offloading is recommended.
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <div class="cta-container">
+      <button id="priorityButton" class="btn-primary" type="button">
+        View Full Migration Roadmap →
+      </button>
+    </div>
+  </main>
+
+  <footer style="margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border); text-align: center; color: var(--gray); font-size: 13px;">
+    MineGuard is for educational and planning purposes only.
+  </footer>
+
+  <script src="engine.js"></script>
+  <script src="engine-real.js"></script>
+  <script>
+    const MIGRATED_NODES = ["ca-root", "ot-gateway", "auth-svc", "ventilation", "haulage"];
+    let currentNodes = [];
+    let currentEdges = [];
+    let currentQDay = 2029;
+    let currentCascadeResults = null;
+    let currentPriorityList = [];
+    let animationRunning = false;
+
+    function isLocalStorageAvailable() {
+      try {
+        const k = "__test__";
+        window.localStorage.setItem(k, k);
+        window.localStorage.removeItem(k);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function getDefaultNodes() {
+      return [
+        { id: "ca-root", label: "CA-Root", algorithm: "RSA-4096", criticality: "CRITICAL", x: 400, y: 50 },
+        { id: "auth-svc", label: "Auth-Svc", algorithm: "RSA-2048", criticality: "HIGH", x: 250, y: 150 },
+        { id: "dns-svc", label: "DNS-Svc", algorithm: "ECDSA", criticality: "HIGH", x: 550, y: 150 },
+        { id: "ot-gateway", label: "OT-Gateway", algorithm: "RSA-2048", criticality: "CRITICAL", x: 400, y: 250 },
+        { id: "ventilation", label: "Ventilation", algorithm: "RSA-2048", criticality: "CRITICAL", x: 200, y: 350 },
+        { id: "gas-monitor", label: "Gas-Monitor", algorithm: "RSA-2048", criticality: "HIGH", x: 400, y: 350 },
+        { id: "haulage", label: "Haulage", algorithm: "ECDSA", criticality: "CRITICAL", x: 600, y: 350 },
+        { id: "geo-db", label: "Geo-DB", algorithm: "AES-256", criticality: "SAFE", x: 400, y: 450 },
+        { id: "email", label: "Email", algorithm: "RSA-2048", criticality: "MEDIUM", x: 100, y: 150 },
+        { id: "hr-portal", label: "HR-Portal", algorithm: "RSA-2048", criticality: "MEDIUM", x: 700, y: 150 },
+        { id: "finance", label: "Finance", algorithm: "ECDSA", criticality: "HIGH", x: 100, y: 250 },
+        { id: "scada-historian", label: "SCADA-Historian", algorithm: "RSA-2048", criticality: "HIGH", x: 700, y: 250 },
+        { id: "drilling-sensors", label: "Drilling-Sensors", algorithm: "ECDSA", criticality: "MEDIUM", x: 100, y: 350 },
+        { id: "contract-archive", label: "Contract-Archive", algorithm: "RSA-2048", criticality: "MEDIUM", x: 700, y: 350 },
+        { id: "vpn-gateway", label: "VPN-Gateway", algorithm: "RSA-2048", criticality: "HIGH", x: 250, y: 450 },
+        { id: "backup-system", label: "Backup-System", algorithm: "RSA-2048", criticality: "MEDIUM", x: 550, y: 450 },
+        { id: "customer-db", label: "Customer-DB", algorithm: "AES-256", criticality: "SAFE", x: 100, y: 450 },
+        { id: "safety-system", label: "Safety-System", algorithm: "AES-256", criticality: "SAFE", x: 700, y: 450 },
+        { id: "iot-sensors", label: "IoT-Sensors", algorithm: "ECDSA", criticality: "MEDIUM", x: 250, y: 50 },
+        { id: "reporting", label: "Reporting", algorithm: "RSA-2048", criticality: "MEDIUM", x: 550, y: 50 }
+      ];
+    }
+
+    function getDefaultEdges() {
+      return [
+        { from: "ca-root", to: "auth-svc" },
+        { from: "ca-root", to: "dns-svc" },
+        { from: "ca-root", to: "ot-gateway" },
+        { from: "ca-root", to: "vpn-gateway" },
+        { from: "auth-svc", to: "ot-gateway" },
+        { from: "auth-svc", to: "email" },
+        { from: "auth-svc", to: "hr-portal" },
+        { from: "dns-svc", to: "ot-gateway" },
+        { from: "dns-svc", to: "finance" },
+        { from: "dns-svc", to: "scada-historian" },
+        { from: "ot-gateway", to: "ventilation" },
+        { from: "ot-gateway", to: "gas-monitor" },
+        { from: "ot-gateway", to: "haulage" },
+        { from: "ot-gateway", to: "drilling-sensors" },
+        { from: "ot-gateway", to: "contract-archive" },
+        { from: "ventilation", to: "geo-db" },
+        { from: "gas-monitor", to: "geo-db" },
+        { from: "haulage", to: "geo-db" },
+        { from: "vpn-gateway", to: "backup-system" },
+        { from: "backup-system", to: "customer-db" },
+        { from: "backup-system", to: "safety-system" },
+        { from: "iot-sensors", to: "ca-root" },
+        { from: "reporting", to: "ca-root" },
+        { from: "email", to: "geo-db" },
+        { from: "hr-portal", to: "geo-db" },
+        { from: "finance", to: "geo-db" },
+        { from: "scada-historian", to: "geo-db" },
+        { from: "contract-archive", to: "geo-db" }
+      ];
+    }
+
+    function init() {
+      console.log("Page 4 loaded");
+
+      // Mode toggle initialization
+      const currentMode = (isLocalStorageAvailable() && localStorage.getItem("mg_mode")) || "real";
+      if (typeof setMode === "function") setMode(currentMode);
+      document.querySelectorAll(".mode-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.getAttribute("data-mode") === currentMode);
+        btn.addEventListener("click", () => {
+          const m = btn.getAttribute("data-mode");
+          if (isLocalStorageAvailable()) localStorage.setItem("mg_mode", m);
+          if (typeof setMode === "function") setMode(m);
+          document.querySelectorAll(".mode-btn").forEach(b => {
+            b.classList.toggle("active", b.getAttribute("data-mode") === m);
+          });
+        });
+      });
+
+      const scanPath = (isLocalStorageAvailable() && (localStorage.getItem("mg_scanPath") || localStorage.getItem("scanPath"))) || "/path/to/mining-project";
+      const projectName = scanPath.split("/").pop() || "mining-project";
+      const pageTitleEl = document.getElementById("pageTitle");
+      if (pageTitleEl) pageTitleEl.textContent = "Cascade Simulator: " + projectName;
+
+      // Load graph data with safe fallbacks
+      let nodes = getDefaultNodes();
+      let edges = getDefaultEdges();
+
+      if (isLocalStorageAvailable()) {
+        const rawN = localStorage.getItem("graphNodes") || localStorage.getItem("mg_graphNodes");
+        if (rawN) {
+          try {
+            const parsedN = JSON.parse(rawN);
+            if (Array.isArray(parsedN) && parsedN.length > 0) nodes = parsedN;
+          } catch (e) {
+            console.log("Invalid graph data, using fallback");
+            nodes = getDefaultNodes();
+          }
+        }
+
+        const rawE = localStorage.getItem("graphEdges") || localStorage.getItem("mg_graphEdges");
+        if (rawE) {
+          try {
+            const parsedE = JSON.parse(rawE);
+            if (Array.isArray(parsedE) && parsedE.length > 0) edges = parsedE;
+          } catch (e) {
+            console.log("Invalid edges data, using fallback");
+            edges = getDefaultEdges();
+          }
+        }
+      }
+
+      currentNodes = nodes;
+      currentEdges = edges;
+
+      // Slider listener
+      const slider = document.getElementById("qDaySlider");
+      if (slider) {
+        slider.addEventListener("input", onSliderChange);
+      }
+
+      // Initial simulation
+      updateSimulation();
+
+      // CTA Navigation
+      const prioBtn = document.getElementById("priorityButton");
+      if (prioBtn) {
+        prioBtn.addEventListener("click", navigateToPage5);
+      }
+
+      const exportBtn = document.getElementById("exportButton");
+      if (exportBtn) {
+        exportBtn.addEventListener("click", () => {
+          console.log("Export clicked");
+        });
+      }
+    }
+
+    function onSliderChange() {
+      const slider = document.getElementById("qDaySlider");
+      if (!slider) return;
+      const qDay = parseInt(slider.value, 10);
+      currentQDay = qDay;
+      const valEl = document.getElementById("qDayValue");
+      if (valEl) valEl.textContent = qDay;
+      updateSimulation();
+    }
+
+    function updateStageDescription(qDay) {
+      const descEl = document.getElementById("stageDescription");
+      if (!descEl) return;
+      if (qDay <= 2028) {
+        descEl.textContent = "Only RSA-2048 fails. ~8 systems affected.";
+      } else if (qDay <= 2030) {
+        descEl.textContent = "RSA-2048 + ECDSA fail. ~14 systems affected.";
+      } else {
+        descEl.textContent = "RSA-2048 + ECDSA + RSA-4096 fail. ~18 systems affected.";
+      }
+    }
+
+    function runCascade(qDay, nodes, edges, migratedNodes) {
+      if (typeof qDay !== "number") qDay = currentQDay;
+      nodes = nodes || currentNodes || getDefaultNodes();
+      edges = edges || currentEdges || getDefaultEdges();
+      migratedNodes = migratedNodes || [];
+
+      let seedAlgos = ["RSA-2048"];
+      if (qDay >= 2029) seedAlgos.push("ECDSA");
+      if (qDay >= 2031) seedAlgos.push("RSA-4096");
+
+      const seedNodes = nodes
+        .filter(n => seedAlgos.includes(n.algorithm) && !migratedNodes.includes(n.id))
+        .map(n => n.id);
+
+      const failed = new Set();
+      const queue = [];
+      const timeline = [];
+
+      seedNodes.forEach(id => {
+        failed.add(id);
+        queue.push(id);
+        const nodeObj = nodes.find(n => n.id === id);
+        timeline.push({
+          hour: 0,
+          nodeId: id,
+          status: "FAILED",
+          reason: `${nodeObj ? nodeObj.algorithm : 'Crypto'} vulnerability compromised`
+        });
+      });
+
+      let hour = 0;
+      while (queue.length > 0) {
+        hour += 2;
+        const levelSize = queue.length;
+        for (let i = 0; i < levelSize; i++) {
+          const current = queue.shift();
+
+          edges.forEach(e => {
+            let dep = null;
+            if (e.to === current) dep = e.from;
+            else if (e.from === current) dep = e.to;
+
+            if (dep && !failed.has(dep) && !migratedNodes.includes(dep)) {
+              failed.add(dep);
+              queue.push(dep);
+              timeline.push({
+                hour: hour,
+                nodeId: dep,
+                status: "FAILED",
+                reason: `Dependent connection to ${current} lost`
+              });
+            }
+          });
+        }
+      }
+
+      return {
+        failedNodes: Array.from(failed),
+        failureTimeline: timeline,
+        totalDown: failed.size,
+        totalSystems: nodes.length
+      };
+    }
+    window.runCascade = runCascade;
+
+    function updateSimulation() {
+      const qDay = currentQDay;
+      updateStageDescription(qDay);
+
+      const leftResult = runCascade(qDay, currentNodes, currentEdges, []);
+      const rightResult = runCascade(qDay, currentNodes, currentEdges, MIGRATED_NODES);
+      currentCascadeResults = leftResult;
+
+      // Render static colored nodes
+      renderCascadeGraph("graphLeft", currentNodes, currentEdges, leftResult.failedNodes, []);
+      renderCascadeGraph("graphRight", currentNodes, currentEdges, rightResult.failedNodes, MIGRATED_NODES);
+
+      // Status text
+      const leftStatus = document.getElementById("leftStatus");
+      if (leftStatus) leftStatus.textContent = leftResult.totalDown > 10 ? "CRITICAL" : "HIGH";
+
+      const leftDown = document.getElementById("leftDown");
+      if (leftDown) leftDown.textContent = `${leftResult.totalDown}/${currentNodes.length}`;
+
+      const rightStatus = document.getElementById("rightStatus");
+      if (rightStatus) rightStatus.textContent = "OPERATIONAL";
+
+      const rightDown = document.getElementById("rightDown");
+      if (rightDown) rightDown.textContent = `${rightResult.totalDown}/${currentNodes.length}`;
+
+      // Animate BFS propagation
+      animateCascade("graphLeft", leftResult.failedNodes, leftResult.failureTimeline);
+
+      // Failure timeline (worst-case left result)
+      renderTimeline(leftResult.failureTimeline, currentNodes);
+
+      // Migration priority list
+      renderPriority();
+
+      // Persist simulation data to localStorage
+      if (isLocalStorageAvailable()) {
+        try {
+          localStorage.setItem("cascadeResults", JSON.stringify(leftResult));
+          localStorage.setItem("mg_cascadeResults", JSON.stringify(leftResult));
+          localStorage.setItem("migrationPriority", JSON.stringify(currentPriorityList));
+          localStorage.setItem("mg_migrationPriority", JSON.stringify(currentPriorityList));
+        } catch (e) {
+          console.warn("Storage save error:", e);
+        }
+      }
+
+      console.log(`Cascade run for Q-Day ${qDay}: ${leftResult.totalDown} down (no migration), ${rightResult.totalDown} down (with migration)`);
+    }
+
+    function renderCascadeGraph(svgId, nodes, edges, failedNodes, migratedNodes) {
+      const svg = document.getElementById(svgId);
+      if (!svg) return;
+      svg.innerHTML = "";
+
+      const nodeMap = {};
+      nodes.forEach(n => { nodeMap[n.id] = n; });
+
+      // Edges layer
+      const edgesGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      edges.forEach(edge => {
+        const from = nodeMap[edge.from];
+        const to = nodeMap[edge.to];
+        if (!from || !to) return;
+
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", from.x);
+        line.setAttribute("y1", from.y);
+        line.setAttribute("x2", to.x);
+        line.setAttribute("y2", to.y);
+        line.setAttribute("stroke", "#374151");
+        line.setAttribute("stroke-width", "1.5");
+        edgesGroup.appendChild(line);
+      });
+      svg.appendChild(edgesGroup);
+
+      // Nodes layer
+      const nodesGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      nodes.forEach(node => {
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.setAttribute("id", `${svgId}-node-${node.id}`);
+
+        let fill = "#10b981"; // green default
+        if (svgId === "graphLeft") {
+          if (failedNodes.includes(node.id)) fill = "#ef4444"; // red
+        } else {
+          if (migratedNodes.includes(node.id)) {
+            fill = "#10b981"; // green
+          } else if (failedNodes.includes(node.id)) {
+            fill = "#ef4444"; // red
+          }
+        }
+
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", node.x);
+        circle.setAttribute("cy", node.y);
+        circle.setAttribute("r", 22);
+        circle.setAttribute("fill", fill);
+        circle.setAttribute("class", "cascade-node " + (fill === "#ef4444" ? "failed" : "safe"));
+        circle.setAttribute("id", `${svgId}-${node.id}`);
+        g.appendChild(circle);
+
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", node.x);
+        text.setAttribute("y", node.y + 36);
+        text.setAttribute("class", "cascade-label");
+        text.textContent = node.label;
+        g.appendChild(text);
+
+        nodesGroup.appendChild(g);
+      });
+      svg.appendChild(nodesGroup);
+    }
+
+    function animateCascade(svgId, failedNodes, timeline) {
+      if (animationRunning) return;
+      animationRunning = true;
+
+      const sorted = [...timeline].sort((a, b) => a.hour - b.hour);
+
+      sorted.forEach((entry, i) => {
+        setTimeout(() => {
+          const circle = document.getElementById(`${svgId}-${entry.nodeId}`);
+          if (circle) {
+            circle.setAttribute("fill", "#ef4444");
+            circle.classList.add("failed");
+            circle.setAttribute("r", 26);
+            setTimeout(() => circle.setAttribute("r", 22), 200);
+          }
+
+          if (i === sorted.length - 1) {
+            setTimeout(() => { animationRunning = false; }, 300);
+          }
+        }, i * 300);
+      });
+
+      if (!sorted.length) {
+        setTimeout(() => { animationRunning = false; }, 100);
+      }
+    }
+
+    function renderTimeline(timeline, nodes) {
+      const tbody = document.getElementById("timelineBody");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      const nodeMap = {};
+      nodes.forEach(n => { nodeMap[n.id] = n; });
+
+      const sorted = [...timeline].sort((a, b) => a.hour - b.hour);
+      const seen = new Set();
+
+      sorted.forEach(entry => {
+        if (!seen.has(entry.nodeId)) {
+          seen.add(entry.nodeId);
+          const node = nodeMap[entry.nodeId];
+          const tr = document.createElement("tr");
+
+          const tdHour = document.createElement("td");
+          tdHour.textContent = "Hour " + entry.hour;
+
+          const tdSystem = document.createElement("td");
+          tdSystem.innerHTML = "<strong>" + (node ? node.label : entry.nodeId) + "</strong>";
+
+          const tdStatus = document.createElement("td");
+          tdStatus.className = "status-" + entry.status;
+          tdStatus.textContent = entry.status;
+
+          const tdReason = document.createElement("td");
+          tdReason.textContent = entry.reason || "Cascading failure propagated";
+
+          tr.appendChild(tdHour);
+          tr.appendChild(tdSystem);
+          tr.appendChild(tdStatus);
+          tr.appendChild(tdReason);
+          tbody.appendChild(tr);
+        }
+      });
+
+      // Final summary row
+      const finalTr = document.createElement("tr");
+      finalTr.className = "timeline-final";
+      finalTr.innerHTML = `
+        <td>Hour 24</td>
+        <td>All Affected Systems</td>
+        <td class="timeline-failed">${seen.size}/${nodes.length} DOWN</td>
+        <td>Critical pit operations halted</td>
+      `;
+      tbody.appendChild(finalTr);
+    }
+
+    function renderPriority() {
+      const priorities = [
+        { rank: 1, name: "CA-Root", algo: "RSA-4096 → ML-KEM", action: "MIGRATE FIRST", reason: "Cascade trigger", effort: "4 weeks" },
+        { rank: 2, name: "OT-Gateway", algo: "RSA-2048 → ML-KEM", action: "HIGH", reason: "Safety critical", effort: "3 weeks" },
+        { rank: 3, name: "Auth-Svc", algo: "RSA-2048 → ML-DSA", action: "HIGH", reason: "Access control", effort: "2 weeks" },
+        { rank: 4, name: "Ventilation", algo: "RSA-2048 → ML-KEM", action: "MEDIUM", reason: "Safety system", effort: "3 weeks" },
+        { rank: 5, name: "Haulage", algo: "ECDSA → ML-DSA", action: "MEDIUM", reason: "Production", effort: "2 weeks" }
+      ];
+
+      currentPriorityList = priorities;
+
+      const badgeClass = {
+        "MIGRATE FIRST": "badge-migrate-first",
+        "HIGH": "badge-high",
+        "MEDIUM": "badge-medium"
+      };
+
+      const container = document.getElementById("priorityList");
+      if (!container) return;
+
+      container.innerHTML = priorities.map(p => `
+        <div class="priority-row">
+          <span class="priority-rank">${p.rank}.</span>
+          <div>
+            <div class="priority-name">${p.name}</div>
+            <div class="priority-reason">${p.algo}</div>
+          </div>
+          <span class="priority-badge ${badgeClass[p.action]}">${p.action}</span>
+          <span class="priority-effort">${p.effort}</span>
+          <span class="priority-reason">${p.reason}</span>
+        </div>
+      `).join("");
+
+      if (isLocalStorageAvailable()) {
+        try {
+          localStorage.setItem("mg_migrationPriority", JSON.stringify(priorities));
+          localStorage.setItem("migrationPriority", JSON.stringify(priorities));
+        } catch (e) {}
+      }
+    }
+
+    function navigateToPage5() {
+      if (isLocalStorageAvailable()) {
+        try {
+          if (!currentCascadeResults) {
+            currentCascadeResults = runCascade(currentQDay, currentNodes, currentEdges, []);
+          }
+          localStorage.setItem("cascadeResults", JSON.stringify(currentCascadeResults));
+          localStorage.setItem("mg_cascadeResults", JSON.stringify(currentCascadeResults));
+          localStorage.setItem("migrationPriority", JSON.stringify(currentPriorityList));
+          localStorage.setItem("mg_migrationPriority", JSON.stringify(currentPriorityList));
+        } catch (e) {
+          console.warn("Storage save error:", e);
+        }
+      }
+      console.log("Navigating to page5.html");
+      window.location.href = "page5.html";
+    }
+    window.navigateToPage5 = navigateToPage5;
+
+    window.addEventListener("load", init);
+  </script>
+</body>
+</html>

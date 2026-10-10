@@ -1,0 +1,12 @@
+MOSCA'S THEOREM: QUANTUM RISK HORIZON AND THEOREM OF SHELF-LIFE INEQUALITY
+Dr. Michele Mosca, Institute for Quantum Computing.
+
+1. THE FUNDAMENTAL THEOREM
+Let:
+- X = The security shelf-life of the data (number of years the data must remain confidential).
+- Y = The migration time (number of years required to re-engineer, test, and deploy post-quantum systems).
+- Z = The time until a quantum computer capable of breaking classical algorithms is built (Q-Day horizon).
+
+2. THE THEOREM INEQUALITY
+If X + Y > Z, then an organization's systems are ALREADY vulnerable to catastrophic compromise.
+Even if a quantum computer will not exist for 8 years (Z = 8), if critical mine geological data must remain confidential for 10 years (X = 10) and migration takes 3 years (Y = 3), then X + Y = 13 > 8. The data harvested today under "Harvest Now, Decrypt Later" will be exposed within its required confidentiality lifespan.

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MineGuard — Risk Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --card: #111827;
+      --border: #1f2937;
+      --text: #f9fafb;
+      --gray: #9ca3af;
+      --accent: #06b6d4;
+      --critical: #ef4444;
+      --high: #f59e0b;
+      --medium: #06b6d4;
+      --safe: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+      line-height: 1.6;
+    }
+
+    h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+    h2 { font-size: 20px; font-weight: 600; margin-bottom: 16px; }
+    h3 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+
+    a { color: var(--accent); text-decoration: none; margin-right: 16px; }
+    a:hover { text-decoration: underline; }
+
+    button {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 200ms ease;
+    }
+    button:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(6,182,212,0.3); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-top: 24px;
+    }
+
+    .badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .badge.critical, .badge-CRITICAL, .badge-critical { background: var(--critical); color: #fff; }
+    .badge.high, .badge-HIGH, .badge-high { background: var(--high); color: var(--bg); }
+    .badge.medium, .badge-MEDIUM, .badge-medium { background: var(--medium); color: var(--bg); }
+    .badge.safe, .badge-LOW, .badge-safe { background: var(--safe); color: var(--bg); }
+
+    table { width: 100%; border-collapse: collapse; }
+    td, th { padding: 12px 8px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { color: var(--gray); font-size: 12px; text-transform: uppercase; }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo { font-size: 20px; font-weight: 700; color: var(--text); }
+
+    #modeToggle {
+      display: inline-flex;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .mode-btn {
+      background: transparent;
+      color: var(--gray);
+      border: none;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    .mode-btn:hover { transform: none; box-shadow: none; color: var(--text); }
+    .mode-btn.active { background: var(--accent); color: var(--bg); }
+
+    .algo-bar-row { display: flex; align-items: center; margin-bottom: 12px; }
+    .algo-bar-label { width: 120px; font-size: 14px; font-weight: 500; }
+    .algo-bar-track { flex: 1; height: 10px; background: var(--bg); border-radius: 5px; overflow: hidden; margin: 0 16px; border: 1px solid var(--border); }
+    .algo-bar-fill { height: 100%; background: var(--accent); }
+    .algo-bar-count { width: 100px; font-size: 13px; color: var(--gray); text-align: right; }
+
+    .recommendation-row { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .recommendation-row:last-child { border-bottom: none; }
+    .rec-current { font-weight: 600; color: var(--critical); width: 120px; }
+    .rec-arrow { color: var(--gray); margin: 0 16px; }
+    .rec-replacement { color: var(--accent); font-weight: 700; flex: 1; }
+    .rec-note { color: var(--gray); font-size: 13px; }
+
+    .pqc-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <div class="logo">MineGuard</div>
+      
+    </div>
+    <nav>
+      <a href="page1.html">Back</a>
+    </nav>
+  </header>
+
+  <main id="app">
+    <div style="display:flex; justify-content:space-between; align-items:baseline;">
+      <h1 id="pageTitle">Scan Results</h1>
+      <div style="color:var(--gray); font-size:13px;">Engine: <strong id="scannerSource" style="color:var(--accent);">Detected by quantum-safe-audit</strong></div>
+    </div>
+    <div id="scanInfo" style="color:var(--gray); font-size:14px; margin-bottom:16px;">Scan metadata</div>
+    
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-top:16px;">
+      <div class="card" style="margin-top:0;">
+        <div style="color:var(--gray); font-size:12px;">QUANTUM RISK SCORE</div>
+        <div style="font-size:48px; font-weight:700;"><span id="riskScore">95</span><span style="font-size:18px; color:var(--gray);">/100</span></div>
+        <span id="riskBadge" class="badge critical">CRITICAL</span>
+      </div>
+      <div class="card" style="margin-top:0;">
+        <div style="color:var(--gray); font-size:12px;">VULNERABLE ALGORITHMS</div>
+        <div style="font-size:48px; font-weight:700;" id="algoCount">4</div>
+      </div>
+      <div class="card" style="margin-top:0;">
+        <div style="color:var(--gray); font-size:12px;">CRITICAL SYSTEMS</div>
+        <div style="font-size:48px; font-weight:700;" id="criticalCount">6</div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h3>Findings by Algorithm</h3>
+      <div id="algorithmChart"></div>
+    </div>
+    
+    <div class="card">
+      <h3>Detailed Findings</h3>
+      <table id="findingsTable">
+        <thead><tr><th>File</th><th>Line</th><th>Algorithm</th><th>Severity</th></tr></thead>
+        <tbody id="findingsBody"></tbody>
+      </table>
+    </div>
+    
+    <div class="card">
+      <h3>NIST Migration Recommendations</h3>
+      <div id="recommendations"></div>
+    </div>
+
+    <!-- REAL PQC DEMO SECTION -->
+    <div class="card" id="pqcDemoCard">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <h3>Live PQC Cryptographic Engine (FIPS 203 & FIPS 204)</h3>
+          <p style="color:var(--gray); font-size:14px;">Executes authentic post-quantum lattice cryptography (ML-KEM-768 key encapsulation & ML-DSA-65 signature).</p>
+        </div>
+        <button id="runPqcDemoBtn" type="button">Run Live PQC Execution</button>
+      </div>
+
+      <div id="pqcOutput" class="pqc-box" style="display:none; margin-top:16px;">
+        <div style="color:var(--safe); font-weight:700; margin-bottom:8px;">✓ ML-KEM-768 & ML-DSA-65 Verification Succeeded</div>
+        <div><strong>Public Key (Alice):</strong> <span id="pqcPubKey" style="color:var(--gray);"></span></div>
+        <div><strong>Shared Secret (Bob & Alice Match):</strong> <span id="pqcSecret" style="color:var(--accent);"></span></div>
+        <div><strong>Signature Output:</strong> <span id="pqcSig" style="color:var(--gray);"></span></div>
+        <div style="margin-top:8px; color:var(--text); font-size:12px;">
+          Timings: Encapsulation: <span id="pqcEncapsTime"></span> | Decapsulation: <span id="pqcDecapsTime"></span> | Signature: <span id="pqcSigTime"></span>
+        </div>
+      </div>
+    </div>
+    
+    <div style="text-align:center; margin-top:32px;">
+      <button id="cascadeButton" style="width:100%;">View Cascade Simulation</button>
+    </div>
+  </main>
+
+  <footer style="margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border); text-align: center; color: var(--gray); font-size: 13px;">
+    MineGuard is for educational and planning purposes only.
+  </footer>
+
+  <script src="engine.js"></script>
+  <script src="engine-real.js"></script>
+  <script>
+    var currentScanPath = "/path/to/mining-project";
+    var currentRiskScore = 95;
+    var currentRiskSeverity = "CRITICAL";
+
+    function isLocalStorageAvailable() {
+      try {
+        var k = "__test__";
+        window.localStorage.setItem(k, k);
+        window.localStorage.removeItem(k);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function init() {
+      console.log("page2 loaded");
+
+      var currentMode = (isLocalStorageAvailable() && localStorage.getItem("mg_mode")) || "real";
+      if (typeof setMode === "function") setMode(currentMode);
+
+      document.querySelectorAll(".mode-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var mode = btn.getAttribute("data-mode");
+          if (typeof setMode === "function") setMode(mode);
+        });
+      });
+
+      var scanPath = "/path/to/mining-project";
+      var scanType = "source";
+      var scanDate = new Date().toISOString().split("T")[0];
+
+      if (isLocalStorageAvailable()) {
+        var sp = localStorage.getItem("scanPath");
+        if (sp) scanPath = sp;
+        var st = localStorage.getItem("scanType");
+        if (st) scanType = st;
+        var sd = localStorage.getItem("scanDate");
+        if (sd) scanDate = sd;
+      }
+      currentScanPath = scanPath;
+
+      var projectName = scanPath.split("/").pop() || "mining-project";
+      var pageTitleEl = document.getElementById("pageTitle");
+      if (pageTitleEl) pageTitleEl.textContent = "Scan Results: " + projectName;
+
+      var scanInfoEl = document.getElementById("scanInfo");
+      if (scanInfoEl) scanInfoEl.textContent = "Path: " + scanPath + " | Type: " + scanType + " | Date: " + scanDate;
+
+      var findings = getFindings();
+      var calc = calculateRiskScore(findings);
+      currentRiskScore = calc.score;
+      currentRiskSeverity = calc.severity;
+
+      renderMetrics(calc.score, calc.severity, findings);
+      renderAlgorithmChart(findings);
+      renderFindingsTable(findings);
+      renderRecommendations();
+
+      var cascadeBtn = document.getElementById("cascadeButton");
+      if (cascadeBtn) cascadeBtn.addEventListener("click", navigateToPage3);
+
+      var pqcBtn = document.getElementById("runPqcDemoBtn");
+      if (pqcBtn) {
+        pqcBtn.addEventListener("click", async function () {
+          pqcBtn.textContent = "Running PQC...";
+          pqcBtn.disabled = true;
+          try {
+            var demo = (typeof demonstratePQC === "function") ? await demonstratePQC() : null;
+            if (demo) {
+              document.getElementById("pqcOutput").style.display = "block";
+              document.getElementById("pqcPubKey").textContent = demo.keys.publicKeyHex;
+              document.getElementById("pqcSecret").textContent = demo.keys.sharedSecretHex;
+              document.getElementById("pqcSig").textContent = demo.keys.signaturePreview;
+              document.getElementById("pqcEncapsTime").textContent = demo.timings.encapsMs + "ms";
+              document.getElementById("pqcDecapsTime").textContent = demo.timings.decapsMs + "ms";
+              document.getElementById("pqcSigTime").textContent = demo.timings.sigGenMs + "ms";
+            }
+          } finally {
+            pqcBtn.textContent = "Run Live PQC Execution";
+            pqcBtn.disabled = false;
+          }
+        });
+      }
+    }
+
+    function getFindings() {
+      return [
+        { file: "auth/server.js", line: 47, algorithm: "RSA-2048", severity: "HIGH" },
+        { file: "auth/server.js", line: 112, algorithm: "RSA-2048", severity: "HIGH" },
+        { file: "config/tls.yaml", line: 8, algorithm: "ECDSA", severity: "HIGH" },
+        { file: "scada/gateway.py", line: 203, algorithm: "RSA-4096", severity: "HIGH" },
+        { file: "utils/hash.py", line: 15, algorithm: "MD5", severity: "MEDIUM" },
+        { file: "api/client.js", line: 88, algorithm: "ECDSA", severity: "HIGH" },
+        { file: "db/backup.py", line: 34, algorithm: "RSA-2048", severity: "HIGH" },
+        { file: "core/crypto.py", line: 12, algorithm: "MD5", severity: "LOW" }
+      ];
+    }
+
+    function calculateRiskScore(findings) {
+      findings = findings || getFindings();
+      var high = 0;
+      var medium = 0;
+      for (var i = 0; i < findings.length; i++) {
+        if (findings[i].severity === "HIGH") high++;
+        else if (findings[i].severity === "MEDIUM") medium++;
+      }
+      var score = Math.min(100, (high * 15) + (medium * 5));
+      var severity = "LOW";
+      if (score > 80) severity = "CRITICAL";
+      else if (score > 60) severity = "HIGH";
+      else if (score > 30) severity = "MEDIUM";
+
+      if (isLocalStorageAvailable()) {
+        localStorage.setItem("riskScore", score);
+        localStorage.setItem("riskSeverity", severity);
+      }
+      return { score: score, severity: severity };
+    }
+
+    function renderMetrics(score, severity, findings) {
+      findings = findings || getFindings();
+      var riskScoreEl = document.getElementById("riskScore");
+      if (riskScoreEl) riskScoreEl.textContent = score;
+
+      var riskBadgeEl = document.getElementById("riskBadge");
+      if (riskBadgeEl) {
+        riskBadgeEl.textContent = severity;
+        riskBadgeEl.className = "badge " + (severity === "CRITICAL" ? "critical" : severity.toLowerCase());
+      }
+
+      var uniqueAlgos = {};
+      var highCount = 0;
+      for (var i = 0; i < findings.length; i++) {
+        uniqueAlgos[findings[i].algorithm] = true;
+        if (findings[i].severity === "HIGH") highCount++;
+      }
+      var algoKeys = Object.keys(uniqueAlgos);
+
+      var algoCountEl = document.getElementById("algoCount");
+      if (algoCountEl) algoCountEl.textContent = algoKeys.length;
+
+      var criticalCountEl = document.getElementById("criticalCount");
+      if (criticalCountEl) criticalCountEl.textContent = highCount;
+    }
+
+    function renderAlgorithmChart(findings) {
+      var chart = document.getElementById("algorithmChart");
+      if (!chart) return;
+      chart.innerHTML = "";
+
+      findings = findings || getFindings();
+      var counts = {};
+      for (var i = 0; i < findings.length; i++) {
+        var a = findings[i].algorithm;
+        counts[a] = (counts[a] || 0) + 1;
+      }
+
+      var algos = Object.keys(counts);
+      var maxCount = 0;
+      algos.forEach(function (k) { if (counts[k] > maxCount) maxCount = counts[k]; });
+
+      algos.forEach(function (algo) {
+        var count = counts[algo];
+        var row = document.createElement("div");
+        row.className = "algo-bar-row";
+
+        var label = document.createElement("div");
+        label.className = "algo-bar-label";
+        label.textContent = algo;
+
+        var track = document.createElement("div");
+        track.className = "algo-bar-track";
+
+        var fill = document.createElement("div");
+        fill.className = "algo-bar-fill";
+        var pct = maxCount > 0 ? (count / maxCount) * 100 : 0;
+        fill.style.width = pct + "%";
+        track.appendChild(fill);
+
+        var countDiv = document.createElement("div");
+        countDiv.className = "algo-bar-count";
+        countDiv.textContent = count + " occurrence" + (count === 1 ? "" : "s");
+
+        row.appendChild(label);
+        row.appendChild(track);
+        row.appendChild(countDiv);
+        chart.appendChild(row);
+      });
+    }
+
+    function renderFindingsTable(findings) {
+      var tbody = document.getElementById("findingsBody");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      findings = findings || getFindings();
+
+      findings.forEach(function (f) {
+        var tr = document.createElement("tr");
+
+        var tdFile = document.createElement("td");
+        tdFile.style.fontFamily = "ui-monospace, monospace";
+        tdFile.textContent = f.file;
+
+        var tdLine = document.createElement("td");
+        tdLine.style.color = "var(--gray)";
+        tdLine.textContent = f.line;
+
+        var tdAlgo = document.createElement("td");
+        tdAlgo.style.fontWeight = "600";
+        tdAlgo.textContent = f.algorithm;
+
+        var tdSev = document.createElement("td");
+        var badge = document.createElement("span");
+        badge.className = "badge badge-" + f.severity;
+        badge.textContent = f.severity;
+        tdSev.appendChild(badge);
+
+        tr.appendChild(tdFile);
+        tr.appendChild(tdLine);
+        tr.appendChild(tdAlgo);
+        tr.appendChild(tdSev);
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderRecommendations() {
+      var container = document.getElementById("recommendations");
+      if (!container) return;
+      container.innerHTML = "";
+
+      var recs = [
+        { current: "RSA-2048", replacement: "ML-KEM (FIPS 203)", note: "for key exchange" },
+        { current: "RSA-2048", replacement: "ML-DSA (FIPS 204)", note: "for signatures" },
+        { current: "RSA-4096", replacement: "ML-DSA (FIPS 204)", note: "for Root CA signing" },
+        { current: "ECDSA", replacement: "ML-DSA (FIPS 204)", note: "or SLH-DSA (FIPS 205)" },
+        { current: "MD5", replacement: "SHA-3", note: "or SHA-256" }
+      ];
+
+      recs.forEach(function (r) {
+        var row = document.createElement("div");
+        row.className = "recommendation-row";
+
+        var currentSpan = document.createElement("span");
+        currentSpan.className = "rec-current";
+        currentSpan.textContent = r.current;
+
+        var arrowSpan = document.createElement("span");
+        arrowSpan.className = "rec-arrow";
+        arrowSpan.textContent = "→";
+
+        var replSpan = document.createElement("span");
+        replSpan.className = "rec-replacement";
+        replSpan.textContent = r.replacement;
+
+        var noteSpan = document.createElement("span");
+        noteSpan.className = "rec-note";
+        noteSpan.textContent = "(" + r.note + ")";
+
+        row.appendChild(currentSpan);
+        row.appendChild(arrowSpan);
+        row.appendChild(replSpan);
+        row.appendChild(noteSpan);
+        container.appendChild(row);
+      });
+    }
+
+    function navigateToPage3() {
+      if (isLocalStorageAvailable()) {
+        localStorage.setItem("scanPath", currentScanPath);
+        localStorage.setItem("riskScore", currentRiskScore);
+        localStorage.setItem("riskSeverity", currentRiskSeverity);
+      }
+      window.location.href = "page3.html";
+    }
+    window.navigateToPage3 = navigateToPage3;
+
+    window.addEventListener("load", init);
+  </script>
+</body>
+</html>

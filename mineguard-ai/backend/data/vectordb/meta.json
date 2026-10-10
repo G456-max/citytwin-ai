@@ -1,0 +1,6 @@
+{
+  "dimension": 256,
+  "total_chunks": 44,
+  "backend": "numpy_fallback",
+  "saved_at": "2026-10-09T12:04:24.408930"
+}

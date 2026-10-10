@@ -1,0 +1,618 @@
+[
+  {
+    "chunk_id": "nist-fips-203-chunk-001",
+    "text": "NIST FIPS 203: MODULE-LATTICE-BASED KEY-ENCAPSULATION MECHANISM STANDARD (ML-KEM)\nPublished: August 13, 2024. U.S. National Institute of Standards and Technology.",
+    "metadata": {
+      "source_id": "nist-fips-203",
+      "source_title": "NIST FIPS 203: Module-Lattice-Based Key-Encapsulation Mechanism Standard (ML-KEM)",
+      "source_url": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf",
+      "category": "NIST",
+      "year": 2024,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 1,
+      "character_count": 162
+    }
+  },
+  {
+    "chunk_id": "nist-fips-203-chunk-002",
+    "text": "NIST FIPS 203: MODULE-LATTICE-BASED KEY-ENCAPSULATION MECHANISM STANDARD (ML-KEM)\nPublished: August 13, 2024. U.S. National Institute of Standards and Technology.\n1. OVERVIEW AND PURPOSE\nFederal Information Processing Standard (FIPS) 203 specifies the Module-Lattice-Based Key-Encapsulation Mechanism (ML-KEM). ML-KEM is designed to protect sensitive electronic data against both classical and quantum computing adversaries. It replaces classical key agreement protocols, including Diffie-Hellman (DH), Elliptic Curve Diffie-Hellman (ECDH), and RSA key encapsulation.",
+    "metadata": {
+      "source_id": "nist-fips-203",
+      "source_title": "NIST FIPS 203: Module-Lattice-Based Key-Encapsulation Mechanism Standard (ML-KEM)",
+      "source_url": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf",
+      "category": "NIST",
+      "year": 2024,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 2,
+      "character_count": 567
+    }
+  },
+  {
+    "chunk_id": "nist-fips-203-chunk-003",
+    "text": "1. OVERVIEW AND PURPOSE\nFederal Information Processing Standard (FIPS) 203 specifies the Module-Lattice-Based Key-Encapsulation Mechanism (ML-KEM). ML-KEM is designed to protect sensitive electronic data against both classical and quantum computing adversaries. It replaces classical key agreement protocols, including Diffie-Hellman (DH), Elliptic Curve Diffie-Hellman (ECDH), and RSA key encapsulation.\n2. CRYPTOGRAPHIC FOUNDATION\nML-KEM is mathematically grounded in the hardness of the Module Learning With Errors (M-LWE) problem over structured polynomial rings. M-LWE is conjectured to be resistant to polynomial-time quantum algorithms, including Shor's algorithm, which polynomial-solves discrete logarithms and integer factorization.",
+    "metadata": {
+      "source_id": "nist-fips-203",
+      "source_title": "NIST FIPS 203: Module-Lattice-Based Key-Encapsulation Mechanism Standard (ML-KEM)",
+      "source_url": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf",
+      "category": "NIST",
+      "year": 2024,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 3,
+      "character_count": 742
+    }
+  },
+  {
+    "chunk_id": "nist-fips-203-chunk-004",
+    "text": "2. CRYPTOGRAPHIC FOUNDATION\nML-KEM is mathematically grounded in the hardness of the Module Learning With Errors (M-LWE) problem over structured polynomial rings. M-LWE is conjectured to be resistant to polynomial-time quantum algorithms, including Shor's algorithm, which polynomial-solves discrete logarithms and integer factorization.\n3.",
+    "metadata": {
+      "source_id": "nist-fips-203",
+      "source_title": "NIST FIPS 203: Module-Lattice-Based Key-Encapsulation Mechanism Standard (ML-KEM)",
+      "source_url": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf",
+      "category": "NIST",
+      "year": 2024,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 4,
+      "character_count": 340
+    }
+  },
+  {
+    "chunk_id": "nist-fips-203-chunk-005",
+    "text": "3.\nPARAMETER SETS AND SECURITY CATEGORIES\nNIST defines three primary parameter sets:\n- ML-KEM-512: NIST Security Category 1 (equivalent classical brute-force security to AES-128).\nPublic key size: 800 bytes; Ciphertext size: 768 bytes; Shared secret: 32 bytes.\n- ML-KEM-768: NIST Security Category 3 (equivalent classical brute-force security to AES-192).\nPublic key size: 1,184 bytes; Ciphertext size: 1,088 bytes; Shared secret: 32 bytes.",
+    "metadata": {
+      "source_id": "nist-fips-203",
+      "source_title": "NIST FIPS 203: Module-Lattice-Based Key-Encapsulation Mechanism Standard (ML-KEM)",
+      "source_url": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf",
+      "category": "NIST",
+      "year": 2024,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 5,
+      "character_count": 440
+    }
+  },
+  {
+    "chunk_id": "nist-fips-203-chunk-006",
+    "text": "Public key size: 1,184 bytes; Ciphertext size: 1,088 bytes; Shared secret: 32 bytes.\nRecommended for general enterprise and industrial applications.\n- ML-KEM-1024: NIST Security Category 5 (equivalent classical brute-force security to AES-256).\nPublic key size: 1,568 bytes; Ciphertext size: 1,568 bytes; Shared secret: 32 bytes.\nRecommended for national security and ultra-critical safety systems.",
+    "metadata": {
+      "source_id": "nist-fips-203",
+      "source_title": "NIST FIPS 203: Module-Lattice-Based Key-Encapsulation Mechanism Standard (ML-KEM)",
+      "source_url": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf",
+      "category": "NIST",
+      "year": 2024,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 6,
+      "character_count": 398
+    }
+  },
+  {
+    "chunk_id": "nist-fips-203-chunk-007",
+    "text": "Recommended for national security and ultra-critical safety systems.\n4. MIGRATION AND HYBRID DEPLOYMENT\nNIST explicitly endorses hybrid key exchange during the transition window, combining ML-KEM-768 with classical ECDH (such as X25519). A hybrid mechanism ensures that data remains secure as long as either the classical or post-quantum primitive remains unbroken.",
+    "metadata": {
+      "source_id": "nist-fips-203",
+      "source_title": "NIST FIPS 203: Module-Lattice-Based Key-Encapsulation Mechanism Standard (ML-KEM)",
+      "source_url": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf",
+      "category": "NIST",
+      "year": 2024,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 7,
+      "character_count": 365
+    }
+  },
+  {
+    "chunk_id": "nist-fips-204-chunk-001",
+    "text": "NIST FIPS 204: MODULE-LATTICE-BASED DIGITAL SIGNATURE STANDARD (ML-DSA)\nPublished: August 13, 2024. U.S. National Institute of Standards and Technology.\n1. OVERVIEW AND PURPOSE\nFIPS 204 specifies the Module-Lattice-Based Digital Signature Algorithm (ML-DSA), derived from the CRYSTALS-Dilithium algorithm. It is the primary post-quantum digital signature standard for identity verification, Public Key Infrastructure (PKI), TLS certificates, VPN handshakes, and digitally signed transactions.",
+    "metadata": {
+      "source_id": "nist-fips-204",
+      "source_title": "NIST FIPS 204: Module-Lattice-Based Digital Signature Standard (ML-DSA)",
+      "source_url": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.204.pdf",
+      "category": "NIST",
+      "year": 2024,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 1,
+      "character_count": 492
+    }
+  },
+  {
+    "chunk_id": "nist-fips-204-chunk-002",
+    "text": "1. OVERVIEW AND PURPOSE\nFIPS 204 specifies the Module-Lattice-Based Digital Signature Algorithm (ML-DSA), derived from the CRYSTALS-Dilithium algorithm. It is the primary post-quantum digital signature standard for identity verification, Public Key Infrastructure (PKI), TLS certificates, VPN handshakes, and digitally signed transactions.\n2. MATHEMATICAL UNDERPINNINGS\nML-DSA relies on the hardness of the Module Short Integer Solution (M-SIS) and Module Learning With Errors (M-LWE) problems in module lattices. Classical signature algorithms like RSA (PKCS#1 v1.5, PSS) and ECDSA (secp256r1, secp384r1) are completely vulnerable to polynomial-time factorization and discrete log cracking via Shor's algorithm on a Cryptanalytically Relevant Quantum Computer (CRQC).",
+    "metadata": {
+      "source_id": "nist-fips-204",
+      "source_title": "NIST FIPS 204: Module-Lattice-Based Digital Signature Standard (ML-DSA)",
+      "source_url": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.204.pdf",
+      "category": "NIST",
+      "year": 2024,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 2,
+      "character_count": 768
+    }
+  },
+  {
+    "chunk_id": "nist-fips-204-chunk-003",
+    "text": "2. MATHEMATICAL UNDERPINNINGS\nML-DSA relies on the hardness of the Module Short Integer Solution (M-SIS) and Module Learning With Errors (M-LWE) problems in module lattices. Classical signature algorithms like RSA (PKCS#1 v1.5, PSS) and ECDSA (secp256r1, secp384r1) are completely vulnerable to polynomial-time factorization and discrete log cracking via Shor's algorithm on a Cryptanalytically Relevant Quantum Computer (CRQC).\n3. PARAMETER SETS\n- ML-DSA-44: Security Category 2. Public key: 1,312 bytes; Signature: 2,420 bytes.\n- ML-DSA-65: Security Category 3. Public key: 1,952 bytes; Signature: 3,309 bytes. General-purpose standard for root CAs, leaf certificates, and industrial authentication gateways.\n- ML-DSA-87: Security Category 5. Public key: 2,592 bytes; Signature: 4,627 bytes. Highest assurance level, mandatory for top-tier root trust anchors and safety interlock signing.",
+    "metadata": {
+      "source_id": "nist-fips-204",
+      "source_title": "NIST FIPS 204: Module-Lattice-Based Digital Signature Standard (ML-DSA)",
+      "source_url": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.204.pdf",
+      "category": "NIST",
+      "year": 2024,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 3,
+      "character_count": 890
+    }
+  },
+  {
+    "chunk_id": "nist-fips-204-chunk-004",
+    "text": "3. PARAMETER SETS\n- ML-DSA-44: Security Category 2. Public key: 1,312 bytes; Signature: 2,420 bytes.\n- ML-DSA-65: Security Category 3. Public key: 1,952 bytes; Signature: 3,309 bytes. General-purpose standard for root CAs, leaf certificates, and industrial authentication gateways.\n- ML-DSA-87: Security Category 5. Public key: 2,592 bytes; Signature: 4,627 bytes. Highest assurance level, mandatory for top-tier root trust anchors and safety interlock signing.\n4. OPERATIONAL CONSIDERATIONS\nBecause ML-DSA public keys and signatures are substantially larger than classical RSA-2048 or ECDSA signatures, network MTU limits, fragmentation in industrial protocols (Modbus/TCP, CIP, DNP3), and embedded RAM constraints must be accommodated during engineering migrations.",
+    "metadata": {
+      "source_id": "nist-fips-204",
+      "source_title": "NIST FIPS 204: Module-Lattice-Based Digital Signature Standard (ML-DSA)",
+      "source_url": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.204.pdf",
+      "category": "NIST",
+      "year": 2024,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 4,
+      "character_count": 767
+    }
+  },
+  {
+    "chunk_id": "nist-fips-205-chunk-001",
+    "text": "NIST FIPS 205: STATELESS HASH-BASED DIGITAL SIGNATURE STANDARD (SLH-DSA)\nPublished: August 13, 2024. U.S. National Institute of Standards and Technology.\n1. OVERVIEW AND PURPOSE\nFIPS 205 specifies the Stateless Hash-Based Digital Signature Algorithm (SLH-DSA), derived from SPHINCS+. Unlike lattice-based schemes, SLH-DSA relies solely on the security properties of standard cryptographic hash functions (such as SHA-256 and SHAKE-256).",
+    "metadata": {
+      "source_id": "nist-fips-205",
+      "source_title": "NIST FIPS 205: Stateless Hash-Based Digital Signature Standard (SLH-DSA)",
+      "source_url": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.205.pdf",
+      "category": "NIST",
+      "year": 2024,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 1,
+      "character_count": 436
+    }
+  },
+  {
+    "chunk_id": "nist-fips-205-chunk-002",
+    "text": "1. OVERVIEW AND PURPOSE\nFIPS 205 specifies the Stateless Hash-Based Digital Signature Algorithm (SLH-DSA), derived from SPHINCS+. Unlike lattice-based schemes, SLH-DSA relies solely on the security properties of standard cryptographic hash functions (such as SHA-256 and SHAKE-256).\n2. CRYPTOGRAPHIC PROPERTIES AND DIVERSITY\nLattice-based schemes (ML-DSA, ML-KEM) share underlying mathematical structures. If an unforeseen breakthrough in algebraic lattice reduction occurs, lattice systems could become vulnerable. SLH-DSA provides an essential non-lattice hedge. Hash functions are not susceptible to Shor's algorithm, and Grover's algorithm only provides a quadratic speedup, which is completely counterbalanced by doubling the digest size (e.g., using SHA-256 or SHA-512).",
+    "metadata": {
+      "source_id": "nist-fips-205",
+      "source_title": "NIST FIPS 205: Stateless Hash-Based Digital Signature Standard (SLH-DSA)",
+      "source_url": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.205.pdf",
+      "category": "NIST",
+      "year": 2024,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 2,
+      "character_count": 776
+    }
+  },
+  {
+    "chunk_id": "nist-fips-205-chunk-003",
+    "text": "2. CRYPTOGRAPHIC PROPERTIES AND DIVERSITY\nLattice-based schemes (ML-DSA, ML-KEM) share underlying mathematical structures. If an unforeseen breakthrough in algebraic lattice reduction occurs, lattice systems could become vulnerable. SLH-DSA provides an essential non-lattice hedge. Hash functions are not susceptible to Shor's algorithm, and Grover's algorithm only provides a quadratic speedup, which is completely counterbalanced by doubling the digest size (e.g., using SHA-256 or SHA-512).\n3.",
+    "metadata": {
+      "source_id": "nist-fips-205",
+      "source_title": "NIST FIPS 205: Stateless Hash-Based Digital Signature Standard (SLH-DSA)",
+      "source_url": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.205.pdf",
+      "category": "NIST",
+      "year": 2024,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 3,
+      "character_count": 496
+    }
+  },
+  {
+    "chunk_id": "nist-fips-205-chunk-004",
+    "text": "3.\nPARAMETER SETS AND TRADEOFFS\nSLH-DSA parameter sets offer varying tradeoffs between verification speed and signature size:\n- SLH-DSA-SHA2-128s / SLH-DSA-SHAKE-128s: Small signatures (~7,856 bytes), slower signing.\n- SLH-DSA-SHA2-128f / SLH-DSA-SHAKE-128f: Faster signing, larger signatures (~17,088 bytes).\n- SLH-DSA-SHA2-256s / 256f: Security Category 5 for long-term critical root certificates.",
+    "metadata": {
+      "source_id": "nist-fips-205",
+      "source_title": "NIST FIPS 205: Stateless Hash-Based Digital Signature Standard (SLH-DSA)",
+      "source_url": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.205.pdf",
+      "category": "NIST",
+      "year": 2024,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 4,
+      "character_count": 399
+    }
+  },
+  {
+    "chunk_id": "nist-fips-205-chunk-005",
+    "text": "- SLH-DSA-SHA2-256s / 256f: Security Category 5 for long-term critical root certificates.\nWhile SLH-DSA signatures are larger and computationally heavier than ML-DSA, their statelessness avoids the state-synchronization vulnerabilities inherent in stateful hash schemes (LMS/XMSS).",
+    "metadata": {
+      "source_id": "nist-fips-205",
+      "source_title": "NIST FIPS 205: Stateless Hash-Based Digital Signature Standard (SLH-DSA)",
+      "source_url": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.205.pdf",
+      "category": "NIST",
+      "year": 2024,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 5,
+      "character_count": 281
+    }
+  },
+  {
+    "chunk_id": "nist-ir-8547-chunk-001",
+    "text": "NIST IR 8547: TRANSITION TO POST-QUANTUM CRYPTOGRAPHY STANDARDS\nPublished: 2024. U.S. National Institute of Standards and Technology.",
+    "metadata": {
+      "source_id": "nist-ir-8547",
+      "source_title": "NIST IR 8547: Transition to Post-Quantum Cryptography Standards",
+      "source_url": "https://csrc.nist.gov/pubs/ir/8547/ipd",
+      "category": "NIST",
+      "year": 2024,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 1,
+      "character_count": 133
+    }
+  },
+  {
+    "chunk_id": "nist-ir-8547-chunk-002",
+    "text": "NIST IR 8547: TRANSITION TO POST-QUANTUM CRYPTOGRAPHY STANDARDS\nPublished: 2024. U.S. National Institute of Standards and Technology.\n1. EXECUTIVE SUMMARY & TRANSITION TIMELINES\nNIST Interagency Report (IR) 8547 outlines federal guidelines for transitioning from classical public-key cryptography to post-quantum standards. Legacy algorithms vulnerable to Shor's algorithm include:\n- Factoring: RSA-2048, RSA-3072, RSA-4096.\n- Discrete Logarithms: DSA, Diffie-Hellman (DH).\n- Elliptic Curves: ECDSA, ECDH across all standard Weierstrass and Edwards curves (secp256r1, Ed25519).",
+    "metadata": {
+      "source_id": "nist-ir-8547",
+      "source_title": "NIST IR 8547: Transition to Post-Quantum Cryptography Standards",
+      "source_url": "https://csrc.nist.gov/pubs/ir/8547/ipd",
+      "category": "NIST",
+      "year": 2024,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 2,
+      "character_count": 577
+    }
+  },
+  {
+    "chunk_id": "nist-ir-8547-chunk-003",
+    "text": "1. EXECUTIVE SUMMARY & TRANSITION TIMELINES\nNIST Interagency Report (IR) 8547 outlines federal guidelines for transitioning from classical public-key cryptography to post-quantum standards. Legacy algorithms vulnerable to Shor's algorithm include:\n- Factoring: RSA-2048, RSA-3072, RSA-4096.\n- Discrete Logarithms: DSA, Diffie-Hellman (DH).\n- Elliptic Curves: ECDSA, ECDH across all standard Weierstrass and Edwards curves (secp256r1, Ed25519).\n2.",
+    "metadata": {
+      "source_id": "nist-ir-8547",
+      "source_title": "NIST IR 8547: Transition to Post-Quantum Cryptography Standards",
+      "source_url": "https://csrc.nist.gov/pubs/ir/8547/ipd",
+      "category": "NIST",
+      "year": 2024,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 3,
+      "character_count": 446
+    }
+  },
+  {
+    "chunk_id": "nist-ir-8547-chunk-004",
+    "text": "2.\nDEPRECATION ROADMAP\n- 2025-2030: Disallow new deployments of classical-only public key algorithms in high-impact systems.\nImplement hybrid key exchange.\n- 2030: Deprecate RSA < 2048 and classical discrete logarithm schemes.\n- 2033: Disallow classical asymmetric cryptography across all sensitive communications and critical infrastructure.\n- 2035: Full transition to post-quantum standards (FIPS 203, FIPS 204, FIPS 205).",
+    "metadata": {
+      "source_id": "nist-ir-8547",
+      "source_title": "NIST IR 8547: Transition to Post-Quantum Cryptography Standards",
+      "source_url": "https://csrc.nist.gov/pubs/ir/8547/ipd",
+      "category": "NIST",
+      "year": 2024,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 4,
+      "character_count": 424
+    }
+  },
+  {
+    "chunk_id": "nist-ir-8547-chunk-005",
+    "text": "- 2035: Full transition to post-quantum standards (FIPS 203, FIPS 204, FIPS 205).\nAny continued reliance on classical keys requires explicit security waivers.",
+    "metadata": {
+      "source_id": "nist-ir-8547",
+      "source_title": "NIST IR 8547: Transition to Post-Quantum Cryptography Standards",
+      "source_url": "https://csrc.nist.gov/pubs/ir/8547/ipd",
+      "category": "NIST",
+      "year": 2024,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 5,
+      "character_count": 158
+    }
+  },
+  {
+    "chunk_id": "nist-ir-8547-chunk-006",
+    "text": "Any continued reliance on classical keys requires explicit security waivers.\n3. \"HARVEST NOW, DECRYPT LATER\" (HNDL) THREAT\nAdversaries actively intercept and store encrypted classical ciphertexts today. When a quantum computer emerges, these stored records will be decrypted retroactively. Systems handling data with longevity exceeding 5 to 10 years (such as mining geological surveys, SCADA telemetry, and safety logs) are at active, present-day risk.",
+    "metadata": {
+      "source_id": "nist-ir-8547",
+      "source_title": "NIST IR 8547: Transition to Post-Quantum Cryptography Standards",
+      "source_url": "https://csrc.nist.gov/pubs/ir/8547/ipd",
+      "category": "NIST",
+      "year": 2024,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 6,
+      "character_count": 453
+    }
+  },
+  {
+    "chunk_id": "nist-sp-800-208-chunk-001",
+    "text": "NIST SP 800-208: RECOMMENDATION FOR STATEFUL HASH-BASED SIGNATURE SCHEMES\nPublished: October 2020. NIST Special Publication.",
+    "metadata": {
+      "source_id": "nist-sp-800-208",
+      "source_title": "NIST SP 800-208: Recommendation for Stateful Hash-Based Signature Schemes",
+      "source_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-208.pdf",
+      "category": "NIST",
+      "year": 2020,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 1,
+      "character_count": 124
+    }
+  },
+  {
+    "chunk_id": "nist-sp-800-208-chunk-002",
+    "text": "NIST SP 800-208: RECOMMENDATION FOR STATEFUL HASH-BASED SIGNATURE SCHEMES\nPublished: October 2020. NIST Special Publication.\n1. SCOPE AND INDUSTRIAL APPLICATION\nNIST SP 800-208 approves stateful hash-based signature algorithms LMS (Leighton-Micali Signatures) and XMSS (eXtended Merkle Signature Scheme) for restricted operational environments. These environments include code signing, firmware validation in Industrial Internet of Things (IIoT), Programmable Logic Controllers (PLCs), and safety-critical embedded systems.",
+    "metadata": {
+      "source_id": "nist-sp-800-208",
+      "source_title": "NIST SP 800-208: Recommendation for Stateful Hash-Based Signature Schemes",
+      "source_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-208.pdf",
+      "category": "NIST",
+      "year": 2020,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 2,
+      "character_count": 523
+    }
+  },
+  {
+    "chunk_id": "nist-sp-800-208-chunk-003",
+    "text": "1. SCOPE AND INDUSTRIAL APPLICATION\nNIST SP 800-208 approves stateful hash-based signature algorithms LMS (Leighton-Micali Signatures) and XMSS (eXtended Merkle Signature Scheme) for restricted operational environments. These environments include code signing, firmware validation in Industrial Internet of Things (IIoT), Programmable Logic Controllers (PLCs), and safety-critical embedded systems.\n2. STATE MANAGEMENT HAZARD\nUnlike traditional signatures, stateful hash signatures consume one-time signing keys. Reusing a one-time signing key catastrophically compromises the entire signing tree. Therefore, SP 800-208 mandates that private keys MUST be maintained in certified Hardware Security Modules (HSMs) that guarantee atomic non-volatile state increments. Stateful signatures MUST NOT be used for general-purpose applications like web server TLS or dynamic messaging.",
+    "metadata": {
+      "source_id": "nist-sp-800-208",
+      "source_title": "NIST SP 800-208: Recommendation for Stateful Hash-Based Signature Schemes",
+      "source_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-208.pdf",
+      "category": "NIST",
+      "year": 2020,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 3,
+      "character_count": 876
+    }
+  },
+  {
+    "chunk_id": "enisa-pqc-2024-chunk-001",
+    "text": "ENISA POST-QUANTUM CRYPTOGRAPHY REPORT (2024)\nEuropean Union Agency for Cybersecurity.\n1. CRITICAL INFRASTRUCTURE FOCUS\nThe European Union Agency for Cybersecurity evaluates quantum vulnerabilities across operational technology (OT) and SCADA environments. Industrial installations\u2014such as power grids, mining ventilation, automated haulage systems, and chemical processing\u2014rely heavily on long-lived hardware with update cycles exceeding 15 to 25 years.\n2.",
+    "metadata": {
+      "source_id": "enisa-pqc-2024",
+      "source_title": "ENISA Post-Quantum Cryptography Report: Current State and Deployment Guidelines",
+      "source_url": "https://www.enisa.europa.eu/publications/post-quantum-cryptography-current-state-and-quantum-mitigation",
+      "category": "ENISA",
+      "year": 2024,
+      "license": "Open Access / European Union (reuse authorised)",
+      "chunk_index": 1,
+      "character_count": 457
+    }
+  },
+  {
+    "chunk_id": "enisa-pqc-2024-chunk-002",
+    "text": "2.\nMIGRATION ROADMAP FOR INDUSTRIAL OT\n- Cryptographic Inventory: Operators must generate comprehensive Cryptographic Bills of Materials (CBOMs) mapping all root CAs, leaf certificates, VPN tunnels, and Modbus/CIP communication paths.\n- Hybrid Key Exchange: Transition to X25519/ML-KEM-768 hybrid tunnels to maintain compliance with existing OT equipment while securing against quantum adversaries.",
+    "metadata": {
+      "source_id": "enisa-pqc-2024",
+      "source_title": "ENISA Post-Quantum Cryptography Report: Current State and Deployment Guidelines",
+      "source_url": "https://www.enisa.europa.eu/publications/post-quantum-cryptography-current-state-and-quantum-mitigation",
+      "category": "ENISA",
+      "year": 2024,
+      "license": "Open Access / European Union (reuse authorised)",
+      "chunk_index": 2,
+      "character_count": 398
+    }
+  },
+  {
+    "chunk_id": "enisa-pqc-2024-chunk-003",
+    "text": "- Hybrid Key Exchange: Transition to X25519/ML-KEM-768 hybrid tunnels to maintain compliance with existing OT equipment while securing against quantum adversaries.\n- Hardware Crypto-Agility: PLCs and Remote Terminal Units (RTUs) must be evaluated for crypto-agility to determine if firmware updates can accommodate ML-KEM and ML-DSA key and signature sizes.",
+    "metadata": {
+      "source_id": "enisa-pqc-2024",
+      "source_title": "ENISA Post-Quantum Cryptography Report: Current State and Deployment Guidelines",
+      "source_url": "https://www.enisa.europa.eu/publications/post-quantum-cryptography-current-state-and-quantum-mitigation",
+      "category": "ENISA",
+      "year": 2024,
+      "license": "Open Access / European Union (reuse authorised)",
+      "chunk_index": 3,
+      "character_count": 357
+    }
+  },
+  {
+    "chunk_id": "nsa-cnsa-2.0-chunk-001",
+    "text": "NSA COMMERCIAL NATIONAL SECURITY ALGORITHM SUITE 2.0 (CNSA 2.0)\nCybersecurity Advisory, National Security Agency (NSA).\n1.\nMANDATORY PQC TRANSITION SCHEDULE\nCNSA 2.0 establishes strict algorithmic requirements for National Security Systems (NSS) and critical infrastructure assets:\n- Software & Firmware Signing: Immediate preference for ML-DSA-87 and stateful hash signatures (LMS/XMSS).\nMandatory enforcement by 2025-2030.",
+    "metadata": {
+      "source_id": "nsa-cnsa-2.0",
+      "source_title": "NSA CNSA 2.0: Commercial National Security Algorithm Suite 2.0 Cybersecurity Advisory",
+      "source_url": "https://media.defense.gov/2022/Sep/07/2003071834/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS_.PDF",
+      "category": "Industry",
+      "year": 2022,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 1,
+      "character_count": 424
+    }
+  },
+  {
+    "chunk_id": "nsa-cnsa-2.0-chunk-002",
+    "text": "Mandatory enforcement by 2025-2030.\n- Web Browsers, Servers & Cloud Services: Full support for ML-KEM-1024 and ML-DSA-87 by 2033.\n- Traditional Networking Equipment (Routers, VPN Gateways, Firewalls): Full transition to ML-KEM and ML-DSA by 2030.\nClassical algorithms prohibited by 2033.",
+    "metadata": {
+      "source_id": "nsa-cnsa-2.0",
+      "source_title": "NSA CNSA 2.0: Commercial National Security Algorithm Suite 2.0 Cybersecurity Advisory",
+      "source_url": "https://media.defense.gov/2022/Sep/07/2003071834/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS_.PDF",
+      "category": "Industry",
+      "year": 2022,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 2,
+      "character_count": 287
+    }
+  },
+  {
+    "chunk_id": "nsa-cnsa-2.0-chunk-003",
+    "text": "Classical algorithms prohibited by 2033.\n2. APPROVED SYMMETRIC AND HASH SUITES\nCNSA 2.0 retains AES-256 as safe against quantum Grover attacks. Symmetric encryption with AES-128 is deemed insufficient for long-term security. SHA-384 and SHA-512 are required for hashing; SHA-1 and MD5 are strictly prohibited.",
+    "metadata": {
+      "source_id": "nsa-cnsa-2.0",
+      "source_title": "NSA CNSA 2.0: Commercial National Security Algorithm Suite 2.0 Cybersecurity Advisory",
+      "source_url": "https://media.defense.gov/2022/Sep/07/2003071834/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS_.PDF",
+      "category": "Industry",
+      "year": 2022,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 3,
+      "character_count": 309
+    }
+  },
+  {
+    "chunk_id": "google-qec-2024-chunk-001",
+    "text": "GOOGLE QUANTUM AI: QUANTUM ERROR CORRECTION WHITE PAPER (2024)\nGoogle Quantum AI Research Team.\n1. PROGRESSION TOWARD LOGICAL QUBITS\nThe transition from noisy intermediate-scale quantum (NISQ) processors to fault-tolerant quantum computers relies on quantum error correction (QEC). Google Quantum AI demonstrates that scaling distance-5 surface codes achieves physical error rates below the fault-tolerant threshold, with physical error suppression improving as surface code distances increase.",
+    "metadata": {
+      "source_id": "google-qec-2024",
+      "source_title": "Google Quantum AI: Quantum Error Correction and Scaling Milestones White Paper",
+      "source_url": "https://quantumai.google/research/error-correction-2024",
+      "category": "Industry",
+      "year": 2024,
+      "license": "Creative Commons Attribution 4.0",
+      "chunk_index": 1,
+      "character_count": 494
+    }
+  },
+  {
+    "chunk_id": "google-qec-2024-chunk-002",
+    "text": "1. PROGRESSION TOWARD LOGICAL QUBITS\nThe transition from noisy intermediate-scale quantum (NISQ) processors to fault-tolerant quantum computers relies on quantum error correction (QEC). Google Quantum AI demonstrates that scaling distance-5 surface codes achieves physical error rates below the fault-tolerant threshold, with physical error suppression improving as surface code distances increase.\n2. THE CRQC TIMELINE\nA Cryptanalytically Relevant Quantum Computer (CRQC) requires approximately 10,000 to 20,000 physical qubits per logical qubit to execute Shor's algorithm on RSA-2048 or ECDSA-256. At current hardware scaling trajectories, expert consensus estimates a non-negligible probability (10-30%) of CRQC availability between 2029 and 2033, accelerating the necessity for proactive cryptographic migration today.",
+    "metadata": {
+      "source_id": "google-qec-2024",
+      "source_title": "Google Quantum AI: Quantum Error Correction and Scaling Milestones White Paper",
+      "source_url": "https://quantumai.google/research/error-correction-2024",
+      "category": "Industry",
+      "year": 2024,
+      "license": "Creative Commons Attribution 4.0",
+      "chunk_index": 2,
+      "character_count": 823
+    }
+  },
+  {
+    "chunk_id": "mosca-inequality-chunk-001",
+    "text": "MOSCA'S THEOREM: QUANTUM RISK HORIZON AND THEOREM OF SHELF-LIFE INEQUALITY\nDr. Michele Mosca, Institute for Quantum Computing.\n1. THE FUNDAMENTAL THEOREM\nLet:\n- X = The security shelf-life of the data (number of years the data must remain confidential).\n- Y = The migration time (number of years required to re-engineer, test, and deploy post-quantum systems).\n- Z = The time until a quantum computer capable of breaking classical algorithms is built (Q-Day horizon).",
+    "metadata": {
+      "source_id": "mosca-inequality",
+      "source_title": "Mosca's Theorem: Quantum Risk Horizon and Data Shelf-Life Inequality",
+      "source_url": "https://eprint.iacr.org/2015/1018",
+      "category": "Academic",
+      "year": 2015,
+      "license": "Open Academic Archive (IACR)",
+      "chunk_index": 1,
+      "character_count": 467
+    }
+  },
+  {
+    "chunk_id": "mosca-inequality-chunk-002",
+    "text": "1. THE FUNDAMENTAL THEOREM\nLet:\n- X = The security shelf-life of the data (number of years the data must remain confidential).\n- Y = The migration time (number of years required to re-engineer, test, and deploy post-quantum systems).\n- Z = The time until a quantum computer capable of breaking classical algorithms is built (Q-Day horizon).\n2. THE THEOREM INEQUALITY\nIf X + Y > Z, then an organization's systems are ALREADY vulnerable to catastrophic compromise.\nEven if a quantum computer will not exist for 8 years (Z = 8), if critical mine geological data must remain confidential for 10 years (X = 10) and migration takes 3 years (Y = 3), then X + Y = 13 > 8. The data harvested today under \"Harvest Now, Decrypt Later\" will be exposed within its required confidentiality lifespan.",
+    "metadata": {
+      "source_id": "mosca-inequality",
+      "source_title": "Mosca's Theorem: Quantum Risk Horizon and Data Shelf-Life Inequality",
+      "source_url": "https://eprint.iacr.org/2015/1018",
+      "category": "Academic",
+      "year": 2015,
+      "license": "Open Academic Archive (IACR)",
+      "chunk_index": 2,
+      "character_count": 785
+    }
+  },
+  {
+    "chunk_id": "cyclonedx-1.7-cbom-chunk-001",
+    "text": "CYCLONEDX 1.7 CRYPTOGRAPHIC BILL OF MATERIALS (CBOM) SPECIFICATION\nOWASP Foundation / CycloneDX Working Group.\n1.\nSCHEMA ARCHITECTURE FOR CRYPTOGRAPHIC ASSETS\nCycloneDX 1.7 introduces first-class representation for Cryptographic Bills of Materials (CBOM).\nA CBOM provides automated, machine-readable transparency into:\n- Cryptographic Assets: Algorithms, cipher suites, private/public keys, certificates, protocols, and hardware tokens.",
+    "metadata": {
+      "source_id": "cyclonedx-1.7-cbom",
+      "source_title": "CycloneDX 1.7 Cryptographic Bill of Materials (CBOM) Specification",
+      "source_url": "https://cyclonedx.org/capabilities/cbom/",
+      "category": "Standards",
+      "year": 2024,
+      "license": "Apache License 2.0",
+      "chunk_index": 1,
+      "character_count": 436
+    }
+  },
+  {
+    "chunk_id": "cyclonedx-1.7-cbom-chunk-002",
+    "text": "A CBOM provides automated, machine-readable transparency into:\n- Cryptographic Assets: Algorithms, cipher suites, private/public keys, certificates, protocols, and hardware tokens.\n- Quantum Vulnerability Metadata: Flags classifying algorithms as \"quantum-vulnerable\", \"classical-safe\", or \"post-quantum-secure\".\n- Parameter Specifications: Modulus size, curve identifier, security strength in bits, execution mode, and implementation dependencies.",
+    "metadata": {
+      "source_id": "cyclonedx-1.7-cbom",
+      "source_title": "CycloneDX 1.7 Cryptographic Bill of Materials (CBOM) Specification",
+      "source_url": "https://cyclonedx.org/capabilities/cbom/",
+      "category": "Standards",
+      "year": 2024,
+      "license": "Apache License 2.0",
+      "chunk_index": 2,
+      "character_count": 448
+    }
+  },
+  {
+    "chunk_id": "cyclonedx-1.7-cbom-chunk-003",
+    "text": "- Parameter Specifications: Modulus size, curve identifier, security strength in bits, execution mode, and implementation dependencies.\n2. INTEROPERABILITY AND AUTOMATION\nCBOMs formatted in CycloneDX 1.7 enable automated vulnerability scanners and risk cascading engines to ingest software and firmware inventories, map them to NIST FIPS 203/204/205 equivalents, and compute algorithmic deprecation metrics.",
+    "metadata": {
+      "source_id": "cyclonedx-1.7-cbom",
+      "source_title": "CycloneDX 1.7 Cryptographic Bill of Materials (CBOM) Specification",
+      "source_url": "https://cyclonedx.org/capabilities/cbom/",
+      "category": "Standards",
+      "year": 2024,
+      "license": "Apache License 2.0",
+      "chunk_index": 3,
+      "character_count": 407
+    }
+  },
+  {
+    "chunk_id": "nist-sp-800-57-chunk-001",
+    "text": "NIST SP 800-57 PART 1 REV 5: RECOMMENDATION FOR KEY MANAGEMENT\nU.S. National Institute of Standards and Technology.\n1.\nCRYPTOGRAPHIC SECURITY STRENGTH LEVELS\nNIST specifies security strengths measured in bits: 112 bits, 128 bits, 192 bits, and 256 bits.\n- RSA-2048 provides approximately 112 bits of security, which is disallowed for federal use post-2030.\n- RSA-3072 provides 128 bits of security.",
+    "metadata": {
+      "source_id": "nist-sp-800-57",
+      "source_title": "NIST SP 800-57 Part 1 Rev 5: Recommendation for Key Management",
+      "source_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt1r5.pdf",
+      "category": "NIST",
+      "year": 2020,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 1,
+      "character_count": 398
+    }
+  },
+  {
+    "chunk_id": "nist-sp-800-57-chunk-002",
+    "text": "- RSA-3072 provides 128 bits of security.\n- RSA-4096 provides 152 bits of security against classical attacks, but ZERO bits of security against Shor's algorithm on a quantum computer.\n- AES-128 provides 128 bits classically, reduced to ~64 bits against Grover's algorithm.\nAES-256 provides 256 bits classically, retaining 128 bits of quantum security.",
+    "metadata": {
+      "source_id": "nist-sp-800-57",
+      "source_title": "NIST SP 800-57 Part 1 Rev 5: Recommendation for Key Management",
+      "source_url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt1r5.pdf",
+      "category": "NIST",
+      "year": 2020,
+      "license": "Public Domain (U.S. Government Work)",
+      "chunk_index": 2,
+      "character_count": 351
+    }
+  },
+  {
+    "chunk_id": "rfc-8391-chunk-001",
+    "text": "RFC 8391: XMSS: EXTENDED MERKLE SIGNATURE SCHEME\nInternet Engineering Task Force (IETF).\n1.\nSTATEFUL HASH-BASED TREE ARCHITECTURE\nRFC 8391 specifies the eXtended Merkle Signature Scheme (XMSS) and multi-tree XMSS (XMSS^MT).\nIt uses Winternitz One-Time Signatures (WOTS+) combined with Merkle hash trees to construct digital signatures whose security relies strictly on second-preimage resistance of cryptographic hash functions.\n2.",
+    "metadata": {
+      "source_id": "rfc-8391",
+      "source_title": "RFC 8391: XMSS: eXtended Merkle Signature Scheme",
+      "source_url": "https://www.rfc-editor.org/rfc/rfc8391.html",
+      "category": "Standards",
+      "year": 2018,
+      "license": "IETF Trust Provisions",
+      "chunk_index": 1,
+      "character_count": 431
+    }
+  },
+  {
+    "chunk_id": "rfc-8391-chunk-002",
+    "text": "2.\nOPERATIONAL STATE CONSTRAINTS\nEvery XMSS private key has a finite signing capacity ($2^h$ signatures).\nThe signing device must persistently increment and persist the leaf index counter.\nIf an index is ever reused, an attacker can forge signatures on arbitrary messages.",
+    "metadata": {
+      "source_id": "rfc-8391",
+      "source_title": "RFC 8391: XMSS: eXtended Merkle Signature Scheme",
+      "source_url": "https://www.rfc-editor.org/rfc/rfc8391.html",
+      "category": "Standards",
+      "year": 2018,
+      "license": "IETF Trust Provisions",
+      "chunk_index": 2,
+      "character_count": 272
+    }
+  },
+  {
+    "chunk_id": "rfc-8554-chunk-001",
+    "text": "RFC 8554: LEIGHTON-MICALI HASH-BASED SIGNATURES (LMS)\nInternet Engineering Task Force (IETF).",
+    "metadata": {
+      "source_id": "rfc-8554",
+      "source_title": "RFC 8554: Leighton-Micali Hash-Based Signatures (LMS)",
+      "source_url": "https://www.rfc-editor.org/rfc/rfc8554.html",
+      "category": "Standards",
+      "year": 2019,
+      "license": "IETF Trust Provisions",
+      "chunk_index": 1,
+      "character_count": 93
+    }
+  },
+  {
+    "chunk_id": "rfc-8554-chunk-002",
+    "text": "RFC 8554: LEIGHTON-MICALI HASH-BASED SIGNATURES (LMS)\nInternet Engineering Task Force (IETF).\n1. LEIGHTON-MICALI SIGNATURE SPECIFICATION\nRFC 8554 specifies LMS and Hierarchical Signature Schemes (HSS). LMS is a stateful hash-based signature scheme using Leighton-Micali One-Time Signatures (LM-OTS) and cryptographic Merkle trees.\n2. INDUSTRIAL FIRMWARE APPLICATION\nDue to its low verification complexity and lean memory footprint, LMS is the chosen algorithm for post-quantum secure boot in safety-critical industrial controllers, mining OT interlocks, and aerospace telecommunications.",
+    "metadata": {
+      "source_id": "rfc-8554",
+      "source_title": "RFC 8554: Leighton-Micali Hash-Based Signatures (LMS)",
+      "source_url": "https://www.rfc-editor.org/rfc/rfc8554.html",
+      "category": "Standards",
+      "year": 2019,
+      "license": "IETF Trust Provisions",
+      "chunk_index": 2,
+      "character_count": 587
+    }
+  }
+]

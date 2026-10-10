@@ -1,0 +1,11 @@
+NSA COMMERCIAL NATIONAL SECURITY ALGORITHM SUITE 2.0 (CNSA 2.0)
+Cybersecurity Advisory, National Security Agency (NSA).
+
+1. MANDATORY PQC TRANSITION SCHEDULE
+CNSA 2.0 establishes strict algorithmic requirements for National Security Systems (NSS) and critical infrastructure assets:
+- Software & Firmware Signing: Immediate preference for ML-DSA-87 and stateful hash signatures (LMS/XMSS). Mandatory enforcement by 2025-2030.
+- Web Browsers, Servers & Cloud Services: Full support for ML-KEM-1024 and ML-DSA-87 by 2033.
+- Traditional Networking Equipment (Routers, VPN Gateways, Firewalls): Full transition to ML-KEM and ML-DSA by 2030. Classical algorithms prohibited by 2033.
+
+2. APPROVED SYMMETRIC AND HASH SUITES
+CNSA 2.0 retains AES-256 as safe against quantum Grover attacks. Symmetric encryption with AES-128 is deemed insufficient for long-term security. SHA-384 and SHA-512 are required for hashing; SHA-1 and MD5 are strictly prohibited.

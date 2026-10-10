@@ -1,0 +1,7 @@
+RFC 8391: XMSS: EXTENDED MERKLE SIGNATURE SCHEME
+Internet Engineering Task Force (IETF).
+
+1. STATEFUL HASH-BASED TREE ARCHITECTURE
+RFC 8391 specifies the eXtended Merkle Signature Scheme (XMSS) and multi-tree XMSS (XMSS^MT). It uses Winternitz One-Time Signatures (WOTS+) combined with Merkle hash trees to construct digital signatures whose security relies strictly on second-preimage resistance of cryptographic hash functions.
+2. OPERATIONAL STATE CONSTRAINTS
+Every XMSS private key has a finite signing capacity ($2^h$ signatures). The signing device must persistently increment and persist the leaf index counter. If an index is ever reused, an attacker can forge signatures on arbitrary messages.

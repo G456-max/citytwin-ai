@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MineGuard — Feature 1: Scanner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #111827;
+      --border: #1f2937;
+      --accent: #f59e0b;
+      --accent-red: #ef4444;
+      --accent-green: #10b981;
+      --text: #f9fafb;
+      --text-muted: #9ca3af;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: rgba(17, 24, 39, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand span {
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .badge-feature {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    main {
+      flex: 1;
+      max-width: 1000px;
+      width: 100%;
+      margin: 40px auto;
+      padding: 0 24px;
+    }
+    .hero {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .hero h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .hero p {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+    .scanner-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      margin-bottom: 32px;
+    }
+    .input-row {
+      display: flex;
+      gap: 12px;
+    }
+    input[type="text"] {
+      flex: 1;
+      background: #0d131f;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 14px 18px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: 'JetBrains Mono', monospace;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus {
+      border-color: var(--accent);
+    }
+    .btn-scan {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #000;
+      border: none;
+      padding: 0 28px;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-scan:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+    }
+    .results-container {
+      display: none;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .risk-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 18px 24px;
+      border-radius: 10px;
+      margin-bottom: 24px;
+    }
+    .risk-score-display {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .risk-val {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--accent-red);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .risk-tag {
+      background: var(--accent-red);
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .table-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th {
+      background: #0d131f;
+      padding: 14px 18px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 14px 18px;
+      border-bottom: 1px solid #1a2234;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    tr:last-child td { border-bottom: none; }
+    .badge-algo {
+      background: rgba(245, 158, 11, 0.12);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .badge-high {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .badge-medium {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .action-bar {
+      display: flex;
+      justify-content: flex-end;
+    }
+    .btn-next {
+      background: #2563eb;
+      color: #fff;
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s;
+    }
+    .btn-next:hover {
+      background: #1d4ed8;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      MineGuard <span>AI</span>
+    </div>
+    <div class="badge-feature">Feature 1 of 4 • Cryptographic Scanner</div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h1>Quantum Vulnerability Scanner</h1>
+      <p>Locate quantum-compromised asymmetric ciphers (RSA, ECDSA) and weak digests (MD5) across OT codebases.</p>
+    </div>
+
+    <div class="scanner-box">
+      <div class="input-row">
+        <input type="text" id="projectPath" value="/path/to/mining-project" placeholder="Enter absolute codebase directory path...">
+        <button class="btn-scan" id="scanBtn" onclick="handleScan()">
+          <span>SCAN</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="results-container" id="resultsContainer">
+      <div class="risk-banner">
+        <div class="risk-score-display">
+          <div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 2px;">CALCULATED QUANTUM RISK</div>
+            <div class="risk-val" id="riskScore">95 / 100</div>
+          </div>
+          <span class="risk-tag" id="riskSeverity">CRITICAL</span>
+        </div>
+        <div style="color: var(--text-muted); font-size: 0.9rem;" id="findingsCountText">
+          8 vulnerabilities identified in infrastructure
+        </div>
+      </div>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>Line</th>
+              <th>Algorithm</th>
+              <th>Severity</th>
+            </tr>
+          </thead>
+          <tbody id="findingsBody">
+            <!-- Injected via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="action-bar">
+        <a href="page2.html" class="btn-next">
+          Feature 2: Simulate Cascade →
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <script src="api.js"></script>
+  <script>
+    async function handleScan() {
+      const btn = document.getElementById('scanBtn');
+      const pathInput = document.getElementById('projectPath').value;
+      btn.innerHTML = 'Scanning...';
+      btn.disabled = true;
+
+      try {
+        const data = await apiScan(pathInput);
+        renderResults(data);
+      } finally {
+        btn.innerHTML = 'SCAN';
+        btn.disabled = false;
+      }
+    }
+
+    function renderResults(data) {
+      document.getElementById('resultsContainer').style.display = 'block';
+      document.getElementById('riskScore').innerText = `${data.risk.score} / 100`;
+      document.getElementById('riskSeverity').innerText = data.risk.severity;
+      document.getElementById('findingsCountText').innerText = `${data.findings.length} vulnerabilities identified in infrastructure`;
+
+      const tbody = document.getElementById('findingsBody');
+      tbody.innerHTML = '';
+
+      data.findings.forEach(f => {
+        const row = document.createElement('tr');
+        const sevClass = f.severity === 'HIGH' ? 'badge-high' : 'badge-medium';
+        row.innerHTML = `
+          <td style="color: #60a5fa;">${f.file}</td>
+          <td>${f.line}</td>
+          <td><span class="badge-algo">${f.algorithm}</span></td>
+          <td><span class="${sevClass}">${f.severity}</span></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // Auto-run if existing scan is saved in localStorage
+    window.addEventListener('DOMContentLoaded', () => {
+      const cached = localStorage.getItem('mineguard_scan');
+      if (cached) {
+        try {
+          renderResults(JSON.parse(cached));
+        } catch (e) {}
+      }
+    });
+  </script>
+</body>
+</html>

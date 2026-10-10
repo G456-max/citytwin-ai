@@ -1,0 +1,133 @@
+{
+  "model_type": "LogisticRegression",
+  "trained_at": "2026-10-09T12:42:56.585173+00:00",
+  "n_samples": 100,
+  "feature_names": [
+    "algorithm_vulnerability",
+    "key_size_normalized",
+    "quantum_threat_type",
+    "is_asymmetric",
+    "is_hash",
+    "is_symmetric",
+    "file_is_config",
+    "file_is_code",
+    "file_is_certificate",
+    "line_density",
+    "context_has_test",
+    "context_has_prod",
+    "has_pqc_replacement",
+    "migration_complexity_score",
+    "migration_effort_normalized",
+    "urgency_score",
+    "nist_standard_priority",
+    "in_degree",
+    "out_degree",
+    "is_cascade_trigger",
+    "centrality_score",
+    "criticality_score",
+    "exposure_score",
+    "data_lifetime_normalized",
+    "mosca_gap_normalized"
+  ],
+  "metrics": {
+    "train": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "roc_auc": 1.0,
+      "confusion_matrix": [
+        [
+          25,
+          0
+        ],
+        [
+          0,
+          45
+        ]
+      ],
+      "classification_report": {
+        "0": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 25.0
+        },
+        "1": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 45.0
+        },
+        "accuracy": 1.0,
+        "macro avg": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 70.0
+        },
+        "weighted avg": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 70.0
+        }
+      }
+    },
+    "test": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "roc_auc": 1.0,
+      "confusion_matrix": [
+        [
+          7,
+          0
+        ],
+        [
+          0,
+          13
+        ]
+      ],
+      "classification_report": {
+        "0": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 7.0
+        },
+        "1": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 13.0
+        },
+        "accuracy": 1.0,
+        "macro avg": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 20.0
+        },
+        "weighted avg": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 20.0
+        }
+      }
+    }
+  },
+  "class_balance": {
+    "0": 36,
+    "1": 64
+  },
+  "label_method": "rule_based_severity",
+  "version": "1.0.0",
+  "split_sizes": {
+    "train": 70,
+    "val": 10,
+    "test": 20
+  }
+}

@@ -1,0 +1,10 @@
+ENISA POST-QUANTUM CRYPTOGRAPHY REPORT (2024)
+European Union Agency for Cybersecurity.
+
+1. CRITICAL INFRASTRUCTURE FOCUS
+The European Union Agency for Cybersecurity evaluates quantum vulnerabilities across operational technology (OT) and SCADA environments. Industrial installations—such as power grids, mining ventilation, automated haulage systems, and chemical processing—rely heavily on long-lived hardware with update cycles exceeding 15 to 25 years.
+
+2. MIGRATION ROADMAP FOR INDUSTRIAL OT
+- Cryptographic Inventory: Operators must generate comprehensive Cryptographic Bills of Materials (CBOMs) mapping all root CAs, leaf certificates, VPN tunnels, and Modbus/CIP communication paths.
+- Hybrid Key Exchange: Transition to X25519/ML-KEM-768 hybrid tunnels to maintain compliance with existing OT equipment while securing against quantum adversaries.
+- Hardware Crypto-Agility: PLCs and Remote Terminal Units (RTUs) must be evaluated for crypto-agility to determine if firmware updates can accommodate ML-KEM and ML-DSA key and signature sizes.

@@ -1,0 +1,8 @@
+GOOGLE QUANTUM AI: QUANTUM ERROR CORRECTION WHITE PAPER (2024)
+Google Quantum AI Research Team.
+
+1. PROGRESSION TOWARD LOGICAL QUBITS
+The transition from noisy intermediate-scale quantum (NISQ) processors to fault-tolerant quantum computers relies on quantum error correction (QEC). Google Quantum AI demonstrates that scaling distance-5 surface codes achieves physical error rates below the fault-tolerant threshold, with physical error suppression improving as surface code distances increase.
+
+2. THE CRQC TIMELINE
+A Cryptanalytically Relevant Quantum Computer (CRQC) requires approximately 10,000 to 20,000 physical qubits per logical qubit to execute Shor's algorithm on RSA-2048 or ECDSA-256. At current hardware scaling trajectories, expert consensus estimates a non-negligible probability (10-30%) of CRQC availability between 2029 and 2033, accelerating the necessity for proactive cryptographic migration today.

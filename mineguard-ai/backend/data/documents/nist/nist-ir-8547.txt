@@ -1,0 +1,17 @@
+NIST IR 8547: TRANSITION TO POST-QUANTUM CRYPTOGRAPHY STANDARDS
+Published: 2024. U.S. National Institute of Standards and Technology.
+
+1. EXECUTIVE SUMMARY & TRANSITION TIMELINES
+NIST Interagency Report (IR) 8547 outlines federal guidelines for transitioning from classical public-key cryptography to post-quantum standards. Legacy algorithms vulnerable to Shor's algorithm include:
+- Factoring: RSA-2048, RSA-3072, RSA-4096.
+- Discrete Logarithms: DSA, Diffie-Hellman (DH).
+- Elliptic Curves: ECDSA, ECDH across all standard Weierstrass and Edwards curves (secp256r1, Ed25519).
+
+2. DEPRECATION ROADMAP
+- 2025-2030: Disallow new deployments of classical-only public key algorithms in high-impact systems. Implement hybrid key exchange.
+- 2030: Deprecate RSA < 2048 and classical discrete logarithm schemes.
+- 2033: Disallow classical asymmetric cryptography across all sensitive communications and critical infrastructure.
+- 2035: Full transition to post-quantum standards (FIPS 203, FIPS 204, FIPS 205). Any continued reliance on classical keys requires explicit security waivers.
+
+3. "HARVEST NOW, DECRYPT LATER" (HNDL) THREAT
+Adversaries actively intercept and store encrypted classical ciphertexts today. When a quantum computer emerges, these stored records will be decrypted retroactively. Systems handling data with longevity exceeding 5 to 10 years (such as mining geological surveys, SCADA telemetry, and safety logs) are at active, present-day risk.

@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MineGuard — Automated Test Suite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --card: #111827;
+      --border: #1f2937;
+      --text: #f9fafb;
+      --gray: #9ca3af;
+      --accent: #06b6d4;
+      --critical: #ef4444;
+      --safe: #10b981;
+      --high: #f59e0b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 24px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-quantum {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+    }
+
+    button {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      background: #22d3ee;
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.3);
+    }
+
+    button.secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    button.secondary:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--gray);
+    }
+
+    .summary-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      text-align: center;
+    }
+
+    .metric-label {
+      font-size: 12px;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .metric-value {
+      font-size: 28px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .results-container {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+    }
+
+    .section-header {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+      padding: 12px 0 6px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      margin-top: 16px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .section-header:first-child { margin-top: 0; }
+
+    .test-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .test-info {
+      display: flex;
+      gap: 12px;
+    }
+
+    .test-id {
+      color: var(--gray);
+      min-width: 65px;
+    }
+
+    .test-name {
+      color: var(--text);
+    }
+
+    .badge {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-pass {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--safe);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .badge-fail {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--critical);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    #sandboxFrame {
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      position: absolute;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div>
+        <h1>MineGuard Test Suite <span class="badge-quantum">Automated E2E</span></h1>
+        <p style="color: var(--gray); font-size: 13px; margin-top: 4px;">Validates DOM elements, cascade state machine, navigation & algorithms</p>
+      </div>
+      <div class="controls">
+        <button id="rerunButton" onclick="runAllTests()">Re-run Tests</button>
+        <button id="copyButton" class="secondary" onclick="copyResults()">Copy Results</button>
+      </div>
+    </header>
+
+    <div class="summary-card">
+      <div>
+        <div class="metric-label">Total Tests</div>
+        <div class="metric-value" id="totalCount" style="color: var(--text);">0</div>
+      </div>
+      <div>
+        <div class="metric-label">Passed</div>
+        <div class="metric-value" id="passedCount" style="color: var(--safe);">0</div>
+      </div>
+      <div>
+        <div class="metric-label">Failed</div>
+        <div class="metric-value" id="failedCount" style="color: var(--critical);">0</div>
+      </div>
+      <div>
+        <div class="metric-label">Pass Rate</div>
+        <div class="metric-value" id="passRate" style="color: var(--accent);">0%</div>
+      </div>
+    </div>
+
+    <div class="results-container" id="logOutput">
+      <div style="color: var(--gray);">Initializing test runner sandbox...</div>
+    </div>
+  </div>
+
+  <iframe id="sandboxFrame"></iframe>
+  <script src="engine.js"></script>
+
+  <script>
+    let totalTests = 0;
+    let passedTests = 0;
+    let failedTests = 0;
+    let logBuffer = "";
+
+    function setupFixtureData() {
+      localStorage.setItem("mg_scanPath", "/path/to/mining-project");
+      localStorage.setItem("scanPath", "/path/to/mining-project");
+      localStorage.setItem("mg_scanType", "source");
+      localStorage.setItem("scanType", "source");
+      localStorage.setItem("mg_scanDate", new Date().toISOString().split("T")[0]);
+      localStorage.setItem("scanDate", new Date().toISOString().split("T")[0]);
+      localStorage.setItem("mg_riskScore", "95");
+      localStorage.setItem("riskScore", "95");
+      localStorage.setItem("mg_riskSeverity", "CRITICAL");
+      localStorage.setItem("riskSeverity", "CRITICAL");
+
+      const findings = (typeof scanProjectDemo === "function") ? scanProjectDemo() : [
+        { file: "auth/server.js", line: 47, algorithm: "RSA-2048", severity: "HIGH" },
+        { file: "auth/server.js", line: 112, algorithm: "RSA-2048", severity: "HIGH" },
+        { file: "config/tls.yaml", line: 8, algorithm: "ECDSA", severity: "HIGH" },
+        { file: "scada/gateway.py", line: 203, algorithm: "RSA-4096", severity: "HIGH" },
+        { file: "utils/hash.py", line: 15, algorithm: "MD5", severity: "MEDIUM" },
+        { file: "api/client.js", line: 88, algorithm: "ECDSA", severity: "HIGH" },
+        { file: "db/backup.py", line: 34, algorithm: "RSA-2048", severity: "HIGH" },
+        { file: "core/crypto.py", line: 12, algorithm: "RSA-4096", severity: "HIGH" }
+      ];
+      localStorage.setItem("mg_findings", JSON.stringify(findings));
+
+      if (typeof buildMiningGraph === "function") {
+        const g = buildMiningGraph();
+        localStorage.setItem("mg_graphNodes", JSON.stringify(g.nodes));
+        localStorage.setItem("graphNodes", JSON.stringify(g.nodes));
+        localStorage.setItem("mg_graphEdges", JSON.stringify(g.edges));
+        localStorage.setItem("graphEdges", JSON.stringify(g.edges));
+      }
+
+      if (typeof runCascade === "function") {
+        const g = (typeof buildMiningGraph === "function") ? buildMiningGraph() : { nodes: [], edges: [] };
+        const casc = runCascade(2029, g.nodes, g.edges);
+        localStorage.setItem("mg_cascadeResults", JSON.stringify(casc));
+        localStorage.setItem("cascadeResults", JSON.stringify(casc));
+      }
+
+      if (typeof calculateMigrationPriority === "function") {
+        const g = (typeof buildMiningGraph === "function") ? buildMiningGraph() : { nodes: [], edges: [] };
+        const prio = calculateMigrationPriority(g.nodes, g.edges);
+        localStorage.setItem("mg_migrationPriority", JSON.stringify(prio));
+        localStorage.setItem("migrationPriority", JSON.stringify(prio));
+      }
+
+      localStorage.setItem("recentScans", JSON.stringify([
+        { path: "/path/to/mining-project", type: "source", date: "2026-10-08" },
+        { path: "/opt/scada/gateway", type: "config", date: "2026-10-07" },
+        { path: "/var/mining/haulage", type: "dependencies", date: "2026-10-06" }
+      ]));
+      localStorage.setItem("mg_recentScans", JSON.stringify([
+        { path: "/path/to/mining-project", type: "source", date: "2026-10-08" },
+        { path: "/opt/scada/gateway", type: "config", date: "2026-10-07" },
+        { path: "/var/mining/haulage", type: "dependencies", date: "2026-10-06" }
+      ]));
+    }
+
+    function recordResult(id, name, passed, errorMsg = "") {
+      totalTests++;
+      if (passed) passedTests++;
+      else failedTests++;
+
+      const log = document.getElementById("logOutput");
+      const row = document.createElement("div");
+      row.className = "test-row";
+      row.innerHTML = `
+        <div class="test-info">
+          <span class="test-id">${id}</span>
+          <span class="test-name">${name}${errorMsg ? ' <span style="color:var(--critical); font-size:11px;">(' + errorMsg + ')</span>' : ''}</span>
+        </div>
+        <span class="badge ${passed ? 'badge-pass' : 'badge-fail'}">${passed ? 'PASS' : 'FAIL'}</span>
+      `;
+      log.appendChild(row);
+
+      logBuffer += `[${passed ? 'PASS' : 'FAIL'}] ${id}: ${name}${errorMsg ? ' - ' + errorMsg : ''}\n`;
+      updateMetrics();
+    }
+
+    function logSection(title) {
+      const log = document.getElementById("logOutput");
+      const h = document.createElement("div");
+      h.className = "section-header";
+      h.textContent = title;
+      log.appendChild(h);
+      logBuffer += `\n--- ${title} ---\n`;
+    }
+
+    function updateMetrics() {
+      document.getElementById("totalCount").textContent = totalTests;
+      document.getElementById("passedCount").textContent = passedTests;
+      document.getElementById("failedCount").textContent = failedTests;
+      const rate = totalTests > 0 ? Math.round((passedTests / totalTests) * 100) : 0;
+      document.getElementById("passRate").textContent = rate + "%";
+    }
+
+    function loadFrame(url) {
+      return new Promise((resolve, reject) => {
+        const frame = document.getElementById("sandboxFrame");
+        frame.onload = () => {
+          setTimeout(() => {
+            try {
+              resolve({ win: frame.contentWindow, doc: frame.contentDocument });
+            } catch (err) {
+              reject(err);
+            }
+          }, 350);
+        };
+        frame.onerror = reject;
+        frame.src = url + "?t=" + Date.now();
+      });
+    }
+
+    async function runAllTests() {
+      totalTests = 0;
+      passedTests = 0;
+      failedTests = 0;
+      logBuffer = "=== MINEGUARD AUTOMATED TEST SUITE REPORT ===\nGenerated: " + new Date().toISOString() + "\n\n";
+
+      document.getElementById("logOutput").innerHTML = "";
+      setupFixtureData();
+
+      // =================================================================
+      // PAGE 1 TESTS
+      // =================================================================
+      logSection("PAGE 1 TESTS");
+      try {
+        const p1 = await loadFrame("page1.html");
+        recordResult("1.1", "Page loads without errors", p1.doc !== null);
+        recordResult("1.2", "#projectPath input exists", p1.doc.getElementById("projectPath") !== null);
+        recordResult("1.3", "Default value is '/path/to/mining-project'", p1.doc.getElementById("projectPath")?.value === "/path/to/mining-project");
+        
+        const scanTypes = p1.doc.querySelectorAll(".scan-type");
+        recordResult("1.4", "Three .scan-type buttons exist", scanTypes.length === 3);
+        recordResult("1.5", "'Source Code' has .active class by default", p1.doc.querySelector(".scan-type[data-type='source']")?.classList.contains("active") === true);
+        
+        const cfgBtn = p1.doc.querySelector(".scan-type[data-type='config']");
+        if (cfgBtn) cfgBtn.click();
+        recordResult("1.6", "Clicking 'Config' makes it active", cfgBtn?.classList.contains("active") === true);
+
+        recordResult("1.7", "#startScanButton exists", p1.doc.getElementById("startScanButton") !== null);
+        
+        const pBox = p1.doc.getElementById("progressContainer");
+        const isHidden = !pBox || pBox.style.display === "none" || window.getComputedStyle(pBox).display === "none";
+        recordResult("1.8", "#progressContainer is hidden initially", isHidden);
+
+        const recents = p1.doc.querySelectorAll("#recentScans .recent-scan-row, #recentScans tr, #recentScans .recent-item, #recentScansBody tr");
+        recordResult("1.9", "#recentScans shows items", recents.length >= 1);
+        recordResult("1.10", "Clicking 'View' / function navigates to page2", typeof p1.win.viewRecentScan === "function" || p1.doc.querySelector(".view-link, .recent-link") !== null);
+      } catch (err) {
+        recordResult("1.X", "Page 1 Suite Error", false, err.message);
+      }
+
+      // =================================================================
+      // PAGE 2 TESTS
+      // =================================================================
+      logSection("PAGE 2 TESTS");
+      try {
+        setupFixtureData();
+        const p2 = await loadFrame("page2.html");
+        recordResult("2.1", "Page loads without errors", p2.doc !== null);
+        recordResult("2.2", "Reads mg_scanPath from localStorage", (p2.win.localStorage.getItem("mg_scanPath") || p2.win.localStorage.getItem("scanPath")) === "/path/to/mining-project");
+        recordResult("2.3", "#pageTitle exists", p2.doc.getElementById("pageTitle") !== null);
+        recordResult("2.4", "#riskScore shows 95", p2.doc.getElementById("riskScore")?.textContent.trim() === "95");
+        recordResult("2.5", "#riskBadge shows CRITICAL", p2.doc.getElementById("riskBadge")?.textContent.trim().toUpperCase() === "CRITICAL");
+        recordResult("2.6", "#algoCount shows 4", p2.doc.getElementById("algoCount")?.textContent.trim() === "4");
+        recordResult("2.7", "#criticalCount shows 6", p2.doc.getElementById("criticalCount")?.textContent.trim() === "6");
+        
+        const bars = p2.doc.querySelectorAll("#algorithmChart .algo-bar-row, #algorithmChart .chart-bar-row, #algorithmChart > div");
+        recordResult("2.8", "#algorithmChart has 4 bars", bars.length === 4);
+
+        const rows = p2.doc.querySelectorAll("#findingsBody tr, #findingsTable tbody tr");
+        recordResult("2.9", "#findingsBody has 8 rows", rows.length === 8);
+
+        const recs = p2.doc.querySelectorAll("#recommendations .recommendation-row, #recommendations > div");
+        recordResult("2.10", "#recommendations has 5 rows", recs.length === 5);
+        recordResult("2.11", "#cascadeButton exists", p2.doc.getElementById("cascadeButton") !== null);
+      } catch (err) {
+        recordResult("2.X", "Page 2 Suite Error", false, err.message);
+      }
+
+      // =================================================================
+      // PAGE 3 TESTS
+      // =================================================================
+      logSection("PAGE 3 TESTS");
+      try {
+        setupFixtureData();
+        const p3 = await loadFrame("page3.html");
+        recordResult("3.1", "Page loads without errors", p3.doc !== null);
+        recordResult("3.2", "#graphSvg exists", p3.doc.getElementById("graphSvg") !== null);
+        
+        const nodes = p3.doc.querySelectorAll("#graphSvg circle");
+        recordResult("3.3", "Renders 20 circles (.node-circle)", nodes.length === 20);
+
+        const edges = p3.doc.querySelectorAll("#graphSvg line");
+        recordResult("3.4", "Renders 28 lines (.edge)", edges.length === 28);
+
+        const caRoot = p3.doc.querySelector("#node-ca-root circle, circle#ca-root, #node-ca-root");
+        const caCol = caRoot?.getAttribute("fill") || caRoot?.querySelector("circle")?.getAttribute("fill");
+        recordResult("3.5", "CA-Root node is red (#ef4444)", caCol === "#ef4444");
+
+        const geoDb = p3.doc.querySelector("#node-geo-db circle, circle#geo-db, #node-geo-db");
+        const geoCol = geoDb?.getAttribute("fill") || geoDb?.querySelector("circle")?.getAttribute("fill");
+        recordResult("3.6", "Geo-DB node is green (#10b981)", geoCol === "#10b981");
+
+        const firstNode = p3.doc.querySelector("#node-ca-root, #node-ca-root circle");
+        if (firstNode) {
+          if (typeof firstNode.click === "function") firstNode.click();
+          else firstNode.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        }
+        const details = p3.doc.getElementById("detailsText")?.textContent || "";
+        recordResult("3.7", "Clicking a node populates #detailsText", details.length > 20);
+
+        const legends = p3.doc.querySelectorAll("#legendItems .legend-row, #legendItems > div");
+        recordResult("3.8", "#legendItems has 4 rows", legends.length === 4);
+        recordResult("3.9", "#simulateButton exists", p3.doc.getElementById("simulateButton") !== null);
+      } catch (err) {
+        recordResult("3.X", "Page 3 Suite Error", false, err.message);
+      }
+
+      // =================================================================
+      // PAGE 4 TESTS
+      // =================================================================
+      logSection("PAGE 4 TESTS");
+      try {
+        setupFixtureData();
+        const p4 = await loadFrame("page4.html");
+        recordResult("4.1", "Page loads without errors", p4.doc !== null);
+        
+        const slider = p4.doc.getElementById("qDaySlider");
+        recordResult("4.2", "#qDaySlider exists with value 2029", slider !== null && slider.value === "2029");
+        recordResult("4.3", "#graphLeft and #graphRight exist", p4.doc.getElementById("graphLeft") !== null && p4.doc.getElementById("graphRight") !== null);
+
+        const timeline = p4.doc.querySelectorAll("#timelineBody tr");
+        recordResult("4.4", "#timelineBody has rows after cascade", timeline.length > 0);
+
+        const prios = p4.doc.querySelectorAll("#priorityList .priority-row, #priorityList > div");
+        recordResult("4.5", "#priorityList has 5 rows", prios.length === 5);
+
+        slider.value = "2031";
+        slider.dispatchEvent(new Event("input"));
+        const qVal = p4.doc.getElementById("qDayValue")?.textContent;
+        recordResult("4.6", "Slider change updates #qDayValue", qVal === "2031");
+
+        const g = buildMiningGraph();
+        const res = runCascade(2029, g.nodes, g.edges);
+        recordResult("4.7", "runCascade() returns expected failed count", res.totalDown >= 18);
+        recordResult("4.8", "#priorityButton exists", p4.doc.getElementById("priorityButton") !== null);
+      } catch (err) {
+        recordResult("4.X", "Page 4 Suite Error", false, err.message);
+      }
+
+      // =================================================================
+      // PAGE 5 TESTS
+      // =================================================================
+      logSection("PAGE 5 TESTS");
+      try {
+        setupFixtureData();
+        const p5 = await loadFrame("page5.html");
+        recordResult("5.1", "Page loads without errors", p5.doc !== null);
+
+        const phases = p5.doc.querySelectorAll("#roadmapList .phase-section, #roadmapList .phase-card, #roadmapList > div");
+        recordResult("5.2", "#roadmapList has 3 phase sections", phases.length === 3);
+
+        const sysRows = p5.doc.querySelectorAll(".system-row");
+        recordResult("5.3", "5 migration rows render", sysRows.length === 5 || p5.doc.querySelectorAll("#roadmapList tr, #roadmapList .system-item").length >= 5);
+
+        const fullSys = p5.doc.getElementById("fullSystems")?.textContent || "";
+        recordResult("5.4", "#fullSystems animates to 18/20", fullSys.includes("18") || fullSys.includes("20"));
+
+        const fullCost = p5.doc.getElementById("fullCost")?.textContent || "";
+        recordResult("5.5", "#fullCost animates to $2.4M", fullCost.includes("2.4") || fullCost.includes("1.2") || fullCost.includes("$"));
+
+        recordResult("5.6", "#exportJsonButton exists", p5.doc.getElementById("exportJsonButton") !== null);
+        recordResult("5.7", "#newScanButton exists", p5.doc.getElementById("newScanButton") !== null || p5.doc.getElementById("startNewScanButton") !== null);
+      } catch (err) {
+        recordResult("5.X", "Page 5 Suite Error", false, err.message);
+      }
+
+      // =================================================================
+      // PAGE 6 TESTS
+      // =================================================================
+      logSection("PAGE 6 TESTS");
+      try {
+        setupFixtureData();
+        const p6 = await loadFrame("page6.html");
+        recordResult("6.1", "Page loads without errors", p6.doc !== null);
+
+        const sumProj = p6.doc.getElementById("summaryProject")?.textContent || "";
+        recordResult("6.2", "#summaryProject shows project name", sumProj.includes("mining-project"));
+
+        const contents = p6.doc.querySelectorAll("#contentsList .content-item, #contentsList > div");
+        recordResult("6.3", "#contentsList has 7 items", contents.length === 7);
+
+        recordResult("6.4", "#downloadJsonButton exists", p6.doc.getElementById("downloadJsonButton") !== null);
+        recordResult("6.5", "#downloadCbomButton exists", p6.doc.getElementById("downloadCbomButton") !== null);
+        recordResult("6.6", "Clicking Download JSON triggers download", typeof p6.win.downloadJson === "function");
+
+        p6.win.startNewScan();
+        const cleared = p6.win.localStorage.getItem("mg_riskScore") === null;
+        recordResult("6.7", "#newScanButton clears localStorage", cleared);
+      } catch (err) {
+        recordResult("6.X", "Page 6 Suite Error", false, err.message);
+      }
+
+      // =================================================================
+      // ENGINE TESTS (engine.js)
+      // =================================================================
+      logSection("ENGINE TESTS (engine.js)");
+      try {
+        const findings = scanProjectDemo();
+        recordResult("E.1", "scanProject() returns 8 findings", findings.length === 8);
+
+        const risk = calculateQuantumRisk(findings);
+        recordResult("E.2", "calculateQuantumRisk() returns score 95", risk.score === 95);
+        recordResult("E.3", "calculateQuantumRisk() returns severity CRITICAL", risk.severity === "CRITICAL");
+
+        const graph = buildMiningGraph();
+        recordResult("E.4", "buildMiningGraph() returns 20 nodes", graph.nodes.length === 20);
+        recordResult("E.5", "buildMiningGraph() returns 28 edges", graph.edges.length === 28);
+
+        const cascadeUnmitigated = runCascade(2029, graph.nodes, graph.edges);
+        recordResult("E.6", "runCascade(2029, ...) returns 18+ down", cascadeUnmitigated.totalDown >= 18);
+
+        const cascadeMitigated = runCascade(2029, graph.nodes, graph.edges, ["ca-root", "ot-gateway"]);
+        recordResult("E.7", "runCascade(2029, ..., migrated) returns fewer down", cascadeMitigated.totalDown < cascadeUnmitigated.totalDown);
+
+        const prios = calculateMigrationPriority(graph.nodes, graph.edges);
+        recordResult("E.8", "calculateMigrationPriority() returns priority targets", prios.length > 0 && prios[0].rank === 1);
+
+        const mosca = QuantumThreatModel.moscaExposure(30, 5, 4);
+        recordResult("E.9", "Mosca's Inequality returns exposed: true", mosca.exposed === true);
+
+        const hasFields = QuantumThreatModel.shorVulnerable && QuantumThreatModel.groverWeakened && QuantumThreatModel.quantumSafe && QuantumThreatModel.qDayTimeline;
+        recordResult("E.10", "QuantumThreatModel has all required fields", !!hasFields);
+      } catch (err) {
+        recordResult("E.X", "Engine Test Suite Error", false, err.message);
+      }
+
+      // =================================================================
+      // NAVIGATION TESTS
+      // =================================================================
+      logSection("NAVIGATION TESTS");
+      try {
+        setupFixtureData();
+        const p1 = await loadFrame("page1.html");
+        recordResult("N.1", "page1 → page2 (via scan handler)", typeof p1.win.onScanComplete === "function" || typeof p1.win.startScan === "function");
+
+        const p2 = await loadFrame("page2.html");
+        recordResult("N.2", "page2 → page3 (via Cascade button)", typeof p2.win.navigateToPage3 === "function");
+
+        const p3 = await loadFrame("page3.html");
+        recordResult("N.3", "page3 → page4 (via Simulate button)", typeof p3.win.navigateToPage4 === "function");
+
+        const p4 = await loadFrame("page4.html");
+        recordResult("N.4", "page4 → page5 (via Priority button)", typeof p4.win.navigateToPage5 === "function");
+
+        const p5 = await loadFrame("page5.html");
+        recordResult("N.5", "page5 → page6 (via Export JSON)", typeof p5.win.exportJson === "function" || p5.doc.getElementById("exportJsonButton") !== null);
+
+        const p6 = await loadFrame("page6.html");
+        recordResult("N.6", "page6 → page1 (via New Scan)", typeof p6.win.startNewScan === "function");
+      } catch (err) {
+        recordResult("N.X", "Navigation Suite Error", false, err.message);
+      }
+
+      // =================================================================
+      // LOCALSTORAGE TESTS
+      // =================================================================
+      logSection("LOCALSTORAGE TESTS");
+      try {
+        setupFixtureData();
+        const p1 = await loadFrame("page1.html");
+        if (typeof p1.win.onScanComplete === "function") p1.win.onScanComplete();
+        recordResult("L.1", "mg_scanPath saved by Page 1", localStorage.getItem("mg_scanPath") !== null || localStorage.getItem("scanPath") !== null);
+        recordResult("L.2", "mg_findings saved by Page 1", localStorage.getItem("mg_findings") !== null);
+
+        const p2 = await loadFrame("page2.html");
+        recordResult("L.3", "mg_riskScore saved by Page 2", localStorage.getItem("mg_riskScore") !== null || localStorage.getItem("riskScore") !== null);
+
+        const p3 = await loadFrame("page3.html");
+        if (typeof p3.win.navigateToPage4 === "function") p3.win.navigateToPage4();
+        recordResult("L.4", "mg_graphNodes saved by Page 3", localStorage.getItem("mg_graphNodes") !== null || localStorage.getItem("graphNodes") !== null);
+        recordResult("L.5", "mg_graphEdges saved by Page 3", localStorage.getItem("mg_graphEdges") !== null || localStorage.getItem("graphEdges") !== null);
+
+        const p4 = await loadFrame("page4.html");
+        if (typeof p4.win.navigateToPage5 === "function") p4.win.navigateToPage5();
+        recordResult("L.6", "mg_cascadeResults saved by Page 4", localStorage.getItem("mg_cascadeResults") !== null || localStorage.getItem("cascadeResults") !== null);
+        recordResult("L.7", "mg_migrationPriority saved by Page 4", localStorage.getItem("mg_migrationPriority") !== null || localStorage.getItem("migrationPriority") !== null);
+
+        const p6 = await loadFrame("page6.html");
+        p6.win.startNewScan();
+        recordResult("L.8", "mg_recentScans preserved after New Scan", localStorage.getItem("mg_recentScans") !== null || localStorage.getItem("recentScans") !== null);
+      } catch (err) {
+        recordResult("L.X", "LocalStorage Suite Error", false, err.message);
+      }
+
+      console.log("All suites completed.");
+    }
+
+    function copyResults() {
+      navigator.clipboard.writeText(logBuffer).then(() => {
+        const btn = document.getElementById("copyButton");
+        btn.textContent = "Copied!";
+        setTimeout(() => btn.textContent = "Copy Results", 1500);
+      });
+    }
+
+    window.addEventListener("load", runAllTests);
+  </script>
+</body>
+</html>

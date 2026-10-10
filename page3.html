@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MineGuard — Dependency Graph</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --card: #111827;
+      --border: #1f2937;
+      --text: #f9fafb;
+      --gray: #9ca3af;
+      --text-muted: #9ca3af;
+      --accent: #06b6d4;
+      --accent-hover: #22d3ee;
+      --critical: #ef4444;
+      --high: #f59e0b;
+      --medium: #06b6d4;
+      --safe: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+      line-height: 1.6;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    #modeToggle {
+      display: inline-flex;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .mode-btn {
+      background: transparent;
+      color: var(--gray);
+      border: none;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border-radius: 0;
+      box-shadow: none;
+      transition: all 150ms ease;
+    }
+
+    .mode-btn:hover {
+      transform: none;
+      box-shadow: none;
+      color: var(--text);
+    }
+
+    .mode-btn.active {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    header nav {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    header nav a {
+      color: var(--gray);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 150ms ease;
+    }
+
+    header nav a:hover {
+      color: var(--accent);
+    }
+
+    header nav a[href="page4.html"] {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    button {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 200ms ease;
+    }
+
+    button:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 20px rgba(6,182,212,0.3);
+    }
+
+    button.btn-secondary {
+      background: transparent;
+      color: var(--gray);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 13px;
+      box-shadow: none;
+    }
+
+    button.btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--text);
+      transform: none;
+      box-shadow: none;
+    }
+
+    button.btn-primary {
+      background: var(--accent);
+      color: #000;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 14px 28px;
+      border-radius: 6px;
+      width: 100%;
+      display: block;
+    }
+
+    button.btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-top: 24px;
+    }
+
+    .scan-info {
+      padding: 8px 0 20px 0;
+    }
+
+    .scan-info h1 {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .subtitle {
+      color: var(--gray);
+      font-size: 14px;
+    }
+
+    .graph-card {
+      padding: 16px;
+      overflow: hidden;
+      margin-top: 0;
+    }
+
+    #graphSvg {
+      width: 100%;
+      height: 520px;
+      display: block;
+      user-select: none;
+    }
+
+    /* Nodes */
+    .graph-node {
+      cursor: pointer;
+    }
+
+    .node-circle {
+      cursor: pointer;
+      transition: r 200ms ease, filter 200ms ease;
+      stroke-width: 2;
+      stroke: rgba(255,255,255,0.15);
+    }
+
+    .node-circle:hover {
+      filter: drop-shadow(0 0 12px currentColor);
+      stroke-width: 3;
+      stroke: rgba(255,255,255,0.6);
+    }
+
+    .node-circle.selected {
+      stroke: #fff;
+      stroke-width: 3;
+      filter: drop-shadow(0 0 16px currentColor);
+    }
+
+    .node-label {
+      font-size: 11px;
+      fill: var(--text);
+      text-anchor: middle;
+      pointer-events: none;
+      font-weight: 600;
+    }
+
+    .node-algo {
+      font-size: 9px;
+      fill: var(--gray);
+      text-anchor: middle;
+      pointer-events: none;
+    }
+
+    /* Edges */
+    .edge {
+      stroke: #374151;
+      stroke-width: 1.5;
+      fill: none;
+      transition: stroke 300ms, stroke-width 300ms;
+    }
+
+    .edge.highlight {
+      stroke: var(--accent);
+      stroke-width: 2.5;
+    }
+
+    /* Legend & Details Side by Side */
+    .legend-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 24px;
+    }
+
+    .legend-card, .details-card {
+      margin-top: 0;
+    }
+
+    .legend-card h3, .details-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 14px;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--gray);
+    }
+
+    .legend-row:last-child {
+      border-bottom: none;
+    }
+
+    .legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .details-empty {
+      color: var(--gray);
+      font-style: italic;
+      padding: 20px 0;
+      text-align: center;
+    }
+
+    .details-content div {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .details-content div:last-child {
+      border-bottom: none;
+    }
+
+    .details-content strong {
+      color: var(--text);
+    }
+
+    .details-label {
+      color: var(--gray);
+      display: inline-block;
+      width: 140px;
+    }
+
+    .details-critical { color: var(--critical); font-weight: 600; }
+    .details-high { color: var(--high); font-weight: 600; }
+    .details-medium { color: var(--medium); font-weight: 600; }
+    .details-safe { color: var(--safe); font-weight: 600; }
+
+    /* CTA */
+    .cta-container {
+      text-align: center;
+      margin: 36px 0;
+    }
+
+    /* Hover tooltip */
+    .tooltip {
+      position: absolute;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 150ms ease;
+      z-index: 1000;
+      white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+
+    .tooltip.show {
+      opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+      .legend-details { grid-template-columns: 1fr; }
+      #graphSvg { height: 400px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <div class="logo">MineGuard</div>
+      
+    </div>
+    <nav>
+      <a href="page2.html">← Back</a>
+      <button id="exportButton" class="btn-secondary" type="button">Export</button>
+      <a href="page4.html">Simulate →</a>
+    </nav>
+  </header>
+
+  <main id="app">
+    <!-- TITLE -->
+    <section class="scan-info">
+      <h1 id="pageTitle">Dependency Graph: mining-project</h1>
+      <p class="subtitle" id="graphInfo">20 systems · 28 connections · 4 critical</p>
+    </section>
+
+    <!-- GRAPH -->
+    <section class="card graph-card">
+      <svg id="graphSvg" viewBox="0 0 800 520" preserveAspectRatio="xMidYMid meet"></svg>
+    </section>
+
+    <!-- LEGEND + DETAILS SIDE BY SIDE -->
+    <section class="legend-details">
+      <div class="card legend-card">
+        <h3>Legend</h3>
+        <div id="legendItems"></div>
+      </div>
+
+      <div class="card details-card">
+        <h3>Node Details</h3>
+        <div id="detailsText" class="details-empty">
+          Click any node to see details
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <div class="cta-container">
+      <button id="simulateButton" class="btn-primary" type="button">
+        Simulate Quantum Attack →
+      </button>
+    </div>
+  </main>
+
+  <footer style="margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border); text-align: center; color: var(--gray); font-size: 13px;">
+    MineGuard is for educational and planning purposes only.
+  </footer>
+
+  <script src="engine.js"></script>
+  <script src="engine-real.js"></script>
+  <script>
+    let graphNodes = [];
+    let graphEdges = [];
+
+    function isLocalStorageAvailable() {
+      try {
+        const k = "__test__";
+        window.localStorage.setItem(k, k);
+        window.localStorage.removeItem(k);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function getDefaultGraph() {
+      const nodes = [
+        { id: "ca-root", label: "CA-Root", algorithm: "RSA-4096", criticality: "CRITICAL", x: 400, y: 50 },
+        { id: "auth-svc", label: "Auth-Svc", algorithm: "RSA-2048", criticality: "HIGH", x: 250, y: 150 },
+        { id: "dns-svc", label: "DNS-Svc", algorithm: "ECDSA", criticality: "HIGH", x: 550, y: 150 },
+        { id: "ot-gateway", label: "OT-Gateway", algorithm: "RSA-2048", criticality: "CRITICAL", x: 400, y: 250 },
+        { id: "ventilation", label: "Ventilation", algorithm: "RSA-2048", criticality: "CRITICAL", x: 200, y: 350 },
+        { id: "gas-monitor", label: "Gas-Monitor", algorithm: "RSA-2048", criticality: "HIGH", x: 400, y: 350 },
+        { id: "haulage", label: "Haulage", algorithm: "ECDSA", criticality: "CRITICAL", x: 600, y: 350 },
+        { id: "geo-db", label: "Geo-DB", algorithm: "AES-256", criticality: "SAFE", x: 400, y: 450 },
+        { id: "email", label: "Email", algorithm: "RSA-2048", criticality: "MEDIUM", x: 100, y: 150 },
+        { id: "hr-portal", label: "HR-Portal", algorithm: "RSA-2048", criticality: "MEDIUM", x: 700, y: 150 },
+        { id: "finance", label: "Finance", algorithm: "ECDSA", criticality: "HIGH", x: 100, y: 250 },
+        { id: "scada-historian", label: "SCADA-Historian", algorithm: "RSA-2048", criticality: "HIGH", x: 700, y: 250 },
+        { id: "drilling-sensors", label: "Drilling-Sensors", algorithm: "ECDSA", criticality: "MEDIUM", x: 100, y: 350 },
+        { id: "contract-archive", label: "Contract-Archive", algorithm: "RSA-2048", criticality: "MEDIUM", x: 700, y: 350 },
+        { id: "vpn-gateway", label: "VPN-Gateway", algorithm: "RSA-2048", criticality: "HIGH", x: 250, y: 450 },
+        { id: "backup-system", label: "Backup-System", algorithm: "RSA-2048", criticality: "MEDIUM", x: 550, y: 450 },
+        { id: "customer-db", label: "Customer-DB", algorithm: "AES-256", criticality: "SAFE", x: 100, y: 450 },
+        { id: "safety-system", label: "Safety-System", algorithm: "AES-256", criticality: "SAFE", x: 700, y: 450 },
+        { id: "iot-sensors", label: "IoT-Sensors", algorithm: "ECDSA", criticality: "MEDIUM", x: 250, y: 50 },
+        { id: "reporting", label: "Reporting", algorithm: "RSA-2048", criticality: "MEDIUM", x: 550, y: 50 }
+      ];
+
+      const edges = [
+        { from: "ca-root", to: "auth-svc" },
+        { from: "ca-root", to: "dns-svc" },
+        { from: "ca-root", to: "ot-gateway" },
+        { from: "ca-root", to: "vpn-gateway" },
+        { from: "auth-svc", to: "ot-gateway" },
+        { from: "auth-svc", to: "email" },
+        { from: "auth-svc", to: "hr-portal" },
+        { from: "dns-svc", to: "ot-gateway" },
+        { from: "dns-svc", to: "finance" },
+        { from: "dns-svc", to: "scada-historian" },
+        { from: "ot-gateway", to: "ventilation" },
+        { from: "ot-gateway", to: "gas-monitor" },
+        { from: "ot-gateway", to: "haulage" },
+        { from: "ot-gateway", to: "drilling-sensors" },
+        { from: "ot-gateway", to: "contract-archive" },
+        { from: "ventilation", to: "geo-db" },
+        { from: "gas-monitor", to: "geo-db" },
+        { from: "haulage", to: "geo-db" },
+        { from: "vpn-gateway", to: "backup-system" },
+        { from: "backup-system", to: "customer-db" },
+        { from: "backup-system", to: "safety-system" },
+        { from: "iot-sensors", to: "ca-root" },
+        { from: "reporting", to: "ca-root" },
+        { from: "email", to: "geo-db" },
+        { from: "hr-portal", to: "geo-db" },
+        { from: "finance", to: "geo-db" },
+        { from: "scada-historian", to: "geo-db" },
+        { from: "contract-archive", to: "geo-db" }
+      ];
+
+      return { nodes, edges };
+    }
+
+    function init() {
+      console.log("Page 3 loaded");
+
+      // Mode toggle initialization
+      const currentMode = (isLocalStorageAvailable() && localStorage.getItem("mg_mode")) || "real";
+      if (typeof setMode === "function") setMode(currentMode);
+      document.querySelectorAll(".mode-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.getAttribute("data-mode") === currentMode);
+        btn.addEventListener("click", () => {
+          const m = btn.getAttribute("data-mode");
+          if (isLocalStorageAvailable()) localStorage.setItem("mg_mode", m);
+          if (typeof setMode === "function") setMode(m);
+          document.querySelectorAll(".mode-btn").forEach(b => {
+            b.classList.toggle("active", b.getAttribute("data-mode") === m);
+          });
+        });
+      });
+
+      const scanPath = (isLocalStorageAvailable() && (localStorage.getItem("mg_scanPath") || localStorage.getItem("scanPath"))) || "/path/to/mining-project";
+      const projectName = scanPath.split("/").pop() || "mining-project";
+      const pageTitleEl = document.getElementById("pageTitle");
+      if (pageTitleEl) {
+        pageTitleEl.textContent = "Dependency Graph: " + projectName;
+      }
+
+      // Load or build graph
+      let storedNodes = null;
+      let storedEdges = null;
+
+      if (isLocalStorageAvailable()) {
+        const rawN = localStorage.getItem("graphNodes") || localStorage.getItem("mg_graphNodes");
+        if (rawN) {
+          try {
+            const parsedN = JSON.parse(rawN);
+            if (Array.isArray(parsedN) && parsedN.length > 0) storedNodes = parsedN;
+          } catch (e) {
+            console.log("Invalid graph nodes JSON");
+          }
+        }
+
+        const rawE = localStorage.getItem("graphEdges") || localStorage.getItem("mg_graphEdges");
+        if (rawE) {
+          try {
+            const parsedE = JSON.parse(rawE);
+            if (Array.isArray(parsedE) && parsedE.length > 0) storedEdges = parsedE;
+          } catch (e) {
+            console.log("Invalid graph edges JSON");
+          }
+        }
+      }
+
+      if (storedNodes && storedEdges) {
+        graphNodes = storedNodes;
+        graphEdges = storedEdges;
+      } else {
+        const generated = (typeof buildMiningGraph === "function") ? buildMiningGraph() : getDefaultGraph();
+        graphNodes = generated.nodes || getDefaultGraph().nodes;
+        graphEdges = generated.edges || getDefaultGraph().edges;
+      }
+
+      const criticalCount = graphNodes.filter(n => n.criticality === "CRITICAL").length;
+      const graphInfo = document.getElementById("graphInfo");
+      if (graphInfo) {
+        graphInfo.textContent = `${graphNodes.length} systems · ${graphEdges.length} connections · ${criticalCount} critical`;
+      }
+
+      // Save graphNodes & graphEdges to localStorage immediately on page load
+      if (isLocalStorageAvailable()) {
+        try {
+          localStorage.setItem("graphNodes", JSON.stringify(graphNodes));
+          localStorage.setItem("graphEdges", JSON.stringify(graphEdges));
+          localStorage.setItem("mg_graphNodes", JSON.stringify(graphNodes));
+          localStorage.setItem("mg_graphEdges", JSON.stringify(graphEdges));
+          localStorage.setItem("criticalCount", String(criticalCount));
+          localStorage.setItem("mg_criticalCount", String(criticalCount));
+        } catch (e) {
+          console.warn("localStorage save error:", e);
+        }
+      }
+
+      renderGraph();
+      renderLegend();
+      attachListeners();
+
+      console.log(`Graph rendered: ${graphNodes.length} nodes, ${graphEdges.length} edges`);
+    }
+
+    function renderGraph() {
+      const svg = document.getElementById("graphSvg");
+      if (!svg) return;
+      svg.innerHTML = "";
+
+      const nodeMap = {};
+      graphNodes.forEach(n => { nodeMap[n.id] = n; });
+
+      // EDGES FIRST (behind nodes)
+      const edgesGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      edgesGroup.setAttribute("class", "edges-layer");
+
+      graphEdges.forEach(edge => {
+        const from = nodeMap[edge.from];
+        const to = nodeMap[edge.to];
+        if (!from || !to) return;
+
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", from.x);
+        line.setAttribute("y1", from.y);
+        line.setAttribute("x2", to.x);
+        line.setAttribute("y2", to.y);
+        line.setAttribute("stroke", "#374151");
+        line.setAttribute("stroke-width", "1.5");
+        line.setAttribute("class", "edge");
+        line.setAttribute("data-from", edge.from);
+        line.setAttribute("data-to", edge.to);
+        edgesGroup.appendChild(line);
+      });
+      svg.appendChild(edgesGroup);
+
+      // NODES
+      const nodesGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      nodesGroup.setAttribute("class", "nodes-layer");
+
+      graphNodes.forEach(node => {
+        const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        group.setAttribute("id", "node-" + node.id);
+        group.setAttribute("data-node-id", node.id);
+        group.setAttribute("class", "graph-node");
+
+        const color = getNodeColor(node.criticality);
+
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", node.x);
+        circle.setAttribute("cy", node.y);
+        circle.setAttribute("r", 22);
+        circle.setAttribute("fill", color);
+        circle.setAttribute("stroke", "#1f2937");
+        circle.setAttribute("stroke-width", "2");
+        circle.setAttribute("class", "node-circle");
+        circle.style.color = color;
+        group.appendChild(circle);
+
+        const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        label.setAttribute("x", node.x);
+        label.setAttribute("y", node.y + 36);
+        label.setAttribute("class", "node-label");
+        label.textContent = node.label;
+        group.appendChild(label);
+
+        const algo = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        algo.setAttribute("x", node.x);
+        algo.setAttribute("y", node.y + 48);
+        algo.setAttribute("class", "node-algo");
+        algo.textContent = node.algorithm;
+        group.appendChild(algo);
+
+        const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+        title.textContent = `${node.label} (${node.algorithm}) — ${node.criticality}`;
+        group.appendChild(title);
+
+        // Click handlers (both group and circle)
+        group.addEventListener("click", () => showNodeDetails(node.id));
+        circle.addEventListener("click", (e) => {
+          e.stopPropagation();
+          showNodeDetails(node.id);
+        });
+
+        // Hover handlers
+        group.addEventListener("mouseenter", (e) => showTooltip(e, node));
+        group.addEventListener("mouseleave", hideTooltip);
+
+        nodesGroup.appendChild(group);
+      });
+      svg.appendChild(nodesGroup);
+    }
+
+    function getNodeColor(criticality) {
+      switch (criticality) {
+        case "CRITICAL": return "#ef4444";
+        case "HIGH": return "#f59e0b";
+        case "MEDIUM": return "#06b6d4";
+        case "SAFE": return "#10b981";
+        default: return "#06b6d4";
+      }
+    }
+
+    function getCriticalityClass(criticality) {
+      return "details-" + (criticality ? criticality.toLowerCase() : "medium");
+    }
+
+    function renderLegend() {
+      const legend = [
+        { color: "#ef4444", label: "Critical (RSA-4096) — Must migrate first" },
+        { color: "#f59e0b", label: "High (RSA-2048/ECDSA) — Migrate soon" },
+        { color: "#06b6d4", label: "Medium (RSA-2048) — Plan migration" },
+        { color: "#10b981", label: "Safe (AES-256) — No action needed" }
+      ];
+
+      const container = document.getElementById("legendItems");
+      if (!container) return;
+
+      container.innerHTML = legend.map(l => `
+        <div class="legend-row">
+          <span class="legend-dot" style="background:${l.color};"></span>
+          <span>${l.label}</span>
+        </div>
+      `).join("");
+    }
+
+    function showNodeDetails(nodeId) {
+      const node = graphNodes.find(n => n.id === nodeId);
+      if (!node) return;
+
+      console.log("Node clicked:", nodeId);
+
+      // Highlight selected
+      document.querySelectorAll(".node-circle").forEach(c => c.classList.remove("selected"));
+      const selectedG = document.getElementById("node-" + nodeId);
+      if (selectedG) {
+        const c = selectedG.querySelector("circle");
+        if (c) c.classList.add("selected");
+      }
+
+      // Highlight connected edges
+      document.querySelectorAll(".edge").forEach(e => e.classList.remove("highlight"));
+      document.querySelectorAll(`.edge[data-from="${nodeId}"], .edge[data-to="${nodeId}"]`)
+        .forEach(e => e.classList.add("highlight"));
+
+      const dependencies = graphEdges.filter(e => e.from === nodeId).length;
+      const dependents = graphEdges.filter(e => e.to === nodeId).length;
+
+      let impact, impactClass;
+      if (dependents > 5) { impact = "HIGH"; impactClass = "details-critical"; }
+      else if (dependents > 2) { impact = "MEDIUM"; impactClass = "details-high"; }
+      else { impact = "LOW"; impactClass = "details-safe"; }
+
+      const details = document.getElementById("detailsText");
+      if (details) {
+        details.className = "details-content";
+        details.innerHTML = `
+          <div><span class="details-label">Selected:</span> <strong>${node.label}</strong></div>
+          <div><span class="details-label">Algorithm:</span> ${node.algorithm}</div>
+          <div><span class="details-label">Criticality:</span> 
+            <span class="${getCriticalityClass(node.criticality)}">${node.criticality}</span>
+          </div>
+          <div><span class="details-label">Dependencies:</span> ${dependencies}</div>
+          <div><span class="details-label">Dependents:</span> ${dependents}</div>
+          <div><span class="details-label">Cascade Impact:</span> 
+            <span class="${impactClass}">${impact}</span>
+          </div>
+        `;
+      }
+    }
+
+    function showTooltip(e, node) {
+      let tooltip = document.getElementById("graph-tooltip");
+      if (!tooltip) {
+        tooltip = document.createElement("div");
+        tooltip.id = "graph-tooltip";
+        tooltip.className = "tooltip";
+        document.body.appendChild(tooltip);
+      }
+      tooltip.textContent = `${node.label} · ${node.algorithm} (${node.criticality})`;
+      tooltip.style.left = (e.pageX + 12) + "px";
+      tooltip.style.top = (e.pageY - 30) + "px";
+      tooltip.classList.add("show");
+    }
+
+    function hideTooltip() {
+      const tooltip = document.getElementById("graph-tooltip");
+      if (tooltip) tooltip.classList.remove("show");
+    }
+
+    function navigateToPage4() {
+      if (isLocalStorageAvailable()) {
+        try {
+          localStorage.setItem("graphNodes", JSON.stringify(graphNodes));
+          localStorage.setItem("graphEdges", JSON.stringify(graphEdges));
+          localStorage.setItem("mg_graphNodes", JSON.stringify(graphNodes));
+          localStorage.setItem("mg_graphEdges", JSON.stringify(graphEdges));
+          const criticalCount = graphNodes.filter(n => n.criticality === "CRITICAL").length;
+          localStorage.setItem("criticalCount", String(criticalCount));
+          localStorage.setItem("mg_criticalCount", String(criticalCount));
+        } catch (e) {
+          console.warn("Storage save error:", e);
+        }
+      }
+      console.log("Navigating to page4.html");
+      window.location.href = "page4.html";
+    }
+    window.navigateToPage4 = navigateToPage4;
+
+    function attachListeners() {
+      const simBtn = document.getElementById("simulateButton");
+      if (simBtn) {
+        simBtn.addEventListener("click", navigateToPage4);
+      }
+
+      const exportBtn = document.getElementById("exportButton");
+      if (exportBtn) {
+        exportBtn.addEventListener("click", () => {
+          console.log("Export clicked");
+        });
+      }
+    }
+
+    window.addEventListener("load", init);
+  </script>
+</body>
+</html>
